@@ -1,0 +1,129 @@
+// Public Supabase configuration. The publishable key is intended for browser use.
+// Keep RLS enabled. NEVER put service_role or private API secrets in this file.
+const SUPABASE_URL = "https://zdnlwgqodtiieewxzoda.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KgimutZrYi9tI4ixcbaTvA_0KwxihZ7";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+const $ = (id) => document.getElementById(id);
+const show = (id, yes=true) => $(id).classList.toggle("hidden", !yes);
+const msg = (id, text, error=false) => { $(id).textContent=text; $(id).classList.toggle("error",error); };
+const fmt = (n) => `${Number(n||0).toFixed(8)} USDT`;
+let currentUser = null, currentProfile = null, currentMember = null;
+
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); b.classList.add("active");
+  show("loginForm",b.dataset.tab==="login"); show("signupForm",b.dataset.tab==="signup"); msg("authMsg","");
+}));
+
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault(); msg("authMsg","Miditra...");
+  const {error}=await db.auth.signInWithPassword({email:$("loginEmail").value.trim(),password:$("loginPassword").value});
+  if(error) return msg("authMsg",error.message,true);
+  await boot();
+});
+$("signupForm").addEventListener("submit",async e=>{
+  e.preventDefault(); msg("authMsg","Mamorona kaonty...");
+  const full_name=$("fullName").value.trim();
+  const {data,error}=await db.auth.signUp({email:$("signupEmail").value.trim(),password:$("signupPassword").value,options:{data:{full_name}}});
+  if(error) return msg("authMsg",error.message,true);
+  if(data.session){
+    await boot();
+  } else {
+    msg("authMsg","Jereo ny email-nao hanamafisana ny fisoratana anarana. Rehefa voamarina dia midira.");
+  }
+});
+$("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();currentUser=null;show("appView",false);show("authView",true);show("logoutBtn",false);});
+$("refreshBtn").addEventListener("click",loadMemberData);
+$("adminRefresh").addEventListener("click",loadAdminData);
+
+async function boot(){
+  const {data:{user}}=await db.auth.getUser();
+  if(!user){show("authView",true);show("appView",false);show("logoutBtn",false);return;}
+  currentUser=user;
+  const {data:profile,error:pErr}=await db.from("profiles").select("id,full_name,email,role").eq("id",user.id).single();
+  if(pErr){msg("globalMsg","Tsy afaka mamaky profil: "+pErr.message,true);return;}
+  currentProfile=profile;
+  const {data:member}=await db.from("members").select("id,full_name,phone,status").eq("auth_user_id",user.id).maybeSingle();
+  currentMember=member;
+  show("authView",false);show("appView",true);show("logoutBtn",true);
+  $("welcomeName").textContent=profile.full_name||user.email;
+  $("welcomeEmail").textContent=user.email;
+  $("rolePill").textContent=profile.role==="admin"?"ADMIN":"MEMBRE";
+  show("adminView",profile.role==="admin");
+  await loadMemberData();
+  if(profile.role==="admin") await loadAdminData();
+}
+async function loadMemberData(){
+  if(!currentUser)return;
+  const {data:member}=await db.from("members").select("id").eq("auth_user_id",currentUser.id).maybeSingle();
+  currentMember=member;
+  if(member){
+    const {data:b}=await db.from("member_balances").select("savings_balance,commission_balance,reserved_savings,reserved_commission").eq("member_id",member.id).maybeSingle();
+    $("savings").textContent=fmt(b?.savings_balance);$("commission").textContent=fmt(b?.commission_balance);
+    $("reservedSavings").textContent="Voatokana: "+fmt(b?.reserved_savings);
+    $("reservedCommission").textContent="Voatokana: "+fmt(b?.reserved_commission);
+    const {data:d}=await db.from("deposit_requests").select("amount,status,tx_hash,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
+    renderTable("myDeposits",["Vola","Sata","TxID","Daty","Fanamarihana"],(d||[]).map(x=>[fmt(x.amount),x.status,x.tx_hash||"",date(x.created_at),x.admin_note||""]));
+    const {data:w}=await db.from("withdrawal_requests").select("amount,status,withdrawal_type,faucetpay_email,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
+    renderTable("myWithdrawals",["Vola","Karazana","Sata","FaucetPay","Daty","Fanamarihana"],(w||[]).map(x=>[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,date(x.created_at),x.admin_note||""]));
+  } else {
+    $("savings").textContent=fmt(0);$("commission").textContent=fmt(0);
+    renderTable("myDeposits",["Dépôt"],[]);renderTable("myWithdrawals",["Retrait"],[]);
+    msg("globalMsg","Tsy mbola mifandray amin'ny kaonty membre ny profil. Mifandraisa amin'ny Admin.",true);
+  }
+}
+function date(s){return s?new Date(s).toLocaleString():"";}
+function renderTable(target,heads,rows){
+  const el=$(target); if(!rows.length){el.innerHTML='<p class="muted">Tsy mbola misy angona.</p>';return;}
+  el.innerHTML="<table><thead><tr>"+heads.map(h=>`<th>${esc(h)}</th>`).join("")+"</tr></thead><tbody>"+rows.map(r=>"<tr>"+r.map(v=>`<td>${esc(String(v??""))}</td>`).join("")+"</tr>").join("")+"</tbody></table>";
+}
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+$("depositForm").addEventListener("submit",async e=>{
+  e.preventDefault(); if(!currentUser)return;
+  msg("globalMsg","Alefa ny fangatahana dépôt...");
+  const {data,error}=await db.rpc("submit_deposit_request",{p_amount:Number($("depositAmount").value),p_faucetpay_email:$("depositEmail").value.trim(),p_tx_hash:$("depositTx").value.trim()});
+  if(error)return msg("globalMsg",error.message,true);
+  e.target.reset();msg("globalMsg","Voaray ny fangatahana dépôt. Mbola miandry fanamarinana.");
+  await loadMemberData();
+});
+$("withdrawForm").addEventListener("submit",async e=>{
+  e.preventDefault(); if(!currentUser)return;
+  msg("globalMsg","Alefa ny fangatahana retrait...");
+  const {data,error}=await db.rpc("submit_withdrawal_request",{p_amount:Number($("withdrawAmount").value),p_faucetpay_email:$("withdrawEmail").value.trim(),p_withdrawal_type:$("withdrawType").value});
+  if(error)return msg("globalMsg",error.message,true);
+  e.target.reset();msg("globalMsg","Voaray ny fangatahana retrait. Ny vola dia voatokana mandra-pitsarana.");
+  await loadMemberData();
+});
+
+async function loadAdminData(){
+  const {data:d,error:de}=await db.from("deposit_requests").select("id,member_id,amount,status,tx_hash,faucetpay_email,created_at").order("created_at",{ascending:false});
+  if(de){msg("globalMsg","Dépôt admin: "+de.message,true);return;}
+  $("adminDeposits").innerHTML=tableWithActions(["Vola","Sata","TxID","Email FaucetPay","Daty"],(d||[]).map(x=>({id:x.id,status:x.status,values:[fmt(x.amount),x.status,x.tx_hash||"",x.faucetpay_email,date(x.created_at)]})), "deposit");
+  const {data:w,error:we}=await db.from("withdrawal_requests").select("id,member_id,amount,status,withdrawal_type,faucetpay_email,created_at").order("created_at",{ascending:false});
+  if(we){msg("globalMsg","Retrait admin: "+we.message,true);return;}
+  $("adminWithdrawals").innerHTML=tableWithActions(["Vola","Karazana","Sata","Email FaucetPay","Daty"],(w||[]).map(x=>({id:x.id,status:x.status,values:[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,date(x.created_at)]})),"withdrawal");
+  const {data:m,error:me}=await db.from("members").select("id,full_name,phone,status,created_at").order("created_at",{ascending:false});
+  if(me){msg("globalMsg","Membre admin: "+me.message,true);return;}
+  renderTable("adminMembers",["Anarana","Finday","Sata","Daty"],(m||[]).map(x=>[x.full_name||"",x.phone||"",x.status||"",date(x.created_at)]));
+}
+function tableWithActions(heads,rows,type){
+  if(!rows.length)return '<p class="muted">Tsy mbola misy fangatahana.</p>';
+  return "<table><thead><tr>"+heads.map(h=>`<th>${esc(h)}</th>`).join("")+"<th>Action</th></tr></thead><tbody>"+rows.map(r=>`<tr>${r.values.map(v=>`<td>${esc(String(v??""))}</td>`).join("")}<td>${r.status==="pending"?`<button class="action" data-action="approve" data-type="${type}" data-id="${r.id}">Ekena</button><button class="action reject" data-action="reject" data-type="${type}" data-id="${r.id}">Lavina</button>`:"—"}</td></tr>`).join("")+"</tbody></table>";
+}
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("button[data-action]");if(!b)return;
+  const decision=b.dataset.action;const type=b.dataset.type;const id=b.dataset.id;
+  let note="";
+  if(decision==="reject"){note=prompt("Antony handavana (tsy maintsy fenoina):")||"";if(!note.trim())return alert("Ilaina ny antony.");}
+  else if(!confirm("Hanova ny sata ho approved ve? Tsy midika izany fa voamarina na nalefa ny vola."))return;
+  const rpc=type==="deposit"?"review_deposit_request":"review_withdrawal_request";
+  const {error}=await db.rpc(rpc,{p_request_id:id,p_decision:decision==="approve"?"approved":"rejected",p_admin_note:note||null});
+  if(error){msg("globalMsg",error.message,true);return;}
+  msg("globalMsg","Voavaova ny sata fangatahana.");await loadAdminData();await loadMemberData();
+});
+
+db.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT"){show("appView",false);show("authView",true);show("logoutBtn",false);} });
+boot();
+
+if ("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));

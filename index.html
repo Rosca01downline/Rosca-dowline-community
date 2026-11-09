@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="mg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#102a43">
+  <meta name="description" content="ROSCA & DOWNLINE COMMUNITY - plateforme de membres et d'épargne">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <title>ROSCA & DOWNLINE COMMUNITY</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="logo">R</div><div><strong>ROSCA & DOWNLINE COMMUNITY</strong><small>Plateforme communautaire</small></div></div>
+  <button id="logoutBtn" class="btn ghost hidden">Hivoaka</button>
+</header>
+
+<main class="wrap">
+  <section id="authView" class="auth-grid">
+    <div class="intro">
+      <span class="eyebrow">TONGASOA</span>
+      <h1>Mitantana ny kaontinao<br><em>amin’ny fomba mazava.</em></h1>
+      <p>Midira na mamoròna kaonty mba hijerena ny mombamomba anao, ny épargne ary ny fangatahana.</p>
+      <div class="notice">Dingana voalohany: fampidirana kaonty sy fitantanana fangatahana. Ny fanamarinana sy fandefasana vola FaucetPay dia mbola mila fampifandraisana API azo antoka.</div>
+    </div>
+    <div class="panel auth-panel">
+      <div class="tabs"><button class="tab active" data-tab="login">Hiditra</button><button class="tab" data-tab="signup">Hisoratra</button></div>
+      <form id="loginForm">
+        <h2>Hiditra amin’ny kaonty</h2>
+        <label>Email<input type="email" id="loginEmail" required autocomplete="email"></label>
+        <label>Teny miafina<input type="password" id="loginPassword" required autocomplete="current-password"></label>
+        <button class="btn primary full" type="submit">Hiditra</button>
+      </form>
+      <form id="signupForm" class="hidden">
+        <h2>Mamorona kaonty</h2>
+        <label>Anarana feno<input id="fullName" required autocomplete="name"></label>
+        <label>Email<input type="email" id="signupEmail" required autocomplete="email"></label>
+        <label>Teny miafina (farafahakeliny 8)<input type="password" id="signupPassword" minlength="8" required autocomplete="new-password"></label>
+        <button class="btn primary full" type="submit">Hisoratra anarana</button>
+      </form>
+      <p id="authMsg" class="message" role="status"></p>
+    </div>
+  </section>
+
+  <section id="appView" class="hidden">
+    <div class="welcome"><div><span class="eyebrow">ESPACE MEMBRE</span><h1 id="welcomeName">Tongasoa</h1><p id="welcomeEmail"></p></div><span id="rolePill" class="pill">Membre</span></div>
+    <div class="stats">
+      <article class="stat"><span>Épargne</span><strong id="savings">0.00000000 USDT</strong><small id="reservedSavings">Voatokana: 0</small></article>
+      <article class="stat"><span>Commission</span><strong id="commission">0.00000000 USDT</strong><small id="reservedCommission">Voatokana: 0</small></article>
+    </div>
+
+    <div class="grid two">
+      <section class="panel">
+        <h2>Fangatahana dépôt</h2>
+        <p class="muted">USDT ihany. Ampidiro ny email FaucetPay sy ny Transaction ID (TxID).</p>
+        <form id="depositForm">
+          <label>Vola (USDT)<input id="depositAmount" type="number" min="0.00000001" step="0.00000001" required></label>
+          <label>Email FaucetPay<input id="depositEmail" type="email" required></label>
+          <label>Transaction ID (TxID)<input id="depositTx" required></label>
+          <button class="btn primary" type="submit">Handefa fangatahana</button>
+        </form>
+      </section>
+      <section class="panel">
+        <h2>Fangatahana retrait</h2>
+        <p class="muted">Alefa amin’ny email FaucetPay. Ny retrait épargne dia manana minimum 15 USDT.</p>
+        <form id="withdrawForm">
+          <label>Karazana retrait<select id="withdrawType"><option value="commission">Commission</option><option value="savings">Épargne (minimum 15 USDT)</option></select></label>
+          <label>Vola (USDT)<input id="withdrawAmount" type="number" min="0.00000001" step="0.00000001" required></label>
+          <label>Email FaucetPay<input id="withdrawEmail" type="email" required></label>
+          <button class="btn primary" type="submit">Hangataka retrait</button>
+        </form>
+      </section>
+    </div>
+
+    <section class="panel">
+      <div class="section-head"><h2>Ny fangatahako</h2><button class="btn ghost small" id="refreshBtn">Havaozy</button></div>
+      <h3>Dépôt</h3><div id="myDeposits" class="table-wrap"></div>
+      <h3>Retrait</h3><div id="myWithdrawals" class="table-wrap"></div>
+    </section>
+
+    <section id="adminView" class="panel hidden">
+      <div class="section-head"><div><span class="eyebrow">ADMINISTRATION</span><h2>Fitantanana</h2></div><button class="btn ghost small" id="adminRefresh">Havaozy</button></div>
+      <div class="admin-block"><h3>Fangatahana dépôt</h3><div id="adminDeposits" class="table-wrap"></div></div>
+      <div class="admin-block"><h3>Fangatahana retrait</h3><div id="adminWithdrawals" class="table-wrap"></div></div>
+      <div class="admin-block"><h3>Mpikambana</h3><div id="adminMembers" class="table-wrap"></div></div>
+      <p class="warning">Fampitandremana: ny fanekena dépôt eto dia manova ny sata ho “approved” fotsiny. Tsy manamarina TxID ary tsy mampiditra vola amin’ny épargne. Aza manamarina vola raha tsy efa voamarina amin’ny rafitra ofisialy.</p>
+    </section>
+  </section>
+  <p id="globalMsg" class="message" role="status"></p>
+</main>
+<footer>© ROSCA & DOWNLINE COMMUNITY · USDT</footer>
+<script src="app.js"></script>
+</body>
+</html>
