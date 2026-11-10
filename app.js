@@ -110,8 +110,8 @@ async function loadAdminData(){
 function renderMemberTable(members){
   const el=$("adminMembers");
   if(!members.length){el.innerHTML='<p class="muted">Tsy mbola misy mpikambana.</p>';return;}
-  el.innerHTML="<table><thead><tr><th>Anarana</th><th>Finday</th><th>Sata</th><th>Daty</th><th>Action</th></tr></thead><tbody>"+
-    members.map(x=>`<tr><td>${esc(x.full_name||"")}</td><td>${esc(x.phone||"")}</td><td>${esc(x.status||"")}</td><td>${esc(date(x.created_at))}</td><td>${x.status==="pending"?`<button class="action" data-action="activate-member" data-type="member" data-id="${x.id}">Activer</button>`:"—"}</td></tr>`).join("")+
+  el.innerHTML="<table><thead><tr><th>Anarana</th><th>Finday</th><th>Sata / Action</th><th>Daty</th></tr></thead><tbody>"+
+    members.map(x=>`<tr><td>${esc(x.full_name||"")}</td><td>${esc(x.phone||"")}</td><td><span>${esc(x.status||"")}</span> ${x.status==="pending"?`<button class="action" data-action="activate-member" data-type="member" data-id="${x.id}">Activer</button>`:"—"}</td><td>${esc(date(x.created_at))}</td></tr>`).join("")+
     "</tbody></table>";
 }
 function tableWithActions(heads,rows,type){
