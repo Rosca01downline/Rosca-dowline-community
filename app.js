@@ -105,7 +105,14 @@ async function loadAdminData(){
   $("adminWithdrawals").innerHTML=tableWithActions(["Vola","Karazana","Sata","Email FaucetPay","Daty"],(w||[]).map(x=>({id:x.id,status:x.status,values:[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,date(x.created_at)]})),"withdrawal");
   const {data:m,error:me}=await db.from("members").select("id,full_name,phone,status,created_at").order("created_at",{ascending:false});
   if(me){msg("globalMsg","Membre admin: "+me.message,true);return;}
-  renderTable("adminMembers",["Anarana","Finday","Sata","Daty"],(m||[]).map(x=>[x.full_name||"",x.phone||"",x.status||"",date(x.created_at)]));
+  renderMemberTable(m||[]);
+}
+function renderMemberTable(members){
+  const el=$("adminMembers");
+  if(!members.length){el.innerHTML='<p class="muted">Tsy mbola misy mpikambana.</p>';return;}
+  el.innerHTML="<table><thead><tr><th>Anarana</th><th>Finday</th><th>Sata</th><th>Daty</th><th>Action</th></tr></thead><tbody>"+
+    members.map(x=>`<tr><td>${esc(x.full_name||"")}</td><td>${esc(x.phone||"")}</td><td>${esc(x.status||"")}</td><td>${esc(date(x.created_at))}</td><td>${x.status==="pending"?`<button class="action" data-action="activate-member" data-type="member" data-id="${x.id}">Activer</button>`:"—"}</td></tr>`).join("")+
+    "</tbody></table>";
 }
 function tableWithActions(heads,rows,type){
   if(!rows.length)return '<p class="muted">Tsy mbola misy fangatahana.</p>';
@@ -114,6 +121,16 @@ function tableWithActions(heads,rows,type){
 document.addEventListener("click",async e=>{
   const b=e.target.closest("button[data-action]");if(!b)return;
   const decision=b.dataset.action;const type=b.dataset.type;const id=b.dataset.id;
+  if(decision==="activate-member"){
+    if(!confirm("Hampavitrika ity mpikambana ity ve?"))return;
+    b.disabled=true;
+    const {data,error}=await db.rpc("admin_activate_member",{p_member_id:id});
+    if(error){msg("globalMsg",error.message,true);b.disabled=false;return;}
+    if(data!==true){msg("globalMsg","Tsy niova ny sata. Mety efa active ilay mpikambana na tsy pending intsony.",true);}
+    else {msg("globalMsg","Voavitrika soa aman-tsara ny mpikambana.");}
+    await loadAdminData();
+    return;
+  }
   let note="";
   if(decision==="reject"){note=prompt("Antony handavana (tsy maintsy fenoina):")||"";if(!note.trim())return alert("Ilaina ny antony.");}
   else if(!confirm("Hanova ny sata ho approved ve? Tsy midika izany fa voamarina na nalefa ny vola."))return;
