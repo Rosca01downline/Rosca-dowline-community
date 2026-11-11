@@ -139,17 +139,27 @@ $("depositType").addEventListener("change",()=>{
   const amounts={membership_fee:1,contribution:3,combined:4};
   $("depositAmount").value=amounts[$("depositType").value];
 });
+const depositMessage=(text,error=false)=>{
+  msg("depositMsg",text,error);
+  msg("globalMsg",text,error);
+};
+$("depositForm").querySelector('button[type="submit"]').addEventListener("click",()=>{
+  depositMessage("Voatsindry ny bokotra. Jerena ny formulaire...");
+});
+$("depositForm").addEventListener("invalid",()=>{
+  depositMessage("Misy saha tsy feno na tsy mety ny format. Hamarino ny email sy TxID.",true);
+},true);
 $("depositForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const form=e.currentTarget;
   const button=form.querySelector('button[type="submit"]');
   if(!currentUser){
-    msg("globalMsg","Tsy hita ny session-nao. Mivoaha (Déconnexion), dia midira indray vao mandefa dépôt.",true);
+    depositMessage("Tsy hita ny session-nao. Mivoaha (Déconnexion), dia midira indray vao mandefa dépôt.",true);
     return;
   }
   if(!form.reportValidity()) return;
   if(button) button.disabled=true;
-  msg("globalMsg","Alefa ny fangatahana dépôt...");
+  depositMessage("Alefa any amin'ny serveur ny fangatahana dépôt...");
   try{
     const {data,error}=await db.rpc("submit_deposit_request",{
       p_amount:Number($("depositAmount").value),
@@ -160,11 +170,10 @@ $("depositForm").addEventListener("submit",async e=>{
     if(error) throw error;
     form.reset();
     configureDepositOptions(currentMember);
-    msg("globalMsg","Voaray ny fangatahana dépôt. Mbola miandry fanamarinana.");
+    depositMessage("Voaray ny fangatahana dépôt. Mbola miandry fanamarinana.");
     await loadMemberData();
-    msg("globalMsg","Voaray ny fangatahana dépôt. Mbola miandry fanamarinana.");
   }catch(error){
-    msg("globalMsg","Tsy tafiditra ny fangatahana dépôt: "+(error?.message||String(error)),true);
+    depositMessage("Tsy tafiditra ny fangatahana dépôt: "+(error?.message||String(error)),true);
   }finally{
     if(button) button.disabled=false;
   }
