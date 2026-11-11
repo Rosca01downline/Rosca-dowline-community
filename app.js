@@ -73,11 +73,25 @@ $("shareReferralBtn").addEventListener("click",async()=>{
   else {try{await navigator.clipboard.writeText(value);$("referralMsg").textContent="Voacopy ilay lien; azonao apetaka amin’ny WhatsApp na Messenger."; }catch(e){$("referralLink").focus();$("referralLink").select();$("referralMsg").textContent="Adikao ilay lien dia zarao amin’ny namanao.";}}
 });
 
+function configureDepositOptions(member){
+  const select=$("depositType");
+  const feeAlreadyPaid=member?.membership_fee_paid===true || member?.status==="active";
+  const feeOption=select.querySelector('option[value="membership_fee"]');
+  const combinedOption=select.querySelector('option[value="combined"]');
+  feeOption.hidden=feeAlreadyPaid;
+  combinedOption.hidden=feeAlreadyPaid;
+  if(feeAlreadyPaid) select.value="contribution";
+  else if(!select.value || (select.value==="contribution" && !member?.membership_fee_paid)) select.value="combined";
+  const amounts={membership_fee:1,contribution:3,combined:4};
+  $("depositAmount").value=amounts[select.value]||3;
+}
+
 async function loadMemberData(){
   if(!currentUser)return;
-  const {data:member,error:memberError}=await db.from("members").select("id,status").eq("auth_user_id",currentUser.id).maybeSingle();
+  const {data:member,error:memberError}=await db.from("members").select("id,status,membership_fee_paid").eq("auth_user_id",currentUser.id).maybeSingle();
   if(memberError){msg("globalMsg","Erreur lecture membre: "+memberError.message,true);return;}
   currentMember=member;
+  configureDepositOptions(member);
   if(member)msg("globalMsg","Membre trouvé dans l’application : "+member.status);
   renderReferralLink(member);
   if(member){
