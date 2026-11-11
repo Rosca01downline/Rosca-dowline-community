@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <title>ROSCA & DOWNLINE COMMUNITY</title>
-  <link rel="stylesheet" href="styles.css?v=20261111-3">
+  <link rel="stylesheet" href="styles.css?v=20261111-4">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -50,6 +50,13 @@
       <article class="stat"><span>Épargne</span><strong id="savings">0.00000000 USDT</strong><small id="reservedSavings">Voatokana: 0</small></article>
       <article class="stat"><span>Commission</span><strong id="commission">0.00000000 USDT</strong><small id="reservedCommission">Voatokana: 0</small></article>
     </div>
+
+    <section id="referralPanel" class="panel referral-panel hidden">
+      <h2>Lien de parrainage</h2>
+      <p class="muted">Zarao amin’ny namanao ity lien manokana ity. Rehefa misoratra amin’io izy ireo dia ho voarakitra ho olona nasainao.</p>
+      <div class="referral-link-row"><input id="referralLink" type="text" readonly aria-label="Lien de parrainage"><button id="copyReferralBtn" class="btn primary" type="button">Copier</button><button id="shareReferralBtn" class="btn secondary" type="button">Partager</button></div>
+      <p id="referralMsg" class="muted" role="status"></p>
+    </section>
 
     <section class="deposit-destination">
       <div class="deposit-destination-title">ALEFASO ETO NY DÉPÔT USDT</div>
@@ -97,6 +104,6 @@
   <p id="globalMsg" class="message" role="status"></p>
 </main>
 <footer>© ROSCA & DOWNLINE COMMUNITY · USDT</footer>
-<script src="app.js?v=20261111-2"></script>
+<script src="app.js?v=20261111-4"></script>
 </body>
 </html>
