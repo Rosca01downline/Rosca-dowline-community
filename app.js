@@ -35,6 +35,7 @@ $("signupForm").addEventListener("submit",async e=>{
 $("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();currentUser=null;show("appView",false);show("authView",true);show("logoutBtn",false);});
 $("refreshBtn").addEventListener("click",loadMemberData);
 $("adminRefresh").addEventListener("click",loadAdminData);
+$("communityRefresh").addEventListener("click",loadCommunityLists);
 
 async function boot(){
   const {data:{user}}=await db.auth.getUser();
@@ -51,6 +52,7 @@ async function boot(){
   $("rolePill").textContent=profile.role==="admin"?"ADMIN":"MEMBRE";
   show("adminView",profile.role==="admin");
   await loadMemberData();
+  await loadCommunityLists();
   if(profile.role==="admin") await loadAdminData();
 }
 
@@ -107,6 +109,24 @@ async function loadMemberData(){
     renderTable("myDeposits",["Dépôt"],[]);renderTable("myWithdrawals",["Retrait"],[]);
     msg("globalMsg","Tsy mbola mifandray amin'ny kaonty membre ny profil. Mifandraisa amin'ny Admin.",true);
   }
+}
+async function loadCommunityLists(){
+  const rosterEl=$("memberRoster"),turnEl=$("publicTurnList");
+  rosterEl.innerHTML='<p class="muted">Ampidirina...</p>';
+  turnEl.innerHTML='<p class="muted">Ampidirina...</p>';
+  const [{data:roster,error:rosterError},{data:turns,error:turnError}]=await Promise.all([
+    db.rpc("get_member_roster"),
+    db.rpc("get_public_turn_list")
+  ]);
+  if(rosterError) rosterEl.innerHTML='<p class="error">Tsy afaka mamaky ny lisitry ny mpikambana: '+esc(rosterError.message)+'</p>';
+  else renderTable("memberRoster",["Laharana","Anarana","Sata","Daty nidirana"],(roster||[]).map(x=>[x.member_number,x.full_name,x.member_status,date(x.joined_at)]));
+  if(turnError) turnEl.innerHTML='<p class="error">Tsy afaka mamaky ny lisitry ny tours: '+esc(turnError.message)+'</p>';
+  else renderTable("publicTurnList",["Tour","Daty","Mpandray","Sata"],(turns||[]).map(x=>[x.turn_number,dateOnly(x.scheduled_date),x.receiver_name,x.turn_status]));
+}
+function dateOnly(s){
+  if(!s)return "";
+  const parts=String(s).split("-");
+  return parts.length===3?new Date(Number(parts[0]),Number(parts[1])-1,Number(parts[2])).toLocaleDateString():String(s);
 }
 function date(s){return s?new Date(s).toLocaleString():"";}
 function renderTable(target,heads,rows){
