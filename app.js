@@ -81,7 +81,6 @@ function configureDepositOptions(member){
   feeOption.hidden=feeAlreadyPaid;
   combinedOption.hidden=feeAlreadyPaid;
   if(feeAlreadyPaid) select.value="contribution";
-  else if(!select.value || (select.value==="contribution" && !member?.membership_fee_paid)) select.value="combined";
   const amounts={membership_fee:1,contribution:3,combined:4};
   $("depositAmount").value=amounts[select.value]||3;
 }
