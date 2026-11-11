@@ -2,3 +2,13 @@
 .deposit-destination{background:#fff4d6;border:2px solid #d9a43b;border-radius:16px;padding:20px 22px;margin:0 0 20px;text-align:center;box-shadow:0 8px 24px #9a6b171c}.deposit-destination-title{font-size:13px;font-weight:900;letter-spacing:.08em;color:#76500c}.deposit-destination-email{font-size:clamp(21px,4.5vw,30px);font-weight:900;color:#102a43;margin:12px 0;overflow-wrap:anywhere}.deposit-destination-help{font-size:12px;line-height:1.5;color:#72551b}@media(max-width:760px){.deposit-destination{padding:18px 12px}.deposit-destination-email{font-size:clamp(20px,6vw,27px)}}
 
 .referral-panel{border:2px solid #d9a43b;background:#fffdf7}.referral-link-row{display:flex;gap:8px;align-items:center}.referral-link-row input{flex:1;min-width:0;margin:0;background:#fff}.referral-link-row .btn{white-space:nowrap}.secondary{background:#eaf1f7;color:#173b56}@media(max-width:560px){.referral-link-row{flex-wrap:wrap}.referral-link-row input{flex-basis:100%}.referral-link-row .btn{flex:1}}
+
+.summary-stats{grid-template-columns:1.2fr 1fr 1fr}
+.summary-stats .stat{min-width:0}
+.summary-stats .total-stat{background:#173f57}
+.balance-details{grid-template-columns:repeat(3,1fr)}
+.action-shortcuts{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 20px}
+.action-shortcuts .btn{min-width:130px}
+#transactionForms{align-items:start}
+#transactionForms .panel{margin-bottom:20px}
+@media(max-width:760px){.summary-stats{grid-template-columns:1fr 1fr}.summary-stats .total-stat{grid-column:1/-1}.balance-details{grid-template-columns:1fr 1fr}}
