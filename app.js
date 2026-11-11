@@ -140,12 +140,34 @@ $("depositType").addEventListener("change",()=>{
   $("depositAmount").value=amounts[$("depositType").value];
 });
 $("depositForm").addEventListener("submit",async e=>{
-  e.preventDefault(); if(!currentUser)return;
+  e.preventDefault();
+  const form=e.currentTarget;
+  const button=form.querySelector('button[type="submit"]');
+  if(!currentUser){
+    msg("globalMsg","Tsy hita ny session-nao. Mivoaha (Déconnexion), dia midira indray vao mandefa dépôt.",true);
+    return;
+  }
+  if(!form.reportValidity()) return;
+  if(button) button.disabled=true;
   msg("globalMsg","Alefa ny fangatahana dépôt...");
-  const {data,error}=await db.rpc("submit_deposit_request",{p_amount:Number($("depositAmount").value),p_faucetpay_email:$("depositEmail").value.trim(),p_tx_hash:$("depositTx").value.trim(),p_payment_type:$("depositType").value});
-  if(error)return msg("globalMsg",error.message,true);
-  e.target.reset();msg("globalMsg","Voaray ny fangatahana dépôt. Mbola miandry fanamarinana.");
-  await loadMemberData();
+  try{
+    const {data,error}=await db.rpc("submit_deposit_request",{
+      p_amount:Number($("depositAmount").value),
+      p_faucetpay_email:$("depositEmail").value.trim(),
+      p_tx_hash:$("depositTx").value.trim(),
+      p_payment_type:$("depositType").value
+    });
+    if(error) throw error;
+    form.reset();
+    configureDepositOptions(currentMember);
+    msg("globalMsg","Voaray ny fangatahana dépôt. Mbola miandry fanamarinana.");
+    await loadMemberData();
+    msg("globalMsg","Voaray ny fangatahana dépôt. Mbola miandry fanamarinana.");
+  }catch(error){
+    msg("globalMsg","Tsy tafiditra ny fangatahana dépôt: "+(error?.message||String(error)),true);
+  }finally{
+    if(button) button.disabled=false;
+  }
 });
 $("withdrawForm").addEventListener("submit",async e=>{
   e.preventDefault(); if(!currentUser)return;
