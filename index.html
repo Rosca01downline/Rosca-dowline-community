@@ -69,7 +69,14 @@
         <h2>Fangatahana dépôt</h2>
         <p class="muted">Rehefa vita ny fandefasana dia ampidiro eto ambany ny email FaucetPay nampiasainao sy ny TxID. Hamarinin’ny Admin ao amin’ny FaucetPay ny fidiran’ny vola alohan’ny hanaovana fanekena.</p>
         <form id="depositForm">
-          <label>Vola (USDT)<input id="depositAmount" type="number" min="0.00000001" step="0.00000001" required></label>
+          <label>Karazana dépôt
+            <select id="depositType" required>
+              <option value="membership_fee">Droit d’adhésion — 1 USDT</option>
+              <option value="contribution">Contribution — 3 USDT</option>
+              <option value="combined" selected>Dépôt mitambatra — 4 USDT</option>
+            </select>
+          </label>
+          <label>Vola (USDT)<input id="depositAmount" type="number" value="4" readonly required></label>
           <label>Email FaucetPay nampiasainao<input id="depositEmail" type="email" required></label>
           <label>Transaction ID (TxID)<input id="depositTx" required></label>
           <button class="btn primary" type="submit">Handefa fangatahana</button>
