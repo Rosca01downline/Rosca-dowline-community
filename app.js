@@ -102,10 +102,14 @@ function renderTable(target,heads,rows){
 }
 function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 
+$("depositType").addEventListener("change",()=>{
+  const amounts={membership_fee:1,contribution:3,combined:4};
+  $("depositAmount").value=amounts[$("depositType").value];
+});
 $("depositForm").addEventListener("submit",async e=>{
   e.preventDefault(); if(!currentUser)return;
   msg("globalMsg","Alefa ny fangatahana dépôt...");
-  const {data,error}=await db.rpc("submit_deposit_request",{p_amount:Number($("depositAmount").value),p_faucetpay_email:$("depositEmail").value.trim(),p_tx_hash:$("depositTx").value.trim()});
+  const {data,error}=await db.rpc("submit_deposit_request",{p_amount:Number($("depositAmount").value),p_faucetpay_email:$("depositEmail").value.trim(),p_tx_hash:$("depositTx").value.trim(),p_payment_type:$("depositType").value});
   if(error)return msg("globalMsg",error.message,true);
   e.target.reset();msg("globalMsg","Voaray ny fangatahana dépôt. Mbola miandry fanamarinana.");
   await loadMemberData();
@@ -120,9 +124,9 @@ $("withdrawForm").addEventListener("submit",async e=>{
 });
 
 async function loadAdminData(){
-  const {data:d,error:de}=await db.from("deposit_requests").select("id,member_id,amount,status,tx_hash,faucetpay_email,created_at").order("created_at",{ascending:false});
+  const {data:d,error:de}=await db.from("deposit_requests").select("id,member_id,amount,payment_type,status,tx_hash,faucetpay_email,created_at").order("created_at",{ascending:false});
   if(de){msg("globalMsg","Dépôt admin: "+de.message,true);return;}
-  $("adminDeposits").innerHTML=tableWithActions(["Vola","Sata","TxID","Email FaucetPay","Daty"],(d||[]).map(x=>({id:x.id,status:x.status,values:[fmt(x.amount),x.status,x.tx_hash||"",x.faucetpay_email,date(x.created_at)]})), "deposit");
+  $("adminDeposits").innerHTML=tableWithActions(["Vola","Karazana","Sata","TxID","Email FaucetPay","Daty"],(d||[]).map(x=>({id:x.id,status:x.status,values:[fmt(x.amount),x.payment_type,x.status,x.tx_hash||"",x.faucetpay_email,date(x.created_at)]})), "deposit");
   const {data:w,error:we}=await db.from("withdrawal_requests").select("id,member_id,amount,status,withdrawal_type,faucetpay_email,created_at").order("created_at",{ascending:false});
   if(we){msg("globalMsg","Retrait admin: "+we.message,true);return;}
   $("adminWithdrawals").innerHTML=tableWithActions(["Vola","Karazana","Sata","Email FaucetPay","Daty"],(w||[]).map(x=>({id:x.id,status:x.status,values:[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,date(x.created_at)]})),"withdrawal");
