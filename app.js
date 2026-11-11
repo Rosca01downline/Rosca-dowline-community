@@ -24,7 +24,7 @@ $("loginForm").addEventListener("submit",async e=>{
 $("signupForm").addEventListener("submit",async e=>{
   e.preventDefault(); msg("authMsg","Mamorona kaonty...");
   const full_name=$("fullName").value.trim();
-  const {data,error}=await db.auth.signUp({email:$("signupEmail").value.trim(),password:$("signupPassword").value,options:{data:{full_name}}});
+  const {data,error}=await db.auth.signUp({email:$("signupEmail").value.trim(),password:$("signupPassword").value,options:{data:{full_name,...(new URLSearchParams(window.location.search).get("ref")?{sponsor_id:new URLSearchParams(window.location.search).get("ref")}: {})}}});
   if(error) return msg("authMsg",error.message,true);
   if(data.session){
     await boot();
@@ -53,10 +53,31 @@ async function boot(){
   await loadMemberData();
   if(profile.role==="admin") await loadAdminData();
 }
+
+function renderReferralLink(member){
+  const panel=$("referralPanel");
+  if(!member || member.status!=="active"){show("referralPanel",false);return;}
+  const link=new URL(window.location.pathname,window.location.origin);
+  link.searchParams.set("ref",member.id);
+  $("referralLink").value=link.toString();
+  show("referralPanel",true);
+}
+$("copyReferralBtn").addEventListener("click",async()=>{
+  const value=$("referralLink").value;
+  try{await navigator.clipboard.writeText(value);$("referralMsg").textContent="Voacopy ilay lien. Azonao zaraina amin’ny namanao izao.";}
+  catch(e){$("referralLink").focus();$("referralLink").select();const ok=document.execCommand("copy");$("referralMsg").textContent=ok?"Voacopy ilay lien.":"Tsindrio ela ilay lien dia safidio Copier.";}
+});
+$("shareReferralBtn").addEventListener("click",async()=>{
+  const value=$("referralLink").value;
+  if(navigator.share){try{await navigator.share({title:"ROSCA & DOWNLINE COMMUNITY",text:"Midira amin'ny ROSCA amin'ity lien de parrainage ity:",url:value});}catch(e){}}
+  else {try{await navigator.clipboard.writeText(value);$("referralMsg").textContent="Voacopy ilay lien; azonao apetaka amin’ny WhatsApp na Messenger."; }catch(e){$("referralLink").focus();$("referralLink").select();$("referralMsg").textContent="Adikao ilay lien dia zarao amin’ny namanao.";}}
+});
+
 async function loadMemberData(){
   if(!currentUser)return;
-  const {data:member}=await db.from("members").select("id").eq("auth_user_id",currentUser.id).maybeSingle();
+  const {data:member}=await db.from("members").select("id,status").eq("auth_user_id",currentUser.id).maybeSingle();
   currentMember=member;
+  renderReferralLink(member);
   if(member){
     const {data:b}=await db.from("member_balances").select("savings_balance,commission_balance,reserved_savings,reserved_commission").eq("member_id",member.id).maybeSingle();
     $("savings").textContent=fmt(b?.savings_balance);$("commission").textContent=fmt(b?.commission_balance);
