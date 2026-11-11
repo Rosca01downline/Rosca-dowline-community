@@ -46,9 +46,15 @@
 
   <section id="appView" class="hidden">
     <div class="welcome"><div><span class="eyebrow">ESPACE MEMBRE</span><h1 id="welcomeName">Tongasoa</h1><p id="welcomeEmail"></p></div><span id="rolePill" class="pill">Membre</span></div>
-    <div class="stats">
+    <div class="stats summary-stats">
+      <article class="stat total-stat"><span>SOLDE TOTAL</span><strong id="totalBalance">0.00000000 USDT</strong><small>Fitambaran’ny solde, tsy retrait mitambatra</small></article>
+      <article class="stat"><span>DÉPÔT TOTAL</span><strong id="totalDeposits">0.00000000 USDT</strong><small>Dépôt voamarina</small></article>
+      <article class="stat"><span>RETRAIT TOTAL</span><strong id="totalWithdrawals">0.00000000 USDT</strong><small>Retrait efa voaloa</small></article>
+    </div>
+    <div class="stats balance-details">
       <article class="stat"><span>Épargne</span><strong id="savings">0.00000000 USDT</strong><small id="reservedSavings">Voatokana: 0</small></article>
       <article class="stat"><span>Commission</span><strong id="commission">0.00000000 USDT</strong><small id="reservedCommission">Voatokana: 0</small></article>
+      <article class="stat"><span>Mining</span><strong id="miningBalance">0.00000000 USDT</strong><small>Valisoa kajy anatiny</small></article>
     </div>
 
     <section class="panel community-lists">
@@ -64,16 +70,20 @@
       <p id="referralMsg" class="muted" role="status"></p>
     </section>
 
-    <section class="deposit-destination">
-      <div class="deposit-destination-title">ALEFASO ETO NY DÉPÔT USDT</div>
-      <div class="deposit-destination-email" id="roscaDepositEmail">rosca01downline@gmail.com</div>
-      <div class="deposit-destination-help">Email FaucetPay handraisana ny volan’ny ROSCA. Adikao tsara io email io rehefa mandefa USDT.</div>
-    </section>
-
-    <div class="grid two">
-      <section class="panel">
-        <h2>Fangatahana dépôt</h2>
-        <p class="muted">Rehefa vita ny fandefasana dia ampidiro eto ambany ny email FaucetPay nampiasainao sy ny TxID. Hamarinin’ny Admin ao amin’ny FaucetPay ny fidiran’ny vola alohan’ny hanaovana fanekena.</p>
+    <div class="action-shortcuts">
+      <button class="btn primary" id="openDepositBtn" type="button">＋ DÉPÔT</button>
+      <button class="btn secondary" id="openWithdrawBtn" type="button">− RETRAIT</button>
+      <button class="btn ghost small" id="openHistoryBtn" type="button">Historique</button>
+    </div>
+    <section id="transactionForms" class="grid two hidden">
+      <section class="panel" id="depositPanel">
+        <div class="section-head"><h2>Fangatahana dépôt</h2><button class="btn ghost small" type="button" data-close-forms>Hidio</button></div>
+        <div class="deposit-destination">
+          <div class="deposit-destination-title">ALEFASO ETO NY DÉPÔT USDT</div>
+          <div class="deposit-destination-email" id="roscaDepositEmail">rosca01downline@gmail.com</div>
+          <div class="deposit-destination-help">Email FaucetPay handraisana ny volan’ny ROSCA. Adikao tsara io email io rehefa mandefa USDT.</div>
+        </div>
+        <p class="muted">Rehefa vita ny fandefasana dia ampidiro eto ny email FaucetPay nampiasainao sy ny TxID. Hamarinin’ny Admin ny fidiran’ny vola.</p>
         <form id="depositForm">
           <label>Karazana dépôt
             <select id="depositType" required>
@@ -89,8 +99,8 @@
         </form>
         <p id="depositMsg" class="message" role="status" aria-live="polite"></p>
       </section>
-      <section class="panel">
-        <h2>Fangatahana retrait</h2>
+      <section class="panel" id="withdrawPanel">
+        <div class="section-head"><h2>Fangatahana retrait</h2><button class="btn ghost small" type="button" data-close-forms>Hidio</button></div>
         <p class="muted">Alefa amin’ny email FaucetPay. Ny retrait épargne dia manana minimum 15 USDT.</p>
         <form id="withdrawForm">
           <label>Karazana retrait<select id="withdrawType"><option value="commission">Commission</option><option value="savings">Épargne (minimum 15 USDT)</option></select></label>
@@ -99,9 +109,8 @@
           <button class="btn primary" type="submit">Hangataka retrait</button>
         </form>
       </section>
-    </div>
-
-    <section class="panel">
+    </section>
+    <section id="historyPanel" class="panel hidden">
       <div class="section-head"><h2>Ny fangatahako</h2><button class="btn ghost small" id="refreshBtn">Havaozy</button></div>
       <h3>Dépôt</h3><div id="myDeposits" class="table-wrap"></div>
       <h3>Retrait</h3><div id="myWithdrawals" class="table-wrap"></div>
