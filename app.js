@@ -75,8 +75,10 @@ $("shareReferralBtn").addEventListener("click",async()=>{
 
 async function loadMemberData(){
   if(!currentUser)return;
-  const {data:member}=await db.from("members").select("id,status").eq("auth_user_id",currentUser.id).maybeSingle();
+  const {data:member,error:memberError}=await db.from("members").select("id,status").eq("auth_user_id",currentUser.id).maybeSingle();
+  if(memberError){msg("globalMsg","Erreur lecture membre: "+memberError.message,true);return;}
   currentMember=member;
+  if(member)msg("globalMsg","Membre trouvé dans l’application : "+member.status);
   renderReferralLink(member);
   if(member){
     const {data:b}=await db.from("member_balances").select("savings_balance,commission_balance,reserved_savings,reserved_commission").eq("member_id",member.id).maybeSingle();
