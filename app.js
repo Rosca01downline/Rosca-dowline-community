@@ -34,6 +34,11 @@ $("signupForm").addEventListener("submit",async e=>{
 });
 $("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();currentUser=null;show("appView",false);show("authView",true);show("logoutBtn",false);});
 $("refreshBtn").addEventListener("click",loadMemberData);
+$("openDepositBtn").addEventListener("click",()=>{show("transactionForms",true);show("depositPanel",true);show("withdrawPanel",false);show("historyPanel",false);});
+$("openWithdrawBtn").addEventListener("click",()=>{show("transactionForms",true);show("depositPanel",false);show("withdrawPanel",true);show("historyPanel",false);});
+$("openHistoryBtn").addEventListener("click",()=>{show("transactionForms",false);show("historyPanel",true);});
+document.querySelectorAll("[data-close-forms]").forEach(b=>b.addEventListener("click",()=>show("transactionForms",false)));
+
 $("adminRefresh").addEventListener("click",loadAdminData);
 $("communityRefresh").addEventListener("click",loadCommunityLists);
 
@@ -97,15 +102,24 @@ async function loadMemberData(){
   renderReferralLink(member);
   if(member){
     const {data:b}=await db.from("member_balances").select("savings_balance,commission_balance,reserved_savings,reserved_commission").eq("member_id",member.id).maybeSingle();
-    $("savings").textContent=fmt(b?.savings_balance);$("commission").textContent=fmt(b?.commission_balance);
+    const savings=Number(b?.savings_balance||0), commission=Number(b?.commission_balance||0), mining=0;
+    $("savings").textContent=fmt(savings);$("commission").textContent=fmt(commission);
+    $("miningBalance").textContent=fmt(mining);
+    $("totalBalance").textContent=fmt(savings+commission+mining);
     $("reservedSavings").textContent="Voatokana: "+fmt(b?.reserved_savings);
     $("reservedCommission").textContent="Voatokana: "+fmt(b?.reserved_commission);
     const {data:d}=await db.from("deposit_requests").select("amount,status,tx_hash,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
-    renderTable("myDeposits",["Vola","Sata","TxID","Daty","Fanamarihana"],(d||[]).map(x=>[fmt(x.amount),x.status,x.tx_hash||"",date(x.created_at),x.admin_note||""]));
     const {data:w}=await db.from("withdrawal_requests").select("amount,status,withdrawal_type,faucetpay_email,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
+    const depositTotal=(d||[]).filter(x=>["approved","completed"].includes(x.status)).reduce((sum,x)=>sum+Number(x.amount||0),0);
+    const withdrawalTotal=(w||[]).filter(x=>x.status==="completed").reduce((sum,x)=>sum+Number(x.amount||0),0);
+    $("totalDeposits").textContent=fmt(depositTotal);
+    $("totalWithdrawals").textContent=fmt(withdrawalTotal);
+    renderTable("myDeposits",["Vola","Sata","TxID","Daty","Fanamarihana"],(d||[]).map(x=>[fmt(x.amount),x.status,x.tx_hash||"",date(x.created_at),x.admin_note||""]));
     renderTable("myWithdrawals",["Vola","Karazana","Sata","FaucetPay","Daty","Fanamarihana"],(w||[]).map(x=>[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,date(x.created_at),x.admin_note||""]));
   } else {
     $("savings").textContent=fmt(0);$("commission").textContent=fmt(0);
+    $("miningBalance").textContent=fmt(0);$("totalBalance").textContent=fmt(0);
+    $("totalDeposits").textContent=fmt(0);$("totalWithdrawals").textContent=fmt(0);
     renderTable("myDeposits",["Dépôt"],[]);renderTable("myWithdrawals",["Retrait"],[]);
     msg("globalMsg","Tsy mbola mifandray amin'ny kaonty membre ny profil. Mifandraisa amin'ny Admin.",true);
   }
