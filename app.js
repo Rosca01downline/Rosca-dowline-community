@@ -34,6 +34,31 @@ $("signupForm").addEventListener("submit",async e=>{
 });
 $("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();currentUser=null;show("appView",false);show("authView",true);show("logoutBtn",false);});
 $("refreshBtn").addEventListener("click",loadMemberData);
+
+$("activateMiningBonusBtn").addEventListener("click",async()=>{
+  const button=$("activateMiningBonusBtn");
+  if(!currentUser || !currentMember || String(currentMember.status).toLowerCase()!=="active") return;
+  button.disabled=true;
+  msg("miningBonusInfo","Activation du bonus en cours...");
+  try{
+    const {data,error}=await db.rpc("activate_referral_mining");
+    if(error) throw error;
+    if(data?.error==="no_active_referrals"){
+      msg("miningBonusInfo","Tsy mbola manana filleul ACTIVE ianao. Rehefa misy dia afaka manetsika ny bonus.");
+    }else if(data?.error==="bonus_already_active"){
+      msg("miningBonusInfo","Efa mandeha ny bonus parrainage-nao. Mbola tsy tapitra ny 24 ora.");
+    }else if(data?.success){
+      msg("miningBonusInfo","Vo activation! Filleul ACTIVE voaisa: "+Number(data.referral_count||0)+". Miasa mandritra ny 24 ora ny bonus.");
+      await loadMemberData();
+    }else{
+      msg("miningBonusInfo","Tsy nahomby ny activation. Havaozy ny pejy ary andramo indray.",true);
+    }
+  }catch(error){
+    msg("miningBonusInfo","Erreur activation: "+(error?.message||String(error)),true);
+  }finally{
+    button.disabled=false;
+  }
+});
 $("openDepositBtn").addEventListener("click",()=>{show("transactionForms",true);show("depositPanel",true);show("withdrawPanel",false);show("historyPanel",false);});
 $("openWithdrawBtn").addEventListener("click",()=>{show("transactionForms",true);show("depositPanel",false);show("withdrawPanel",true);show("historyPanel",false);});
 $("openHistoryBtn").addEventListener("click",()=>{show("transactionForms",false);show("historyPanel",true);});
@@ -111,7 +136,25 @@ async function loadMemberData(){
   renderReferralLink(member);
   if(member){
     const {data:b}=await db.from("member_balances").select("savings_balance,commission_balance,reserved_savings,reserved_commission").eq("member_id",member.id).maybeSingle();
-    const savings=Number(b?.savings_balance||0), commission=Number(b?.commission_balance||0), mining=0;
+    let mining=0;
+    show("miningBonusPanel",String(member.status).toLowerCase()==="active");
+    if(String(member.status).toLowerCase()==="active"){
+      const {data:mine,error:miningError}=await db.rpc("get_my_mining");
+      if(miningError){
+        msg("miningBonusInfo","Tsy afaka mamaky ny Mining: "+miningError.message,true);
+      }else if(mine?.error){
+        msg("miningBonusInfo","Mining: "+mine.error,true);
+      }else{
+        mining=Number(mine?.mining_balance||0);
+        if(mine?.bonus_active && mine?.bonus_until){
+          msg("miningBonusInfo","Bonus parrainage mandeha hatramin'ny "+new Date(mine.bonus_until).toLocaleString()+" · Filleul ACTIVE voaisa: "+Number(mine.bonus_referral_count||0));
+        }else{
+          msg("miningBonusInfo","Base Mining mandeha ho azy. Azonao alefa mandritra ny 24 ora ny bonus raha manana filleul ACTIVE.");
+        }
+      }
+    }else{
+      msg("miningBonusInfo","Miandry activation ho ACTIVE ny kaontinao vao manomboka ny Mining.");
+    }
     $("savings").textContent=fmt(savings);$("commission").textContent=fmt(commission);
     $("miningBalance").textContent=fmt(mining);
     $("totalBalance").textContent=fmt(savings+commission+mining);
@@ -128,6 +171,7 @@ async function loadMemberData(){
   } else {
     $("savings").textContent=fmt(0);$("commission").textContent=fmt(0);
     $("miningBalance").textContent=fmt(0);$("totalBalance").textContent=fmt(0);
+    show("miningBonusPanel",false);
     $("totalDeposits").textContent=fmt(0);$("totalWithdrawals").textContent=fmt(0);
     renderTable("myDeposits",["Dépôt"],[]);renderTable("myWithdrawals",["Retrait"],[]);
     msg("globalMsg","Tsy mbola mifandray amin'ny kaonty membre ny profil. Mifandraisa amin'ny Admin.",true);
