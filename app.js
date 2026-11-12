@@ -312,7 +312,7 @@ function renderMemberTable(members){
 }
 function tableWithActions(heads,rows,type){
   if(!rows.length)return '<p class="muted">Tsy mbola misy fangatahana.</p>';
-  return "<table><thead><tr>"+heads.map(h=>`<th>${esc(h)}</th>`).join("")+"<th>Action</th></tr></thead><tbody>"+rows.map(r=>`<tr>${r.values.map(v=>`<td>${esc(String(v??""))}</td>`).join("")}<td>${r.status==="pending"?`<button class="action" data-action="approve" data-type="${type}" data-id="${r.id}">Ekena</button><button class="action reject" data-action="reject" data-type="${type}" data-id="${r.id}">Lavina</button>`:"—"}</td></tr>`).join("")+"</tbody></table>";
+  return "<table><thead><tr>"+heads.map(h=>`<th>${esc(h)}</th>`).join("")+"<th>Action</th></tr></thead><tbody>"+rows.map(r=>`<tr>${r.values.map(v=>`<td>${esc(String(v??""))}</td>`).join("")}<td>${r.status==="pending"?`<button class="action" data-action="approve" data-type="${type}" data-id="${r.id}">Ekena</button><button class="action reject" data-action="reject" data-type="${type}" data-id="${r.id}">Lavina</button>`:type==="withdrawal"&&r.status==="approved"?`<button class="action" data-action="complete-withdrawal" data-type="${type}" data-id="${r.id}">MARQUER COMME PAYÉ</button>`:"—"}</td></tr>`).join("")+"</tbody></table>";
 }
 document.addEventListener("click",async e=>{
   const b=e.target.closest("button[data-action]");if(!b)return;
@@ -325,6 +325,18 @@ document.addEventListener("click",async e=>{
     if(data!==true){msg("globalMsg","Tsy niova ny sata. Mety efa active ilay mpikambana na tsy pending intsony.",true);}
     else {msg("globalMsg","Voavitrika soa aman-tsara ny mpikambana.");}
     await loadAdminData();
+    return;
+  }
+  if(decision==="complete-withdrawal"){
+    if(type!=="withdrawal")return;
+    if(!confirm("Efa nalefanao tamin’ny FaucetPay ve ny vola? Tsindrio OK raha efa vita tokoa ny transfert. Ity hetsika ity no hanala ny vola amin’ny solde."))return;
+    const txid=prompt("Ampidiro ny FaucetPay Transaction ID (raha misy):");
+    if(txid===null)return;
+    b.disabled=true;
+    const {error}=await db.rpc("finalize_withdrawal_request",{p_request_id:id,p_faucetpay_tx_id:txid.trim()||null});
+    if(error){msg("globalMsg",error.message,true);b.disabled=false;return;}
+    msg("globalMsg","Retrait voamarika ho completed; voava ny solde sy ny réservation.");
+    await loadAdminData();await loadMemberData();
     return;
   }
   let note="";
