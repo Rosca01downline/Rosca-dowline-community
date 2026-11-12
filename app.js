@@ -136,6 +136,7 @@ async function loadMemberData(){
   renderReferralLink(member);
   if(member){
     const {data:b}=await db.from("member_balances").select("savings_balance,commission_balance,reserved_savings,reserved_commission").eq("member_id",member.id).maybeSingle();
+    const savings=Number(b?.savings_balance||0), commission=Number(b?.commission_balance||0);
     let mining=0;
     show("miningBonusPanel",String(member.status).toLowerCase()==="active");
     if(String(member.status).toLowerCase()==="active"){
@@ -155,6 +156,7 @@ async function loadMemberData(){
     }else{
       msg("miningBonusInfo","Miandry activation ho ACTIVE ny kaontinao vao manomboka ny Mining.");
     }
+    await loadMyReferrals(member);
     $("savings").textContent=fmt(savings);$("commission").textContent=fmt(commission);
     $("miningBalance").textContent=fmt(mining);
     $("totalBalance").textContent=fmt(savings+commission+mining);
@@ -176,6 +178,30 @@ async function loadMemberData(){
     renderTable("myDeposits",["Dépôt"],[]);renderTable("myWithdrawals",["Retrait"],[]);
     msg("globalMsg","Tsy mbola mifandray amin'ny kaonty membre ny profil. Mifandraisa amin'ny Admin.",true);
   }
+}
+async function loadMyReferrals(member){
+  const panel=$("myReferralsPanel");
+  if(!member || String(member.status).toLowerCase()!=="active"){
+    show("myReferralsPanel",false);
+    return;
+  }
+  show("myReferralsPanel",true);
+  $("myReferralsList").innerHTML='<p class="muted">Ampidirina...</p>';
+  const {data:referrals,error}=await db.rpc("get_my_referrals");
+  if(error){
+    $("myReferralsList").innerHTML='<p class="error">Tsy afaka mamaky ny filleuls: '+esc(error.message)+'</p>';
+    $("myReferralsCounts").textContent="";
+    return;
+  }
+  const rows=referrals||[];
+  const active=rows.filter(x=>String(x.member_status).toLowerCase()==="active").length;
+  const pending=rows.filter(x=>String(x.member_status).toLowerCase()==="pending").length;
+  $("myReferralsCounts").textContent="Total: "+rows.length+" · ACTIVE: "+active+" · PENDING: "+pending;
+  renderTable("myReferralsList",["Anarana","Sata","Daty nisoratana"],rows.map(x=>[
+    x.full_name||"—",
+    String(x.member_status||"").toUpperCase(),
+    date(x.joined_at)
+  ]));
 }
 async function loadCommunityLists(){
   const rosterEl=$("memberRoster"),turnEl=$("publicTurnList");
