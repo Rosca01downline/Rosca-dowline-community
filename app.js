@@ -83,15 +83,24 @@ $("shareReferralBtn").addEventListener("click",async()=>{
 function configureDepositOptions(member){
   const select=$("depositType");
   const feeAlreadyPaid=member?.membership_fee_paid===true;
+
   const feeOption=select.querySelector('option[value="membership_fee"]');
   const combinedOption=select.querySelector('option[value="combined"]');
-  feeOption.hidden=feeAlreadyPaid;
-  combinedOption.hidden=feeAlreadyPaid;
-  if(feeAlreadyPaid) select.value="contribution";
-  const amounts={membership_fee:1,contribution:3,combined:4};
-  $("depositAmount").value=amounts[select.value]||3;
-}
+  const contributionOption=select.querySelector('option[value="contribution"]');
 
+  if(feeOption) feeOption.hidden=true;
+  if(combinedOption) combinedOption.hidden=feeAlreadyPaid;
+  if(contributionOption) contributionOption.hidden=!feeAlreadyPaid;
+
+  select.value=feeAlreadyPaid?"contribution":"combined";
+
+  const amounts={
+    contribution:3,
+    combined:4
+  };
+
+  $("depositAmount").value=amounts[select.value];
+}
 async function loadMemberData(){
   if(!currentUser)return;
   const {data:member,error:memberError}=await db.from("members").select("id,status,membership_fee_paid").eq("auth_user_id",currentUser.id).maybeSingle();
