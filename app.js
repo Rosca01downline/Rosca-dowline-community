@@ -82,7 +82,7 @@ $("shareReferralBtn").addEventListener("click",async()=>{
 
 function configureDepositOptions(member){
   const select=$("depositType");
-  const feeAlreadyPaid=member?.membership_fee_paid===true || member?.status==="active";
+  const feeAlreadyPaid=member?.membership_fee_paid===true;
   const feeOption=select.querySelector('option[value="membership_fee"]');
   const combinedOption=select.querySelector('option[value="combined"]');
   feeOption.hidden=feeAlreadyPaid;
