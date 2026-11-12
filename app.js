@@ -49,7 +49,7 @@ async function boot(){
   const {data:profile,error:pErr}=await db.from("profiles").select("id,full_name,email,role").eq("id",user.id).single();
   if(pErr){msg("globalMsg","Tsy afaka mamaky profil: "+pErr.message,true);return;}
   currentProfile=profile;
-  const {data:member}=await db.from("members").select("id,full_name,phone,status").eq("auth_user_id",user.id).maybeSingle();
+  const {data:member}=await db.from("members").select("id,full_name,phone,status,membership_fee_paid").eq("auth_user_id",user.id).maybeSingle();
   currentMember=member;
   show("authView",false);show("appView",true);show("logoutBtn",true);
   $("welcomeName").textContent=profile.full_name||user.email;
@@ -142,7 +142,19 @@ async function loadCommunityLists(){
     db.rpc("get_public_turn_list")
   ]);
   if(rosterError) rosterEl.innerHTML='<p class="error">Tsy afaka mamaky ny lisitry ny mpikambana: '+esc(rosterError.message)+'</p>';
-  else renderTable("memberRoster",["Laharana","Anarana","Sata","Daty nidirana"],(roster||[]).map(x=>[x.member_number,x.full_name,x.member_status,date(x.joined_at)]));
+  else {
+    renderTable("memberRoster",["Laharana","Anarana","Sata","Daty nidirana"],(roster||[]).map(x=>[x.member_number,x.full_name,x.member_status,date(x.joined_at)]));
+    if(currentProfile?.role!=="admin" && currentMember){
+      const myName=currentMember.full_name||currentProfile?.full_name||"";
+      const myIndex=(roster||[]).findIndex(x=>String(x.full_name||"").trim().toLowerCase()===String(myName).trim().toLowerCase());
+      if(myIndex>=0){
+        const myNumber=roster[myIndex].member_number||myIndex+1;
+        $("rolePill").textContent=String(myNumber)+"/"+String(roster.length);
+      } else {
+        $("rolePill").textContent="MEMBRE";
+      }
+    }
+  }
   if(turnError) turnEl.innerHTML='<p class="error">Tsy afaka mamaky ny lisitry ny tours: '+esc(turnError.message)+'</p>';
   else renderTable("publicTurnList",["Tour","Daty","Mpandray","Sata"],(turns||[]).map(x=>[x.turn_number,dateOnly(x.scheduled_date),x.receiver_name,x.turn_status]));
 }
