@@ -41,3 +41,21 @@
   color:#fff;
   border:1px solid #1D4ED8;
 }
+
+.challenge-card{
+  display:block;
+  width:100%;
+  margin:0 0 20px;
+  text-align:left;
+  cursor:pointer;
+  border:2px solid #1d4ed8;
+  background:#2563eb;
+  color:#fff;
+  font:inherit;
+}
+.challenge-card span,.challenge-card small{display:block;color:#dbeafe;font-size:12px}
+.challenge-card strong{display:block;font-size:24px;margin:10px 0}
+.challenge-card:hover{background:#1d4ed8;transform:translateY(-1px)}
+.challenge-panel{background:#e6f4ea;border-color:#b7d8c1}
+.challenge-panel h3{margin-top:20px}
+.challenge-panel table{min-width:560px}
