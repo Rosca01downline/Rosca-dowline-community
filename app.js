@@ -72,6 +72,12 @@ $("signupForm").addEventListener("submit",async e=>{
 });
 $("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();currentUser=null;show("appView",false);show("authView",true);show("logoutBtn",false);});
 $("refreshBtn").addEventListener("click",loadMemberData);
+$("challengeCard").addEventListener("click",async()=>{
+  show("challengePanel",true);
+  await loadChallengeData();
+  $("challengePanel").scrollIntoView({behavior:"smooth",block:"start"});
+});
+$("closeChallengeBtn").addEventListener("click",()=>show("challengePanel",false));
 
 $("activateMiningBonusBtn").addEventListener("click",async()=>{
   const button=$("activateMiningBonusBtn");
@@ -226,6 +232,49 @@ async function loadMemberData(){
     msg("globalMsg","Tsy mbola mifandray amin'ny kaonty membre ny profil. Mifandraisa amin'ny Admin.",true);
   }
 }
+async function loadChallengeData(){
+  const now = new Date();
+  const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-01`;
+  $("challengeMonthLabel").textContent = "Volana: " + now.toLocaleDateString("fr-FR",{month:"long",year:"numeric"});
+  $("challengeLeaderboard").innerHTML='<p class="muted">Ampidirina...</p>';
+  $("challengeWinners").innerHTML='<p class="muted">Ampidirina...</p>';
+
+  const [{data:ranking,error:rankingError},{data:winners,error:winnersError}] = await Promise.all([
+    db.rpc("get_monthly_challenge_leaderboard",{p_month:monthStart}),
+    db.from("monthly_challenge_results")
+      .select("challenge_month,winner_name,rank,qualifying_referrals,prize_amount")
+      .order("challenge_month",{ascending:false})
+      .order("rank",{ascending:true})
+      .limit(3)
+  ]);
+
+  if(rankingError){
+    $("challengeLeaderboard").innerHTML='<p class="error">Tsy afaka mamaky ny classement: '+esc(rankingError.message)+'</p>';
+  }else{
+    const rows=(ranking||[]).map(x=>[
+      x.challenge_rank,
+      x.full_name||"—",
+      Number(x.qualifying_referrals||0),
+      Number(x.total_active_referrals||0),
+      x.eligible?"ÉLIGIBLE":"Tsy mbola eligible"
+    ]);
+    renderTable("challengeLeaderboard",["Laharana","Anarana","Filleuls ACTIVE tamin’ity volana ity","Total ACTIVE","Sata"],rows);
+  }
+
+  if(winnersError){
+    $("challengeWinners").innerHTML='<p class="error">Tsy afaka mamaky ny mpandresy: '+esc(winnersError.message)+'</p>';
+  }else{
+    const rows=(winners||[]).map(x=>[
+      new Date(x.challenge_month+"T12:00:00").toLocaleDateString("fr-FR",{month:"long",year:"numeric"}),
+      x.rank,
+      x.winner_name,
+      Number(x.qualifying_referrals||0),
+      fmt(x.prize_amount)+" · Commission"
+    ]);
+    renderTable("challengeWinners",["Volana","Laharana","Anarana","Filleuls","Loka"],rows);
+  }
+}
+
 async function loadMyReferrals(member){
   const panel=$("myReferralsPanel");
   if(!member || String(member.status).toLowerCase()!=="active"){
