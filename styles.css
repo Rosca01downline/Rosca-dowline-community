@@ -32,3 +32,12 @@
   background:#fff0c7;
   border-color:#e8d18a;
 }
+
+
+/* Bleu vif sur les cartes de chiffres du tableau de bord */
+.summary-stats .stat,
+.balance-details .stat {
+  background:#2563EB;
+  color:#fff;
+  border:1px solid #1D4ED8;
+}
