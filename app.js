@@ -163,13 +163,13 @@ async function loadMemberData(){
     $("reservedSavings").textContent="Voatokana: "+fmt(b?.reserved_savings);
     $("reservedCommission").textContent="Voatokana: "+fmt(b?.reserved_commission);
     const {data:d}=await db.from("deposit_requests").select("amount,status,tx_hash,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
-    const {data:w}=await db.from("withdrawal_requests").select("amount,status,withdrawal_type,faucetpay_email,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
+    const {data:w}=await db.from("withdrawal_requests").select("amount,status,withdrawal_type,faucetpay_email,faucetpay_tx_id,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
     const depositTotal=(d||[]).filter(x=>["approved","completed"].includes(x.status)).reduce((sum,x)=>sum+Number(x.amount||0),0);
     const withdrawalTotal=(w||[]).filter(x=>x.status==="completed").reduce((sum,x)=>sum+Number(x.amount||0),0);
     $("totalDeposits").textContent=fmt(depositTotal);
     $("totalWithdrawals").textContent=fmt(withdrawalTotal);
     renderTable("myDeposits",["Vola","Sata","TxID","Daty","Fanamarihana"],(d||[]).map(x=>[fmt(x.amount),x.status,x.tx_hash||"",date(x.created_at),x.admin_note||""]));
-    renderTable("myWithdrawals",["Vola","Karazana","Sata","FaucetPay","Daty","Fanamarihana"],(w||[]).map(x=>[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,date(x.created_at),x.admin_note||""]));
+    renderTable("myWithdrawals",["Vola","Karazana","Sata","FaucetPay","Transaction ID","Daty","Fanamarihana"],(w||[]).map(x=>[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,x.faucetpay_tx_id||"Miandry ID",date(x.created_at),x.admin_note||""]));
   } else {
     $("savings").textContent=fmt(0);$("commission").textContent=fmt(0);
     $("miningBalance").textContent=fmt(0);$("totalBalance").textContent=fmt(0);
@@ -296,9 +296,9 @@ async function loadAdminData(){
   const {data:d,error:de}=await db.from("deposit_requests").select("id,member_id,amount,payment_type,status,tx_hash,faucetpay_email,created_at").order("created_at",{ascending:false});
   if(de){msg("globalMsg","Dépôt admin: "+de.message,true);return;}
   $("adminDeposits").innerHTML=tableWithActions(["Vola","Karazana","Sata","TxID","Email FaucetPay","Daty"],(d||[]).map(x=>({id:x.id,status:x.status,values:[fmt(x.amount),x.payment_type,x.status,x.tx_hash||"",x.faucetpay_email,date(x.created_at)]})), "deposit");
-  const {data:w,error:we}=await db.from("withdrawal_requests").select("id,member_id,amount,status,withdrawal_type,faucetpay_email,created_at").order("created_at",{ascending:false});
+  const {data:w,error:we}=await db.from("withdrawal_requests").select("id,member_id,amount,status,withdrawal_type,faucetpay_email,faucetpay_tx_id,created_at").order("created_at",{ascending:false});
   if(we){msg("globalMsg","Retrait admin: "+we.message,true);return;}
-  $("adminWithdrawals").innerHTML=tableWithActions(["Vola","Karazana","Sata","Email FaucetPay","Daty"],(w||[]).map(x=>({id:x.id,status:x.status,values:[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,date(x.created_at)]})),"withdrawal");
+  $("adminWithdrawals").innerHTML=tableWithActions(["Vola","Karazana","Sata","Email FaucetPay","Transaction ID","Daty"],(w||[]).map(x=>({id:x.id,status:x.status,values:[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,x.faucetpay_tx_id||"—",date(x.created_at)]})),"withdrawal");
   const {data:m,error:me}=await db.from("members").select("id,full_name,phone,status,created_at").order("created_at",{ascending:false});
   if(me){msg("globalMsg","Membre admin: "+me.message,true);return;}
   renderMemberTable(m||[]);
@@ -330,10 +330,11 @@ document.addEventListener("click",async e=>{
   if(decision==="complete-withdrawal"){
     if(type!=="withdrawal")return;
     if(!confirm("Efa nalefanao tamin’ny FaucetPay ve ny vola? Tsindrio OK raha efa vita tokoa ny transfert. Ity hetsika ity no hanala ny vola amin’ny solde."))return;
-    const txid=prompt("Ampidiro ny FaucetPay Transaction ID (raha misy):");
+    const txid=prompt("OBLIGATOIRE: Ampidiro ny FaucetPay Transaction ID:");
     if(txid===null)return;
+    if(!txid.trim()){alert("Tsy maintsy ampidirina ny FaucetPay Transaction ID vao afaka mamita retrait.");return;}
     b.disabled=true;
-    const {error}=await db.rpc("finalize_withdrawal_request",{p_request_id:id,p_faucetpay_tx_id:txid.trim()||null});
+    const {error}=await db.rpc("finalize_withdrawal_request",{p_request_id:id,p_faucetpay_tx_id:txid.trim()});
     if(error){msg("globalMsg",error.message,true);b.disabled=false;return;}
     msg("globalMsg","Retrait voamarika ho completed; voava ny solde sy ny réservation.");
     await loadAdminData();await loadMemberData();
