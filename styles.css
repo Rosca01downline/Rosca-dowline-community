@@ -15,10 +15,10 @@
 
 .member-position{border:0;cursor:pointer;font:inherit;font-size:12px;font-weight:800}.member-position:hover{background:#d9e7f2;transform:translateY(-1px)}.member-position:focus-visible{outline:3px solid #bd8a28;outline-offset:3px}
 
-/* Palette bleu vif des panneaux */
+/* Panneaux généraux en vert matsatso */
 .panel{
-  background:#2563EB;
-  border-color:#1D4ED8;
+  background:#e6f4ea;
+  border-color:#b7d8c1;
 }
 #depositPanel{
   background:#dff5e5;
