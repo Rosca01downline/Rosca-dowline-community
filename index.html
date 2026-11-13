@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <title>ROSCA & DOWNLINE COMMUNITY</title>
-  <link rel="stylesheet" href="styles.css?v=20261113-4">
+  <link rel="stylesheet" href="styles.css?v=20261113-5">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'"></script>
 </head>
 <body>
@@ -56,6 +56,20 @@
       <article class="stat"><span>Commission</span><strong id="commission">0.00000000 USDT</strong><small id="reservedCommission">Voatokana: 0</small></article>
       <article class="stat"><span>Mining</span><strong id="miningBalance">0.00000000 USDT</strong><small id="miningLiveStatus">Miandry kajy Mining...</small></article>
     </div>
+    <button id="challengeCard" class="stat challenge-card" type="button">
+      <span>🏆 CHALLENGE MENSUEL</span>
+      <strong>Challenge</strong>
+      <small>Tsindrio hijery ny classement sy ireo mpandresy farany</small>
+    </button>
+    <section id="challengePanel" class="panel challenge-panel hidden">
+      <div class="section-head"><h2>🏆 Challenge mensuel</h2><button id="closeChallengeBtn" class="btn ghost small" type="button">Hidio</button></div>
+      <h3>Classement amin’ity volana ity</h3>
+      <p id="challengeMonthLabel" class="muted"></p>
+      <p class="muted">Mila filleuls ACTIVE 4 farafahakeliny, izay lasa ACTIVE tao anatin’ity volana ity. Loka: 1er = 3 USDT · 2e = 2 USDT · 3e = 1 USDT (Commission).</p>
+      <div id="challengeLeaderboard" class="table-wrap"><p class="muted">Ampidirina...</p></div>
+      <h3>Mpandresy farany</h3>
+      <div id="challengeWinners" class="table-wrap"><p class="muted">Ampidirina...</p></div>
+    </section>
 
     <section id="miningBonusPanel" class="panel hidden">
       <div class="section-head"><h2>Bonus parrainage Mining</h2></div>
@@ -141,6 +155,6 @@
   <p id="globalMsg" class="message" role="status"></p>
 </main>
 <footer>© ROSCA & DOWNLINE COMMUNITY · USDT</footer>
-<script src="app.js?v=20261113-1"></script>
+<script src="app.js?v=20261113-2"></script>
 </body>
 </html>
