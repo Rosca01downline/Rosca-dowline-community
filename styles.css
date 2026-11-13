@@ -12,3 +12,5 @@
 #transactionForms{align-items:start}
 #transactionForms .panel{margin-bottom:20px}
 @media(max-width:760px){.summary-stats{grid-template-columns:1fr 1fr}.summary-stats .total-stat{grid-column:1/-1}.balance-details{grid-template-columns:1fr 1fr}}
+
+.member-position{border:0;cursor:pointer;font:inherit;font-size:12px;font-weight:800}.member-position:hover{background:#d9e7f2;transform:translateY(-1px)}.member-position:focus-visible{outline:3px solid #bd8a28;outline-offset:3px}
