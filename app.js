@@ -9,6 +9,44 @@ const show = (id, yes=true) => $(id).classList.toggle("hidden", !yes);
 const msg = (id, text, error=false) => { $(id).textContent=text; $(id).classList.toggle("error",error); };
 const fmt = (n) => `${Number(n||0).toFixed(8)} USDT`;
 let currentUser = null, currentProfile = null, currentMember = null;
+let miningTicker = null;
+let miningDisplayState = null;
+
+function startMiningTicker(serverBalance, bonusActive, bonusUntil, referralCount, savings, commission){
+  if(miningTicker) clearInterval(miningTicker);
+  const startedAt = Date.now();
+  const bonusEnd = bonusUntil ? new Date(bonusUntil).getTime() : 0;
+  miningDisplayState = {
+    balance: Number(serverBalance || 0),
+    startedAt,
+    bonusActive: Boolean(bonusActive),
+    bonusEnd,
+    referralCount: Number(referralCount || 0),
+    savings: Number(savings || 0),
+    commission: Number(commission || 0)
+  };
+  const render = () => {
+    if(!miningDisplayState) return;
+    const now = Date.now();
+    const elapsed = Math.max(0, (now - miningDisplayState.startedAt) / 1000);
+    const baseGain = elapsed * (0.0055555 / 86400);
+    const bonusSeconds = miningDisplayState.bonusActive && miningDisplayState.bonusEnd
+      ? Math.max(0, (Math.min(now, miningDisplayState.bonusEnd) - miningDisplayState.startedAt) / 1000)
+      : 0;
+    const bonusGain = bonusSeconds * (0.088888 * miningDisplayState.referralCount / 86400);
+    const liveMining = miningDisplayState.balance + baseGain + bonusGain;
+    $("miningBalance").textContent = fmt(liveMining);
+    $("totalBalance").textContent = fmt(miningDisplayState.savings + miningDisplayState.commission + liveMining);
+    const status = $("miningLiveStatus");
+    if(status){
+      status.textContent = miningDisplayState.bonusActive && now < miningDisplayState.bonusEnd
+        ? "Mining automatique + bonus parrainage · miakatra izao"
+        : "Mining automatique · miakatra izao";
+    }
+  };
+  render();
+  miningTicker = setInterval(render, 1000);
+}
 
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); b.classList.add("active");
@@ -147,6 +185,7 @@ async function loadMemberData(){
         msg("miningBonusInfo","Mining: "+mine.error,true);
       }else{
         mining=Number(mine?.mining_balance||0);
+        startMiningTicker(mining, mine?.bonus_active, mine?.bonus_until, mine?.bonus_referral_count, savings, commission);
         if(mine?.bonus_active && mine?.bonus_until){
           msg("miningBonusInfo","Bonus parrainage mandeha hatramin'ny "+new Date(mine.bonus_until).toLocaleString()+" · Filleul ACTIVE voaisa: "+Number(mine.bonus_referral_count||0));
         }else{
@@ -154,6 +193,8 @@ async function loadMemberData(){
         }
       }
     }else{
+      if(miningTicker) clearInterval(miningTicker);
+      miningTicker=null; miningDisplayState=null;
       msg("miningBonusInfo","Miandry activation ho ACTIVE ny kaontinao vao manomboka ny Mining.");
     }
     await loadMyReferrals(member);
@@ -171,6 +212,8 @@ async function loadMemberData(){
     renderTable("myDeposits",["Vola","Sata","TxID","Daty","Fanamarihana"],(d||[]).map(x=>[fmt(x.amount),x.status,x.tx_hash||"",date(x.created_at),x.admin_note||""]));
     renderTable("myWithdrawals",["Vola","Karazana","Sata","FaucetPay","Transaction ID","Daty","Fanamarihana"],(w||[]).map(x=>[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,x.faucetpay_tx_id||"Miandry ID",date(x.created_at),x.admin_note||""]));
   } else {
+    if(miningTicker) clearInterval(miningTicker);
+    miningTicker=null; miningDisplayState=null;
     $("savings").textContent=fmt(0);$("commission").textContent=fmt(0);
     $("miningBalance").textContent=fmt(0);$("totalBalance").textContent=fmt(0);
     show("miningBonusPanel",false);
