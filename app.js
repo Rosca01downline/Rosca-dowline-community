@@ -104,6 +104,10 @@ document.querySelectorAll("[data-close-forms]").forEach(b=>b.addEventListener("c
 
 $("adminRefresh").addEventListener("click",loadAdminData);
 $("communityRefresh").addEventListener("click",loadCommunityLists);
+$("rolePill").addEventListener("click",()=>{
+  const section=document.querySelector(".community-lists");
+  if(section){section.scrollIntoView({behavior:"smooth",block:"start"});$("memberRoster").focus?.({preventScroll:true});}
+});
 
 async function boot(){
   const {data:{user}}=await db.auth.getUser();
