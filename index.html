@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <title>ROSCA & DOWNLINE COMMUNITY</title>
-  <link rel="stylesheet" href="styles.css?v=20261114-1">
+  <link rel="stylesheet" href="styles.css?v=20261114-2">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'"></script>
 </head>
 <body>
@@ -81,7 +81,9 @@
       <div class="section-head"><h2>🪽 HOLDINGS WINGS — SPECIAL GIFT</h2><button id="closeHoldingsWingsBtn" class="btn ghost small" type="button">Hidio</button></div>
       <p><strong>Valisoa manokana: 15 USDT</strong></p>
       <p class="muted">Raha tafiditra ao amin’ny Top 3 amin’ny Challenge mensuel mandritra ny 3 volana misesy ny mpikambana iray, dia mahazo zo hahazo ny HOLDINGS WINGS Special Gift izy.</p>
-      <p class="muted">Rehefa voamarina ny fahazoana valisoa dia apetraka ho miandry (<strong>Pending</strong>) aloha. Ny Admin no manamarina sy manova azy ho <strong>Paid</strong> rehefa tena voaloa. Tsy misy fandoavana automatique.</p>
+      <p class="muted">Rehefa Top 3 mandritra ny 3 volana misesy ianao, dia ampidirina automatique ao amin’ny Commission ny 15 USDT. Ny sata Pending/Paid dia sata ao amin’ny historique, fa tsy manakana ny crédit Commission.</p>
+      <h3>Historique HOLDINGS WINGS</h3>
+      <div id="holdingsWingsHistory" class="table-wrap"><p class="muted">Ampidirina...</p></div>
     </section>
 
     <section id="miningBonusPanel" class="panel hidden">
@@ -155,6 +157,8 @@
       <div class="section-head"><h2>Ny fangatahako</h2><button class="btn ghost small" id="refreshBtn">Havaozy</button></div>
       <h3>Dépôt</h3><div id="myDeposits" class="table-wrap"></div>
       <h3>Retrait</h3><div id="myWithdrawals" class="table-wrap"></div>
+      <h3>HOLDINGS WINGS</h3>
+      <div id="myHoldingsWingsHistory" class="table-wrap"><p class="muted">Ampidirina...</p></div>
     </section>
 
     <section id="adminView" class="panel hidden">
@@ -168,6 +172,6 @@
   <p id="globalMsg" class="message" role="status"></p>
 </main>
 <footer>© ROSCA & DOWNLINE COMMUNITY · USDT</footer>
-<script src="app.js?v=20261114-1"></script>
+<script src="app.js?v=20261114-2"></script>
 </body>
 </html>
