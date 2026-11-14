@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <title>ROSCA & DOWNLINE COMMUNITY</title>
-  <link rel="stylesheet" href="styles.css?v=20261113-5">
+  <link rel="stylesheet" href="styles.css?v=20261114-1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'"></script>
 </head>
 <body>
@@ -56,11 +56,18 @@
       <article class="stat"><span>Commission</span><strong id="commission">0.00000000 USDT</strong><small id="reservedCommission">Voatokana: 0</small></article>
       <article class="stat"><span>Mining</span><strong id="miningBalance">0.00000000 USDT</strong><small id="miningLiveStatus">Miandry kajy Mining...</small></article>
     </div>
-    <button id="challengeCard" class="stat challenge-card" type="button">
-      <span>🏆 CHALLENGE MENSUEL</span>
-      <strong>Challenge</strong>
-      <small>Tsindrio hijery ny classement sy ireo mpandresy farany</small>
-    </button>
+    <div class="dashboard-feature-cards">
+      <button id="challengeCard" class="stat challenge-card" type="button">
+        <span>🏆 CHALLENGE MENSUEL</span>
+        <strong>Challenge</strong>
+        <small>Classement sy mpandresy farany</small>
+      </button>
+      <button id="holdingsWingsCard" class="stat holdings-wings-card" type="button">
+        <span>🪽 HOLDINGS WINGS</span>
+        <strong>15 USDT</strong>
+        <small>Top 3 mandritra ny 3 volana misesy</small>
+      </button>
+    </div>
     <section id="challengePanel" class="panel challenge-panel hidden">
       <div class="section-head"><h2>🏆 Challenge mensuel</h2><button id="closeChallengeBtn" class="btn ghost small" type="button">Hidio</button></div>
       <h3>Classement amin’ity volana ity</h3>
@@ -69,6 +76,12 @@
       <div id="challengeLeaderboard" class="table-wrap"><p class="muted">Ampidirina...</p></div>
       <h3>Mpandresy farany</h3>
       <div id="challengeWinners" class="table-wrap"><p class="muted">Ampidirina...</p></div>
+    </section>
+    <section id="holdingsWingsPanel" class="panel holdings-wings-panel hidden">
+      <div class="section-head"><h2>🪽 HOLDINGS WINGS — SPECIAL GIFT</h2><button id="closeHoldingsWingsBtn" class="btn ghost small" type="button">Hidio</button></div>
+      <p><strong>Valisoa manokana: 15 USDT</strong></p>
+      <p class="muted">Raha tafiditra ao amin’ny Top 3 amin’ny Challenge mensuel mandritra ny 3 volana misesy ny mpikambana iray, dia mahazo zo hahazo ny HOLDINGS WINGS Special Gift izy.</p>
+      <p class="muted">Rehefa voamarina ny fahazoana valisoa dia apetraka ho miandry (<strong>Pending</strong>) aloha. Ny Admin no manamarina sy manova azy ho <strong>Paid</strong> rehefa tena voaloa. Tsy misy fandoavana automatique.</p>
     </section>
 
     <section id="miningBonusPanel" class="panel hidden">
@@ -155,6 +168,6 @@
   <p id="globalMsg" class="message" role="status"></p>
 </main>
 <footer>© ROSCA & DOWNLINE COMMUNITY · USDT</footer>
-<script src="app.js?v=20261113-2"></script>
+<script src="app.js?v=20261114-1"></script>
 </body>
 </html>
