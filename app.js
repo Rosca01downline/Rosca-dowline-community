@@ -161,24 +161,28 @@ $("shareReferralBtn").addEventListener("click",async()=>{
 
 function configureDepositOptions(member){
   const select=$("depositType");
-  const feeAlreadyPaid=member?.membership_fee_paid===true;
+  const status=String(member?.status||"").toLowerCase();
+  const pending=status==="pending";
+  const active=status==="active";
 
-  const feeOption=select.querySelector('option[value="membership_fee"]');
   const combinedOption=select.querySelector('option[value="combined"]');
   const contributionOption=select.querySelector('option[value="contribution"]');
 
-  if(feeOption) feeOption.hidden=true;
-  if(combinedOption) combinedOption.hidden=feeAlreadyPaid;
-  if(contributionOption) contributionOption.hidden=!feeAlreadyPaid;
+  if(combinedOption) combinedOption.hidden=!pending;
+  if(contributionOption) contributionOption.hidden=!active;
 
-  select.value=feeAlreadyPaid?"contribution":"combined";
-
-  const amounts={
-    contribution:3,
-    combined:4
-  };
-
-  $("depositAmount").value=amounts[select.value];
+  if(pending){
+    select.value="combined";
+    $("depositAmount").value=4;
+  }else if(active){
+    select.value="contribution";
+    $("depositAmount").value=3;
+  }else{
+    select.value="";
+    $("depositAmount").value="";
+    select.disabled=true;
+  }
+  if(pending||active) select.disabled=false;
 }
 async function loadHoldingsWingsHistory(member){
   const targets=["holdingsWingsHistory","myHoldingsWingsHistory"];
@@ -396,6 +400,13 @@ $("depositForm").addEventListener("submit",async e=>{
     return;
   }
   if(!form.reportValidity()) return;
+  const status=String(currentMember?.status||"").toLowerCase();
+  const expectedType=status==="pending"?"combined":status==="active"?"contribution":null;
+  const expectedAmount=status==="pending"?4:status==="active"?3:null;
+  if(!expectedType || $("depositType").value!==expectedType || Number($("depositAmount").value)!==expectedAmount){
+    depositMessage("Tsy mifanaraka amin'ny sata-nao ny dépôt. Havaozy ny pejy ary jereo ny vola tokony haloanao.",true);
+    return;
+  }
   if(button) button.disabled=true;
   depositMessage("Alefa any amin'ny serveur ny fangatahana dépôt...");
   try{
