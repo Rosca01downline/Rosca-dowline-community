@@ -250,7 +250,10 @@ async function loadMemberData(){
     const {data:d}=await db.from("deposit_requests").select("amount,status,tx_hash,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
     const {data:w}=await db.from("withdrawal_requests").select("amount,status,withdrawal_type,faucetpay_email,faucetpay_tx_id,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
     const depositTotal=(d||[]).filter(x=>["approved","completed"].includes(x.status)).reduce((sum,x)=>sum+Number(x.amount||0),0);
-    const withdrawalTotal=(w||[]).filter(x=>x.status==="completed").reduce((sum,x)=>sum+Number(x.amount||0),0);
+    const withdrawalBase=(w||[]).filter(x=>x.status==="completed").reduce((sum,x)=>sum+Number(x.amount||0),0);
+    const {data:paidTurnTotal,error:turnTotalError}=await db.rpc("get_my_paid_turn_total");
+    if(turnTotalError) msg("globalMsg","Retrait total tour: "+turnTotalError.message,true);
+    const withdrawalTotal=withdrawalBase+Number(paidTurnTotal||0);
     $("totalDeposits").textContent=fmt(depositTotal);
     $("totalWithdrawals").textContent=fmt(withdrawalTotal);
     renderTable("myDeposits",["Vola","Sata","TxID","Daty","Fanamarihana"],(d||[]).map(x=>[fmt(x.amount),x.status,x.tx_hash||"",date(x.created_at),x.admin_note||""]));
