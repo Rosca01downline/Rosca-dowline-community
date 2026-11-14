@@ -78,8 +78,9 @@ $("challengeCard").addEventListener("click",async()=>{
   $("challengePanel").scrollIntoView({behavior:"smooth",block:"start"});
 });
 $("closeChallengeBtn").addEventListener("click",()=>show("challengePanel",false));
-$("holdingsWingsCard").addEventListener("click",()=>{
+$("holdingsWingsCard").addEventListener("click",async()=>{
   show("holdingsWingsPanel",true);
+  await loadHoldingsWingsHistory(currentMember);
   $("holdingsWingsPanel").scrollIntoView({behavior:"smooth",block:"start"});
 });
 $("closeHoldingsWingsBtn").addEventListener("click",()=>show("holdingsWingsPanel",false));
@@ -179,12 +180,40 @@ function configureDepositOptions(member){
 
   $("depositAmount").value=amounts[select.value];
 }
+async function loadHoldingsWingsHistory(member){
+  const targets=["holdingsWingsHistory","myHoldingsWingsHistory"];
+  if(!member){
+    targets.forEach(id=>{ if($(id)) $(id).innerHTML='<p class="muted">Tsy mbola misy angona.</p>'; });
+    return;
+  }
+  const {data,error}=await db.from("holdings_wings_rewards")
+    .select("first_month,second_month,third_month,first_rank,second_rank,third_rank,reward_amount,status,awarded_at")
+    .eq("member_id",member.id)
+    .order("third_month",{ascending:false});
+  if(error){
+    targets.forEach(id=>{ if($(id)) $(id).innerHTML='<p class="error">Tsy afaka mamaky ny historique HOLDINGS WINGS: '+esc(error.message)+'</p>'; });
+    return;
+  }
+  const rows=(data||[]).map(x=>[
+    [x.first_month,x.second_month,x.third_month].map(m=>m?new Date(m+"T12:00:00").toLocaleDateString("fr-FR",{month:"short",year:"numeric"}):"—").join(" → "),
+    [x.first_rank,x.second_rank,x.third_rank].map(r=>r?"Top "+r:"—").join(" / "),
+    fmt(x.reward_amount),
+    String(x.status||"pending").toUpperCase(),
+    date(x.awarded_at)
+  ]);
+  const markup=rows.length
+    ? "<table><thead><tr>"+["Volana 3 misesy","Laharana","Valisoa","Sata historique","Daty"].map(h=>"<th>"+esc(h)+"</th>").join("")+"</tr></thead><tbody>"+rows.map(row=>"<tr>"+row.map(v=>"<td>"+esc(String(v??""))+"</td>").join("")+"</tr>").join("")+"</tbody></table>"
+    : '<p class="muted">Mbola tsy nahazo HOLDINGS WINGS ianao.</p>';
+  targets.forEach(id=>{ if($(id)) $(id).innerHTML=markup; });
+}
+
 async function loadMemberData(){
   if(!currentUser)return;
   const {data:member,error:memberError}=await db.from("members").select("id,status,membership_fee_paid").eq("auth_user_id",currentUser.id).maybeSingle();
   if(memberError){msg("globalMsg","Erreur lecture membre: "+memberError.message,true);return;}
   currentMember=member;
   configureDepositOptions(member);
+  await loadHoldingsWingsHistory(member);
   if(member)msg("globalMsg","Membre trouvé dans l’application : "+member.status);
   renderReferralLink(member);
   if(member){
