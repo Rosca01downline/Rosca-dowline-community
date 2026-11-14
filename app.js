@@ -356,7 +356,7 @@ async function loadCommunityLists(){
     }
   }
   if(turnError) turnEl.innerHTML='<p class="error">Tsy afaka mamaky ny lisitry ny tours: '+esc(turnError.message)+'</p>';
-  else renderTable("publicTurnList",["Tour","Daty","Mpandray","Sata"],(turns||[]).map(x=>[x.turn_number,dateOnly(x.scheduled_date),x.receiver_name,x.turn_status]));
+  else renderTable("publicTurnList",["Tour","Daty","Mpandray","Sata","FaucetPay TxID","Daty nandoavana"],(turns||[]).map(x=>[x.turn_number,dateOnly(x.scheduled_date),x.receiver_name,x.turn_status,x.faucetpay_tx_id||"—",date(x.paid_at)]));
 }
 function dateOnly(s){
   if(!s)return "";
@@ -432,6 +432,13 @@ async function loadAdminData(){
   const {data:m,error:me}=await db.from("members").select("id,full_name,phone,status,created_at").order("created_at",{ascending:false});
   if(me){msg("globalMsg","Membre admin: "+me.message,true);return;}
   renderMemberTable(m||[]);
+  await loadAdminTurns();
+}
+async function loadAdminTurns(){
+  const {data,error}=await db.from("member_turns").select("id,turn_number,scheduled_date,status,faucetpay_tx_id,paid_at,members(full_name)").order("turn_number",{ascending:true});
+  if(error){msg("globalMsg","Lisitra tour admin: "+error.message,true);return;}
+  const rows=(data||[]).map(t=>({id:t.id,status:t.status,values:[t.turn_number,dateOnly(t.scheduled_date),t.members?.full_name||"—",t.status,t.faucetpay_tx_id||"—",date(t.paid_at)]}));
+  $("adminTurns").innerHTML=tableWithActions(["Tour","Daty","Mpandray","Sata","FaucetPay TxID","Daty nandoavana"],rows,"turn");
 }
 function renderMemberTable(members){
   const el=$("adminMembers");
@@ -442,7 +449,7 @@ function renderMemberTable(members){
 }
 function tableWithActions(heads,rows,type){
   if(!rows.length)return '<p class="muted">Tsy mbola misy fangatahana.</p>';
-  return "<table><thead><tr>"+heads.map(h=>`<th>${esc(h)}</th>`).join("")+"<th>Action</th></tr></thead><tbody>"+rows.map(r=>`<tr>${r.values.map(v=>`<td>${esc(String(v??""))}</td>`).join("")}<td>${r.status==="pending"?`<button class="action" data-action="approve" data-type="${type}" data-id="${r.id}">Ekena</button><button class="action reject" data-action="reject" data-type="${type}" data-id="${r.id}">Lavina</button>`:type==="withdrawal"&&r.status==="approved"?`<button class="action" data-action="complete-withdrawal" data-type="${type}" data-id="${r.id}">MARQUER COMME PAYÉ</button>`:"—"}</td></tr>`).join("")+"</tbody></table>";
+  return "<table><thead><tr>"+heads.map(h=>`<th>${esc(h)}</th>`).join("")+"<th>Action</th></tr></thead><tbody>"+rows.map(r=>`<tr>${r.values.map(v=>`<td>${esc(String(v??""))}</td>`).join("")}<td>${r.status==="pending"?`<button class="action" data-action="approve" data-type="${type}" data-id="${r.id}">Ekena</button><button class="action reject" data-action="reject" data-type="${type}" data-id="${r.id}">Lavina</button>`:type==="withdrawal"&&r.status==="approved"?`<button class="action" data-action="complete-withdrawal" data-type="${type}" data-id="${r.id}">MARQUER COMME PAYÉ</button>`:type==="turn"&&r.status==="waiting"?`<button class="action" data-action="mark-turn-paid" data-type="turn" data-id="${r.id}">CONFIRMER PAIEMENT + TxID</button>`:"—"}</td></tr>`).join("")+"</tbody></table>";
 }
 document.addEventListener("click",async e=>{
   const b=e.target.closest("button[data-action]");if(!b)return;
@@ -455,6 +462,19 @@ document.addEventListener("click",async e=>{
     if(data!==true){msg("globalMsg","Tsy niova ny sata. Mety efa active ilay mpikambana na tsy pending intsony.",true);}
     else {msg("globalMsg","Voavitrika soa aman-tsara ny mpikambana.");}
     await loadAdminData();
+    return;
+  }
+  if(decision==="mark-turn-paid"){
+    if(type!=="turn")return;
+    const txid=prompt("Ampidiro ny FaucetPay Transaction ID rehefa avy nandefa ny vola tamin’ny mpandray tour:");
+    if(txid===null)return;
+    if(!txid.trim())return alert("Tsy maintsy ampidirina ny FaucetPay Transaction ID.");
+    if(!confirm("Efa nalefanao tokoa ve ny vola ho an’ity mpandray tour ity? Rehefa manamarina ianao dia hiseho ho PAID amin’ny mpikambana rehetra."))return;
+    b.disabled=true;
+    const {error}=await db.rpc("admin_mark_turn_paid",{p_turn_id:id,p_tx_id:txid.trim()});
+    if(error){msg("globalMsg",error.message,true);b.disabled=false;return;}
+    msg("globalMsg","Voamarika ho PAID ny tour ary voatahiry ny FaucetPay TxID.");
+    await loadAdminData();await loadCommunityLists();
     return;
   }
   if(decision==="complete-withdrawal"){
