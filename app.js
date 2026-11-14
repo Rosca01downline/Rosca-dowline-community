@@ -78,6 +78,11 @@ $("challengeCard").addEventListener("click",async()=>{
   $("challengePanel").scrollIntoView({behavior:"smooth",block:"start"});
 });
 $("closeChallengeBtn").addEventListener("click",()=>show("challengePanel",false));
+$("holdingsWingsCard").addEventListener("click",()=>{
+  show("holdingsWingsPanel",true);
+  $("holdingsWingsPanel").scrollIntoView({behavior:"smooth",block:"start"});
+});
+$("closeHoldingsWingsBtn").addEventListener("click",()=>show("holdingsWingsPanel",false));
 
 $("activateMiningBonusBtn").addEventListener("click",async()=>{
   const button=$("activateMiningBonusBtn");
