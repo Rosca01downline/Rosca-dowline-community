@@ -8,6 +8,7 @@ const $ = (id) => document.getElementById(id);
 const show = (id, yes=true) => $(id).classList.toggle("hidden", !yes);
 const msg = (id, text, error=false) => { $(id).textContent=text; $(id).classList.toggle("error",error); };
 const fmt = (n) => `${Number(n||0).toFixed(8)} USDT`;
+const fmtMining = (n) => `${Number(n||0).toFixed(12)} USDT`;
 let currentUser = null, currentProfile = null, currentMember = null;
 let miningTicker = null;
 let miningDisplayState = null;
@@ -35,8 +36,8 @@ function startMiningTicker(serverBalance, bonusActive, bonusUntil, referralCount
       : 0;
     const bonusGain = bonusSeconds * (0.088888 * miningDisplayState.referralCount / 86400);
     const liveMining = miningDisplayState.balance + baseGain + bonusGain;
-    $("miningBalance").textContent = fmt(liveMining);
-    $("totalBalance").textContent = fmt(miningDisplayState.savings + miningDisplayState.commission + liveMining);
+    $("miningBalance").textContent = fmtMining(liveMining);
+    $("totalBalance").textContent = fmtMining(miningDisplayState.savings + miningDisplayState.commission + liveMining);
     const status = $("miningLiveStatus");
     if(status){
       status.textContent = miningDisplayState.bonusActive && now < miningDisplayState.bonusEnd
@@ -45,7 +46,7 @@ function startMiningTicker(serverBalance, bonusActive, bonusUntil, referralCount
     }
   };
   render();
-  miningTicker = setInterval(render, 1000);
+  miningTicker = setInterval(render, 100);
 }
 
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
