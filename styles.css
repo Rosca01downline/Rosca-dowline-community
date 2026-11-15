@@ -143,8 +143,11 @@
 .ludo-center .center-green{background:#08a84a;clip-path:polygon(0 0,100% 0,0 100%)}
 .ludo-center .center-yellow{background:#ffd500;clip-path:polygon(100% 0,100% 100%,0 50%)}
 .ludo-center .center-blue{background:#159bd7;clip-path:polygon(0 0,100% 100%,0 100%)}
-.ludo-pawn{z-index:3;align-self:center;justify-self:center;width:82%;height:82%;min-width:0;min-height:0;padding:0;border:2px solid #fff;border-radius:50%;font-size:clamp(8px,2vw,13px);font-weight:900;color:#fff;box-shadow:0 1px 4px #0005;cursor:pointer}
-.ludo-pawn:disabled{cursor:default;opacity:.9}
-.ludo-pawn.red{background:#dc2626}.ludo-pawn.green{background:#16a34a}.ludo-pawn.yellow{background:#d4a000;color:#172033}.ludo-pawn.blue{background:#2563eb}
+.ludo-pawn{z-index:3;align-self:center;justify-self:center;display:grid;place-items:center;width:92%;height:92%;min-width:0;min-height:0;padding:0;border:0;border-radius:0;background:transparent;cursor:pointer;filter:drop-shadow(0 2px 2px #0007);transition:transform .12s ease,filter .12s ease}
+.ludo-pawn svg{display:block;width:100%;height:100%;overflow:visible}
+.ludo-pawn .pawn-shape{fill:currentColor;stroke:#fff;stroke-width:4;stroke-linejoin:round}
+.ludo-pawn:disabled{cursor:default;opacity:1}
+.ludo-pawn:not(:disabled):active{transform:scale(.88)}
+.ludo-pawn.red{color:#c9151d}.ludo-pawn.green{color:#079447}.ludo-pawn.yellow{color:#e0b900}.ludo-pawn.blue{color:#0788c5}
 .ludo-board-empty{grid-column:1/-1;align-self:center;text-align:center;padding:20px}
 @media(max-width:560px){.ludo-game{padding:9px}.ludo-game-head{align-items:flex-start;flex-direction:column}.ludo-dice-box{width:100%;justify-content:space-between}.ludo-board{width:100%}}
