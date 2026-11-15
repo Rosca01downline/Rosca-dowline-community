@@ -161,13 +161,28 @@ function renderLudoBoard(snapshot){
   const ownSeat=players.find(p=>p.member_id===currentMember?.id)?.seat_number;
   const myTurn=Number(state.current_turn_seat)===Number(ownSeat);
   const cells=[];
+  const safeTrack=[0,8,13,21,26,34,39,47];
   for(let r=0;r<15;r++) for(let c=0;c<15;c++){
-    const base=(r<6&&c<6)?"yard-red":(r<6&&c>8)?"yard-green":(r>8&&c>8)?"yard-yellow":(r>8&&c<6)?"yard-blue":"";
-    const track=LUDO_TRACK.some(([rr,cc])=>rr===r&&cc===c);
-    const lane=Object.entries(LUDO_HOME_LANES).some(([s,coords])=>coords.some(([rr,cc])=>rr===r&&cc===c));
-    cells.push('<div class="ludo-cell '+base+(track?' track':'')+(lane?' lane':'')+'"></div>');
+    let base="";
+    if(r<6&&c<6) base="yard-red";
+    else if(r<6&&c>8) base="yard-green";
+    else if(r>8&&c>8) base="yard-yellow";
+    else if(r>8&&c<6) base="yard-blue";
+    const inYard=(r<6&&c<6)||(r<6&&c>8)||(r>8&&c>8)||(r>8&&c<6);
+    const innerYard=inYard&&((r>=1&&r<=4&&(c<=4||c>=10))||(c>=1&&c<=4&&(r>=10&&r<=13))||(c>=10&&c<=13&&(r>=10&&r<=13)));
+    const trackIndex=LUDO_TRACK.findIndex(([rr,cc])=>rr===r&&cc===c);
+    const laneSeat=Object.entries(LUDO_HOME_LANES).find(([s,coords])=>coords.some(([rr,cc])=>rr===r&&cc===c))?.[0];
+    let cls="ludo-cell "+base;
+    if(innerYard) cls+=" yard-inner";
+    if(trackIndex>=0) cls+=" track"+(safeTrack.includes(trackIndex)?" safe":"");
+    if(laneSeat) cls+=" lane lane-"+laneSeat;
+    if(r===6&&c===1) cls+=" start-red";
+    if(r===1&&c===8) cls+=" start-green";
+    if(r===8&&c===13) cls+=" start-yellow";
+    if(r===13&&c===6) cls+=" start-blue";
+    cells.push('<div class="'+cls+'"></div>');
   }
-  board.innerHTML=cells.join("");
+  board.innerHTML=cells.join("")+'<div class="ludo-center" aria-hidden="true"><span class="center-red"></span><span class="center-green"></span><span class="center-yellow"></span><span class="center-blue"></span></div>';
   players.forEach(player=>{
     const seat=Number(player.seat_number);
     const positions=state.pawns?.[String(seat)]?.pawns||[-1,-1,-1,-1];
