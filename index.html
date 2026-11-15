@@ -93,6 +93,31 @@
       <p class="muted">Ny bonus dia kajiana ho an’ny filleul ACTIVE ihany, ary mila averina alefa rehefa tapitra ny 24 ora.</p>
     </section>
 
+
+    <section id="ludoSocialPanel" class="panel ludo-panel">
+      <div class="section-head"><div><span class="eyebrow">ESPACE LUDO</span><h2>🎲 Ludo & Chat communautaire</h2></div><button id="ludoRefreshBtn" class="btn ghost small" type="button">Havaozy</button></div>
+      <p class="muted">Chat sy cadeau visuel ao amin'ny room. Tsy misy mise en jeu, retrait na famindrana SC amin'ity sehatra ity.</p>
+      <label>Safidio ny room misy anao
+        <select id="ludoRoomSelect"><option value="">Mitady room...</option></select>
+      </label>
+      <div id="ludoRoomStatus" class="muted" role="status">Ampidirina ny room...</div>
+      <div class="ludo-chat-feed" id="ludoChatFeed" aria-live="polite"><p class="muted">Safidio aloha ny room.</p></div>
+      <form id="ludoChatForm" class="ludo-chat-form">
+        <label>Hafatra<input id="ludoChatInput" maxlength="2000" placeholder="Soraty eto ny hafatra..." autocomplete="off"></label>
+        <button class="btn primary" type="submit">Alefa</button>
+      </form>
+      <div class="ludo-gift-row">
+        <label>Handefa cadeau ho an'i
+          <select id="ludoGiftRecipient"><option value="">Safidio ny mpandray</option></select>
+        </label>
+        <label>Cadeau
+          <select id="ludoGiftCode"><option value="">Safidio ny cadeau</option></select>
+        </label>
+        <button id="ludoSendGiftBtn" class="btn secondary" type="button">🎁 Alefa cadeau visuel</button>
+      </div>
+      <p id="ludoSocialMsg" class="message" role="status"></p>
+    </section>
+
     <section class="panel community-lists">
       <div class="section-head"><h2>Lisitry ny communauté</h2><button class="btn ghost small" id="communityRefresh" type="button">Havaozy</button></div>
       <h3>Mpikambana</h3><div id="memberRoster" class="table-wrap"></div>
