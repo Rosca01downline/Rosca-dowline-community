@@ -230,6 +230,7 @@ async function rollLudoDice(){
   if(!currentLudoRoomId||ludoBoardBusy) return;
   ludoBoardBusy=true;
   $("ludoRollBtn").disabled=true;
+  if(ludoGameSnapshot) renderLudoBoard(ludoGameSnapshot);
   try{
     const {data,error}=await db.rpc("roll_ludo_dice",{p_room_id:currentLudoRoomId});
     if(error) throw error;
@@ -242,11 +243,15 @@ async function rollLudoDice(){
     }
   }catch(error){
     msg("ludoSocialMsg","Erreur dés: "+(error?.message||String(error)),true);
-  }finally{ludoBoardBusy=false;await loadLudoGameState();}
+  }finally{
+    ludoBoardBusy=false;
+    if(ludoGameSnapshot) renderLudoBoard(ludoGameSnapshot);
+  }
 }
 async function moveLudoPawn(index){
   if(!currentLudoRoomId||ludoBoardBusy) return;
   ludoBoardBusy=true;
+  if(ludoGameSnapshot) renderLudoBoard(ludoGameSnapshot);
   try{
     const {data,error}=await db.rpc("move_ludo_pawn",{p_room_id:currentLudoRoomId,p_pawn_index:index});
     if(error) throw error;
@@ -254,7 +259,10 @@ async function moveLudoPawn(index){
     await loadLudoGameState();
   }catch(error){
     msg("ludoSocialMsg","Tsy afaka mamindra pion: "+(error?.message||String(error)),true);
-  }finally{ludoBoardBusy=false;await loadLudoGameState();}
+  }finally{
+    ludoBoardBusy=false;
+    if(ludoGameSnapshot) renderLudoBoard(ludoGameSnapshot);
+  }
 }
 $("ludoRollBtn").addEventListener("click",rollLudoDice);
 
