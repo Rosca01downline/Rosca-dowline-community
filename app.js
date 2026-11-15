@@ -268,20 +268,17 @@ async function loadLudoRoomMembers(){
   target.innerHTML='<option value="">Ampidirina...</option>';
   if(!currentLudoRoomId) return;
   try{
-    const {data:players,error}=await db.from("ludo_room_players")
-      .select("member_id,is_bot,seat_number").eq("room_id",currentLudoRoomId);
+    const {data:members,error}=await db.rpc("get_ludo_room_members",{
+      p_room_id:currentLudoRoomId
+    });
     if(error) throw error;
-    const ids=(players||[]).map(p=>p.member_id).filter(Boolean);
-    const {data:members,error:memberError}=ids.length
-      ? await db.from("members").select("id,full_name").in("id",ids)
-      : {data:[],error:null};
-    if(memberError) throw memberError;
     ludoRoomMembers=members||[];
     target.innerHTML='<option value="">Safidio ny mpandray</option>'+ludoRoomMembers
       .filter(m=>m.id!==currentMember?.id)
       .map(m=>'<option value="'+esc(m.id)+'">'+esc(m.full_name||"Membre")+'</option>').join("");
     msg("ludoRoomStatus","Room voafidy. Afaka mifampiresaka sy mandefa cadeau visuel ianao.");
   }catch(error){
+    ludoRoomMembers=[];
     target.innerHTML='<option value="">Tsy afaka mamaky mpilalao</option>';
     msg("ludoRoomStatus","Erreur mpilalao: "+(error?.message||String(error)),true);
   }
@@ -291,6 +288,7 @@ async function loadLudoChat(){
   if(!currentLudoRoomId){feed.innerHTML='<p class="muted">Safidio aloha ny room.</p>';return;}
   feed.innerHTML='<p class="muted">Ampidirina ny chat...</p>';
   try{
+    await loadLudoRoomMembers();
     const [{data:messages,error:messageError},{data:gifts,error:giftError},{data:catalog,error:catalogError}]=await Promise.all([
       db.from("ludo_chat_messages").select("id,sender_member_id,message_type,content,created_at")
         .eq("room_id",currentLudoRoomId).order("created_at",{ascending:true}).limit(100),
