@@ -300,6 +300,7 @@ async function boot(){
   show("adminView",profile.role==="admin");
   await loadMemberData();
   await loadCommunityLists();
+  await loadLudoRooms();
   if(profile.role==="admin") await loadAdminData();
 }
 
