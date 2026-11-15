@@ -116,6 +116,8 @@ document.querySelectorAll("[data-close-forms]").forEach(b=>b.addEventListener("c
 
 
 let currentLudoRoomId = null;
+let ludoChatChannel = null;
+let ludoChatChannelRoomId = null;
 let ludoRoomMembers = [];
 let ludoGameSnapshot = null;
 let ludoBoardBusy = false;
@@ -501,7 +503,19 @@ async function loadLudoRoomMembers(){
 }
 async function loadLudoChat(){
   const feed=$("ludoChatFeed");
-  if(!currentLudoRoomId){feed.innerHTML='<p class="muted">Safidio aloha ny room.</p>';return;}
+  if(!currentLudoRoomId){
+    if(ludoChatChannel){await db.removeChannel(ludoChatChannel);ludoChatChannel=null;ludoChatChannelRoomId=null;}
+    feed.innerHTML='<p class="muted">Safidio aloha ny room.</p>';return;
+  }
+  if(ludoChatChannelRoomId!==currentLudoRoomId){
+    if(ludoChatChannel) await db.removeChannel(ludoChatChannel);
+    const roomId=currentLudoRoomId;
+    ludoChatChannel=db.channel("ludo-chat-"+roomId)
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"ludo_chat_messages",filter:"room_id=eq."+roomId},()=>{if(currentLudoRoomId===roomId) loadLudoChat();})
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"ludo_chat_gift_events",filter:"room_id=eq."+roomId},()=>{if(currentLudoRoomId===roomId) loadLudoChat();})
+      .subscribe();
+    ludoChatChannelRoomId=roomId;
+  }
   feed.innerHTML='<p class="muted">Ampidirina ny chat...</p>';
   try{
     await loadLudoRoomMembers();
