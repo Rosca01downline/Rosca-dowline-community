@@ -383,7 +383,8 @@ function renderLudoRoomOptions(){
     const shortId=id.slice(0,8);
     return !term || id.includes(term) || shortId.includes(term) ||
       String(r.game_mode||"").toLowerCase().includes(term) ||
-      String(r.status||"").toLowerCase().includes(term);
+      String(r.status||"").toLowerCase().includes(term) ||
+      String(r.search_names||"").toLowerCase().includes(term);
   };
   const joined=ludoJoinedRoomCache.filter(matches);
   const open=ludoOpenRoomCache.filter(matches);
@@ -426,6 +427,31 @@ async function loadLudoRooms(){
     if(roomError) throw roomError;
     ludoJoinedRoomCache=rooms||[];
     ludoOpenRoomCache=(openRooms||[]).filter(r=>!ids.includes(r.id));
+    const searchableRoomIds=[...new Set([...ludoJoinedRoomCache,...ludoOpenRoomCache].map(r=>r.id))];
+    if(searchableRoomIds.length){
+      const {data:roomPlayers,error:playersError}=await db.from("ludo_room_players")
+        .select("room_id,member_id").in("room_id",searchableRoomIds);
+      if(playersError) throw playersError;
+      const memberIds=[...new Set((roomPlayers||[]).map(p=>p.member_id).filter(Boolean))];
+      let memberNames=[];
+      if(memberIds.length){
+        const {data:names,error:namesError}=await db.from("members").select("id,full_name").in("id",memberIds);
+        if(namesError) throw namesError;
+        memberNames=names||[];
+      }
+      const namesById=new Map(memberNames.map(m=>[m.id,m.full_name||""]));
+      const namesByRoom=new Map();
+      (roomPlayers||[]).forEach(p=>{
+        if(!p.member_id) return;
+        const list=namesByRoom.get(p.room_id)||[];
+        const name=namesById.get(p.member_id);
+        if(name) list.push(name);
+        namesByRoom.set(p.room_id,list);
+      });
+      [...ludoJoinedRoomCache,...ludoOpenRoomCache].forEach(room=>{
+        room.search_names=(namesByRoom.get(room.id)||[]).join(" ");
+      });
+    }
     renderLudoRoomOptions();
     if(currentLudoRoomId && ludoJoinedRoomCache.some(r=>r.id===currentLudoRoomId)){
       select.value=currentLudoRoomId;
