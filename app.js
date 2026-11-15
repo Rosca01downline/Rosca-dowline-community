@@ -119,6 +119,49 @@ let currentLudoRoomId = null;
 let ludoRoomMembers = [];
 
 $("ludoRefreshBtn").addEventListener("click", loadLudoRooms);
+$("ludoCreateRoomBtn").addEventListener("click", async () => {
+  const button=$("ludoCreateRoomBtn");
+  if(!currentMember?.id || String(currentMember.status).toLowerCase()!=="active"){
+    msg("ludoSocialMsg","Kaonty ACTIVE ihany no afaka mamorona room.",true); return;
+  }
+  button.disabled=true;
+  msg("ludoSocialMsg","Mamorona room...");
+  try{
+    const {data,error}=await db.rpc("create_ludo_room",{
+      p_game_mode:$("ludoGameMode").value,
+      p_player_count:Number($("ludoPlayerCount").value)
+    });
+    if(error) throw error;
+    currentLudoRoomId=data;
+    msg("ludoSocialMsg","Voaforona ny room! Tsy misy mise na transfert SC.");
+    await loadLudoRooms();
+    $("ludoRoomSelect").value=data;
+    await loadLudoRoomMembers();
+    await loadLudoChat();
+  }catch(error){
+    msg("ludoSocialMsg","Tsy nahomby ny famoronana room: "+(error?.message||String(error)),true);
+  }finally{button.disabled=false;}
+});
+$("ludoJoinRoomBtn").addEventListener("click", async () => {
+  const roomId=$("ludoOpenRoomSelect").value;
+  const button=$("ludoJoinRoomBtn");
+  if(!roomId){msg("ludoSocialMsg","Safidio aloha ny room ONLINE.",true);return;}
+  button.disabled=true;
+  msg("ludoSocialMsg","Miditra ao amin'ny room...");
+  try{
+    const {data,error}=await db.rpc("join_ludo_room",{p_room_id:roomId});
+    if(error) throw error;
+    currentLudoRoomId=data;
+    msg("ludoSocialMsg","Tafiditra soa aman-tsara ao amin'ny room!");
+    await loadLudoRooms();
+    $("ludoRoomSelect").value=data;
+    await loadLudoRoomMembers();
+    await loadLudoChat();
+  }catch(error){
+    msg("ludoSocialMsg","Tsy tafiditra ao amin'ny room: "+(error?.message||String(error)),true);
+    await loadLudoRooms();
+  }finally{button.disabled=false;}
+});
 $("ludoRoomSelect").addEventListener("change", async e => {
   currentLudoRoomId = e.target.value || null;
   await loadLudoRoomMembers();
@@ -173,44 +216,50 @@ $("ludoSendGiftBtn").addEventListener("click", async () => {
 
 async function loadLudoRooms(){
   const select=$("ludoRoomSelect");
+  const openSelect=$("ludoOpenRoomSelect");
   select.innerHTML='<option value="">Mitady room...</option>';
+  openSelect.innerHTML='<option value="">Mitady room...</option>';
   $("ludoChatFeed").innerHTML='<p class="muted">Ampidirina...</p>';
   if(!currentMember?.id){
     select.innerHTML='<option value="">Tsy mbola misy profil membre</option>';
+    openSelect.innerHTML='<option value="">Tsy mbola misy profil membre</option>';
     msg("ludoRoomStatus","Mila kaonty membre ianao vao afaka miditra amin'ny chat.",true);
     return;
   }
   try{
-    const {data:joined,error}=await db.from("ludo_room_players")
-      .select("room_id").eq("member_id",currentMember.id);
-    if(error) throw error;
+    const [{data:joined,error:joinedError},{data:openRooms,error:openError}]=await Promise.all([
+      db.from("ludo_room_players").select("room_id").eq("member_id",currentMember.id),
+      db.from("ludo_rooms").select("id,game_mode,player_count,status,created_at")
+        .eq("game_mode","online").eq("status","waiting")
+        .order("created_at",{ascending:false}).limit(50)
+    ]);
+    if(joinedError) throw joinedError;
+    if(openError) throw openError;
     const ids=[...new Set((joined||[]).map(x=>x.room_id).filter(Boolean))];
-    if(!ids.length){
-      select.innerHTML='<option value="">Tsy mbola ao anaty room ianao</option>';
-      msg("ludoRoomStatus","Mbola tsy misy room nidiranao. Ny famoronana room sy lalao dia dingana manaraka.");
-      $("ludoGiftRecipient").innerHTML='<option value="">Tsy misy mpandray</option>';
-      $("ludoChatFeed").innerHTML='<p class="muted">Tsy mbola misy room hanehoana chat.</p>';
-      return;
-    }
-    const {data:rooms,error:roomError}=await db.from("ludo_rooms")
-      .select("id,game_mode,player_count,status,created_at")
-      .in("id",ids).in("status",["waiting","playing"])
-      .order("created_at",{ascending:false});
+    const {data:rooms,error:roomError}=ids.length
+      ? await db.from("ludo_rooms").select("id,game_mode,player_count,status,created_at")
+          .in("id",ids).in("status",["waiting","playing"]).order("created_at",{ascending:false})
+      : {data:[],error:null};
     if(roomError) throw roomError;
-    select.innerHTML='<option value="">Safidio ny room</option>'+(rooms||[]).map(r=>
+    select.innerHTML='<option value="">Safidio ny room efa nidiranao</option>'+(rooms||[]).map(r=>
       '<option value="'+esc(r.id)+'">Room '+esc(String(r.id).slice(0,8))+' · '+esc(r.game_mode)+' · '+esc(r.status)+'</option>'
     ).join("");
+    openSelect.innerHTML='<option value="">Safidio ny room ONLINE</option>'+(openRooms||[])
+      .filter(r=>!ids.includes(r.id))
+      .map(r=>'<option value="'+esc(r.id)+'">Room '+esc(String(r.id).slice(0,8))+' · '+r.player_count+' joueurs · miandry</option>').join("");
     if(currentLudoRoomId && (rooms||[]).some(r=>r.id===currentLudoRoomId)){
       select.value=currentLudoRoomId;
       await loadLudoRoomMembers();
       await loadLudoChat();
     }else{
       currentLudoRoomId=null;
-      msg("ludoRoomStatus","Safidio ny room iray.");
-      $("ludoChatFeed").innerHTML='<p class="muted">Safidio aloha ny room.</p>';
+      msg("ludoRoomStatus","Safidio ny room efa nidiranao, na midira amin'ny room ONLINE misokatra.");
+      $("ludoChatFeed").innerHTML='<p class="muted">Tsy mbola nisafidy room ianao.</p>';
+      $("ludoGiftRecipient").innerHTML='<option value="">Tsy misy mpandray</option>';
     }
   }catch(error){
     select.innerHTML='<option value="">Tsy afaka mamaky room</option>';
+    openSelect.innerHTML='<option value="">Tsy afaka mamaky room</option>';
     msg("ludoRoomStatus","Erreur room: "+(error?.message||String(error)),true);
   }
 }
