@@ -372,6 +372,31 @@ $("ludoSendGiftBtn").addEventListener("click", async () => {
   }finally{button.disabled=false;}
 });
 
+let ludoJoinedRoomCache = [];
+let ludoOpenRoomCache = [];
+function renderLudoRoomOptions(){
+  const term=String($("ludoRoomSearch")?.value||"").trim().toLowerCase();
+  const select=$("ludoRoomSelect");
+  const openSelect=$("ludoOpenRoomSelect");
+  const matches=r=>{
+    const id=String(r.id||"").toLowerCase();
+    const shortId=id.slice(0,8);
+    return !term || id.includes(term) || shortId.includes(term) ||
+      String(r.game_mode||"").toLowerCase().includes(term) ||
+      String(r.status||"").toLowerCase().includes(term);
+  };
+  const joined=ludoJoinedRoomCache.filter(matches);
+  const open=ludoOpenRoomCache.filter(matches);
+  select.innerHTML='<option value="">Safidio ny room efa nidiranao ('+joined.length+')</option>'+joined.map(r=>
+    '<option value="'+esc(r.id)+'">Room '+esc(String(r.id).slice(0,8))+' · '+esc(r.game_mode)+' · '+esc(r.status)+'</option>'
+  ).join("");
+  openSelect.innerHTML='<option value="">Safidio ny room ONLINE misokatra ('+open.length+')</option>'+open.map(r=>
+    '<option value="'+esc(r.id)+'">Room '+esc(String(r.id).slice(0,8))+' · '+r.player_count+' joueurs · miandry</option>'
+  ).join("");
+  if(term && !joined.length && !open.length){
+    msg("ludoRoomStatus","Tsy nahitana room mifanaraka amin'ny recherche: "+esc(term));
+  }
+}
 async function loadLudoRooms(){
   const select=$("ludoRoomSelect");
   const openSelect=$("ludoOpenRoomSelect");
@@ -389,7 +414,7 @@ async function loadLudoRooms(){
       db.from("ludo_room_players").select("room_id").eq("member_id",currentMember.id),
       db.from("ludo_rooms").select("id,game_mode,player_count,status,created_at")
         .eq("game_mode","online").eq("status","waiting")
-        .order("created_at",{ascending:false}).limit(50)
+        .order("created_at",{ascending:false}).limit(100)
     ]);
     if(joinedError) throw joinedError;
     if(openError) throw openError;
@@ -399,19 +424,16 @@ async function loadLudoRooms(){
           .in("id",ids).in("status",["waiting","playing"]).order("created_at",{ascending:false})
       : {data:[],error:null};
     if(roomError) throw roomError;
-    select.innerHTML='<option value="">Safidio ny room efa nidiranao</option>'+(rooms||[]).map(r=>
-      '<option value="'+esc(r.id)+'">Room '+esc(String(r.id).slice(0,8))+' · '+esc(r.game_mode)+' · '+esc(r.status)+'</option>'
-    ).join("");
-    openSelect.innerHTML='<option value="">Safidio ny room ONLINE</option>'+(openRooms||[])
-      .filter(r=>!ids.includes(r.id))
-      .map(r=>'<option value="'+esc(r.id)+'">Room '+esc(String(r.id).slice(0,8))+' · '+r.player_count+' joueurs · miandry</option>').join("");
-    if(currentLudoRoomId && (rooms||[]).some(r=>r.id===currentLudoRoomId)){
+    ludoJoinedRoomCache=rooms||[];
+    ludoOpenRoomCache=(openRooms||[]).filter(r=>!ids.includes(r.id));
+    renderLudoRoomOptions();
+    if(currentLudoRoomId && ludoJoinedRoomCache.some(r=>r.id===currentLudoRoomId)){
       select.value=currentLudoRoomId;
       await loadLudoRoomMembers();
       await loadLudoChat();
     }else{
       currentLudoRoomId=null;
-      msg("ludoRoomStatus","Safidio ny room efa nidiranao, na midira amin'ny room ONLINE misokatra.");
+      msg("ludoRoomStatus","Mitadiava room amin'ny code/ID, na safidio amin'ny lisitra.");
       $("ludoChatFeed").innerHTML='<p class="muted">Tsy mbola nisafidy room ianao.</p>';
       $("ludoGiftRecipient").innerHTML='<option value="">Tsy misy mpandray</option>';
     }
@@ -421,6 +443,7 @@ async function loadLudoRooms(){
     msg("ludoRoomStatus","Erreur room: "+(error?.message||String(error)),true);
   }
 }
+$("ludoRoomSearch").addEventListener("input",renderLudoRoomOptions);
 async function loadLudoRoomMembers(){
   const target=$("ludoGiftRecipient");
   target.innerHTML='<option value="">Ampidirina...</option>';
