@@ -128,29 +128,29 @@
 .ludo-dice-box span{font-size:10px;font-weight:800;color:#718293}
 .ludo-dice-box strong{font-size:25px;min-width:24px;text-align:center;color:#102a43}
 .ludo-dice-box .btn{padding:9px 11px}
-.ludo-board{width:min(100%,460px);aspect-ratio:1;margin:0 auto;display:grid;grid-template-columns:repeat(15,minmax(0,1fr));grid-template-rows:repeat(15,minmax(0,1fr));position:relative;background:#fff;border:5px solid #26394d;border-radius:10px;overflow:hidden;box-shadow:0 5px 18px #102a4330}
-.ludo-cell{border:1px solid #b9c3cc;background:#fff;min-width:0;min-height:0}
-.ludo-cell.track{background:linear-gradient(145deg,#fff,#f5f7fa)}
-.ludo-cell.safe:after{content:"★";display:grid;place-items:center;width:100%;height:100%;font-size:clamp(7px,1.5vw,13px);color:#a4adb7}
-.ludo-cell.yard-red{background:#e91d2b}.ludo-cell.yard-green{background:#08a84a}.ludo-cell.yard-yellow{background:#ffd51b}.ludo-cell.yard-blue{background:#159bd7}
-.ludo-cell.yard-inner{background:transparent;border:0}
-.ludo-cell.lane-1{background:#e91d2b}.ludo-cell.lane-2{background:#08a84a}.ludo-cell.lane-3{background:#ffd51b}.ludo-cell.lane-4{background:#159bd7}
-.ludo-cell.start-red{background:#e91d2b}.ludo-cell.start-green{background:#08a84a}.ludo-cell.start-yellow{background:#ffd51b}.ludo-cell.start-blue{background:#159bd7}
-.ludo-home{z-index:2;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:13%;padding:13%;margin:0;background:#fff;border:3px solid currentColor;box-shadow:inset 0 0 0 1px #d9e0e6;pointer-events:none}
-.ludo-home i{display:block;border:3px solid currentColor;border-radius:50%;background:#f7f9fb;box-shadow:inset 0 2px 4px #00000018}
+.ludo-board{width:min(100%,460px);aspect-ratio:1;margin:0 auto;display:grid;grid-template-columns:repeat(15,minmax(0,1fr));grid-template-rows:repeat(15,minmax(0,1fr));position:relative;background:radial-gradient(circle at 50% 50%,#c9f7a0 0,#8fdb65 65%,#65b94d 100%);border:7px solid #287d37;border-radius:18px;overflow:hidden;box-shadow:0 7px 0 #17552a,0 12px 22px #102a4338,inset 0 0 0 3px #baf58d}
+.ludo-cell{border:1px solid #b7c7bd;background:rgba(255,255,255,.94);min-width:0;min-height:0;box-shadow:inset 0 1px 2px #fff}
+.ludo-cell.track{background:linear-gradient(145deg,#fff 0%,#f2f8f1 100%);border-color:#9aaea0}
+.ludo-cell.safe:after{content:"★";display:grid;place-items:center;width:100%;height:100%;font-size:clamp(7px,1.5vw,13px);color:#e7a900;text-shadow:0 1px #fff}
+.ludo-cell.yard-red{background:linear-gradient(145deg,#ff555b,#d80e20)}.ludo-cell.yard-green{background:linear-gradient(145deg,#59e47e,#07943e)}.ludo-cell.yard-yellow{background:linear-gradient(145deg,#fff06b,#f5bd00)}.ludo-cell.yard-blue{background:linear-gradient(145deg,#57d4ff,#087fc4)}
+.ludo-cell.yard-inner{background:transparent;border:0;box-shadow:none}
+.ludo-cell.lane-1{background:linear-gradient(145deg,#ff8585,#e21b2d)}.ludo-cell.lane-2{background:linear-gradient(145deg,#8cf4a0,#0aa34a)}.ludo-cell.lane-3{background:linear-gradient(145deg,#fff59a,#f3c400)}.ludo-cell.lane-4{background:linear-gradient(145deg,#8be2ff,#078acb)}
+.ludo-cell.start-red{background:#ed1c2b}.ludo-cell.start-green{background:#08a84a}.ludo-cell.start-yellow{background:#ffd51b}.ludo-cell.start-blue{background:#159bd7}
+.ludo-home{z-index:2;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:13%;padding:13%;margin:0;background:linear-gradient(145deg,#fff,#edf5ec);border:4px solid currentColor;border-radius:20%;box-shadow:0 3px 7px #173b2550,inset 0 0 0 3px #fff;pointer-events:none}
+.ludo-home i{display:block;border:3px solid currentColor;border-radius:50%;background:radial-gradient(circle at 32% 25%,#fff 0 12%,#f4f7f4 13% 65%,#d4ded5 100%);box-shadow:inset 0 3px 5px #0002,0 2px 2px #0002}
 .home-red{grid-area:2/2/span 4/span 4;color:#d71924}
 .home-green{grid-area:2/11/span 4/span 4;color:#078e40}
 .home-yellow{grid-area:11/11/span 4/span 4;color:#d4ae00}
 .home-blue{grid-area:11/2/span 4/span 4;color:#087fb8}
-.ludo-center{grid-area:7/7/span 3/span 3;z-index:2;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;border:2px solid #526274;background:#fff;overflow:hidden}
+.ludo-center{grid-area:7/7/span 3/span 3;z-index:2;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;border:3px solid #fff;background:#fff;overflow:hidden;box-shadow:0 0 0 2px #799783}
 .ludo-center span{display:block}
-.ludo-center .center-red{background:#ed1c24;clip-path:polygon(0 0,100% 50%,0 100%)}
-.ludo-center .center-green{background:#08a84a;clip-path:polygon(0 0,100% 0,0 100%)}
-.ludo-center .center-yellow{background:#ffd500;clip-path:polygon(100% 0,100% 100%,0 50%)}
-.ludo-center .center-blue{background:#159bd7;clip-path:polygon(0 0,100% 100%,0 100%)}
-.ludo-pawn{z-index:3;align-self:center;justify-self:center;display:grid;place-items:center;width:92%;height:92%;min-width:0;min-height:0;padding:0;border:0;border-radius:0;background:transparent;cursor:pointer;filter:drop-shadow(0 2px 2px #0007);transition:transform .12s ease,filter .12s ease}
+.ludo-center .center-red{background:linear-gradient(135deg,#ff6d6d,#d91025);clip-path:polygon(0 0,100% 50%,0 100%)}
+.ludo-center .center-green{background:linear-gradient(135deg,#8bf3a0,#078d3e);clip-path:polygon(0 0,100% 0,0 100%)}
+.ludo-center .center-yellow{background:linear-gradient(135deg,#fff17a,#e6ae00);clip-path:polygon(100% 0,100% 100%,0 50%)}
+.ludo-center .center-blue{background:linear-gradient(135deg,#7cddff,#0879bd);clip-path:polygon(0 0,100% 100%,0 100%)}
+.ludo-pawn{z-index:3;align-self:center;justify-self:center;display:grid;place-items:center;width:94%;height:94%;min-width:0;min-height:0;padding:0;border:0;border-radius:0;background:transparent;cursor:pointer;filter:drop-shadow(0 2px 2px #0008);transition:transform .12s ease,filter .12s ease}
 .ludo-pawn svg{display:block;width:100%;height:100%;overflow:visible}
-.ludo-pawn .pawn-shape{fill:currentColor;stroke:#fff;stroke-width:4;stroke-linejoin:round}
+.ludo-pawn .pawn-shape{stroke:#fff;stroke-width:3;stroke-linejoin:round}
 .ludo-pawn:disabled{cursor:default;opacity:1}
 .ludo-pawn:not(:disabled):active{transform:scale(.88)}
 .ludo-pawn.red{color:#c9151d}.ludo-pawn.green{color:#079447}.ludo-pawn.yellow{color:#e0b900}.ludo-pawn.blue{color:#0788c5}
