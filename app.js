@@ -191,7 +191,8 @@ function renderLudoBoard(snapshot){
       const pawn=document.createElement("button");
       pawn.type="button";
       pawn.className="ludo-pawn "+(LUDO_COLORS[seat]||"red");
-      pawn.textContent=String(index+1);
+      pawn.setAttribute("aria-label","Pion "+(index+1)+" de "+(player.full_name||("Seat "+seat)));
+      pawn.innerHTML='<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path class="pawn-shape" d="M50 5C36 5 26 16 26 30c0 10 6 18 15 22L15 82c-4 6 0 13 8 13h54c8 0 12-7 8-13L59 52c9-4 15-12 15-22C74 16 64 5 50 5Z"/><path class="pawn-shine" d="M37 19c-5 8-4 17 2 22" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" opacity=".75"/></svg>';
       pawn.style.gridRow=String(r+1);
       pawn.style.gridColumn=String(c+1);
       pawn.title=(player.full_name||("Seat "+seat))+" · pion "+(index+1)+" · position "+pos;
