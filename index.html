@@ -97,7 +97,24 @@
     <section id="ludoSocialPanel" class="panel ludo-panel">
       <div class="section-head"><div><span class="eyebrow">ESPACE LUDO</span><h2>🎲 Ludo & Chat communautaire</h2></div><button id="ludoRefreshBtn" class="btn ghost small" type="button">Havaozy</button></div>
       <p class="muted">Chat sy cadeau visuel ao amin'ny room. Tsy misy mise en jeu, retrait na famindrana SC amin'ity sehatra ity.</p>
-      <label>Safidio ny room misy anao
+      <div class="ludo-room-create">
+        <h3>Mamorona room vaovao</h3>
+        <label>Karazana lalao
+          <select id="ludoGameMode"><option value="online">ONLINE — olona</option><option value="bot">BOT MASTER</option></select>
+        </label>
+        <label>Isan'ny mpilalao
+          <select id="ludoPlayerCount"><option value="2">2 mpilalao</option><option value="4">4 mpilalao</option></select>
+        </label>
+        <button id="ludoCreateRoomBtn" class="btn primary" type="button">＋ Créer room</button>
+      </div>
+      <div class="ludo-room-join">
+        <h3>Room ONLINE misokatra</h3>
+        <label>Safidio ny room hidirana
+          <select id="ludoOpenRoomSelect"><option value="">Mitady room...</option></select>
+        </label>
+        <button id="ludoJoinRoomBtn" class="btn secondary" type="button">Rejoindre room</button>
+      </div>
+      <label>Room efa nidiranao
         <select id="ludoRoomSelect"><option value="">Mitady room...</option></select>
       </label>
       <div id="ludoRoomStatus" class="muted" role="status">Ampidirina ny room...</div>
