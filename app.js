@@ -114,6 +114,169 @@ $("openWithdrawBtn").addEventListener("click",()=>{show("transactionForms",true)
 $("openHistoryBtn").addEventListener("click",()=>{show("transactionForms",false);show("historyPanel",true);});
 document.querySelectorAll("[data-close-forms]").forEach(b=>b.addEventListener("click",()=>show("transactionForms",false)));
 
+
+let currentLudoRoomId = null;
+let ludoRoomMembers = [];
+
+$("ludoRefreshBtn").addEventListener("click", loadLudoRooms);
+$("ludoRoomSelect").addEventListener("change", async e => {
+  currentLudoRoomId = e.target.value || null;
+  await loadLudoRoomMembers();
+  await loadLudoChat();
+});
+$("ludoChatForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const content=$("ludoChatInput").value.trim();
+  if(!currentLudoRoomId || !content) return;
+  const button=e.currentTarget.querySelector('button[type="submit"]');
+  button.disabled=true;
+  msg("ludoSocialMsg","Alefa ny hafatra...");
+  try{
+    const {error}=await db.rpc("send_ludo_chat_message",{
+      p_room_id:currentLudoRoomId,
+      p_message_type:"text",
+      p_content:content,
+      p_audio_path:null,
+      p_recipient_member_id:null
+    });
+    if(error) throw error;
+    $("ludoChatInput").value="";
+    msg("ludoSocialMsg","Voaray ny hafatra.");
+    await loadLudoChat();
+  }catch(error){
+    msg("ludoSocialMsg","Tsy tafavoaka ny hafatra: "+(error?.message||String(error)),true);
+  }finally{button.disabled=false;}
+});
+$("ludoSendGiftBtn").addEventListener("click", async () => {
+  const recipient=$("ludoGiftRecipient").value;
+  const gift=$("ludoGiftCode").value;
+  if(!currentLudoRoomId || !recipient || !gift){
+    msg("ludoSocialMsg","Safidio aloha ny room, ny mpandray ary ny cadeau.",true);
+    return;
+  }
+  const button=$("ludoSendGiftBtn");
+  button.disabled=true;
+  msg("ludoSocialMsg","Alefa ny cadeau...");
+  try{
+    const {error}=await db.rpc("send_ludo_visual_gift",{
+      p_room_id:currentLudoRoomId,
+      p_recipient_member_id:recipient,
+      p_gift_code:gift
+    });
+    if(error) throw error;
+    msg("ludoSocialMsg","Voaray ny cadeau visuel! Tsy nisy SC nafindra.");
+    await loadLudoChat();
+  }catch(error){
+    msg("ludoSocialMsg","Tsy tafavoaka ny cadeau: "+(error?.message||String(error)),true);
+  }finally{button.disabled=false;}
+});
+
+async function loadLudoRooms(){
+  const select=$("ludoRoomSelect");
+  select.innerHTML='<option value="">Mitady room...</option>';
+  $("ludoChatFeed").innerHTML='<p class="muted">Ampidirina...</p>';
+  if(!currentMember?.id){
+    select.innerHTML='<option value="">Tsy mbola misy profil membre</option>';
+    msg("ludoRoomStatus","Mila kaonty membre ianao vao afaka miditra amin'ny chat.",true);
+    return;
+  }
+  try{
+    const {data:joined,error}=await db.from("ludo_room_players")
+      .select("room_id").eq("member_id",currentMember.id);
+    if(error) throw error;
+    const ids=[...new Set((joined||[]).map(x=>x.room_id).filter(Boolean))];
+    if(!ids.length){
+      select.innerHTML='<option value="">Tsy mbola ao anaty room ianao</option>';
+      msg("ludoRoomStatus","Mbola tsy misy room nidiranao. Ny famoronana room sy lalao dia dingana manaraka.");
+      $("ludoGiftRecipient").innerHTML='<option value="">Tsy misy mpandray</option>';
+      $("ludoChatFeed").innerHTML='<p class="muted">Tsy mbola misy room hanehoana chat.</p>';
+      return;
+    }
+    const {data:rooms,error:roomError}=await db.from("ludo_rooms")
+      .select("id,game_mode,player_count,status,created_at")
+      .in("id",ids).in("status",["waiting","playing"])
+      .order("created_at",{ascending:false});
+    if(roomError) throw roomError;
+    select.innerHTML='<option value="">Safidio ny room</option>'+(rooms||[]).map(r=>
+      '<option value="'+esc(r.id)+'">Room '+esc(String(r.id).slice(0,8))+' · '+esc(r.game_mode)+' · '+esc(r.status)+'</option>'
+    ).join("");
+    if(currentLudoRoomId && (rooms||[]).some(r=>r.id===currentLudoRoomId)){
+      select.value=currentLudoRoomId;
+      await loadLudoRoomMembers();
+      await loadLudoChat();
+    }else{
+      currentLudoRoomId=null;
+      msg("ludoRoomStatus","Safidio ny room iray.");
+      $("ludoChatFeed").innerHTML='<p class="muted">Safidio aloha ny room.</p>';
+    }
+  }catch(error){
+    select.innerHTML='<option value="">Tsy afaka mamaky room</option>';
+    msg("ludoRoomStatus","Erreur room: "+(error?.message||String(error)),true);
+  }
+}
+async function loadLudoRoomMembers(){
+  const target=$("ludoGiftRecipient");
+  target.innerHTML='<option value="">Ampidirina...</option>';
+  if(!currentLudoRoomId) return;
+  try{
+    const {data:players,error}=await db.from("ludo_room_players")
+      .select("member_id,is_bot,seat_number").eq("room_id",currentLudoRoomId);
+    if(error) throw error;
+    const ids=(players||[]).map(p=>p.member_id).filter(Boolean);
+    const {data:members,error:memberError}=ids.length
+      ? await db.from("members").select("id,full_name").in("id",ids)
+      : {data:[],error:null};
+    if(memberError) throw memberError;
+    ludoRoomMembers=members||[];
+    target.innerHTML='<option value="">Safidio ny mpandray</option>'+ludoRoomMembers
+      .filter(m=>m.id!==currentMember?.id)
+      .map(m=>'<option value="'+esc(m.id)+'">'+esc(m.full_name||"Membre")+'</option>').join("");
+    msg("ludoRoomStatus","Room voafidy. Afaka mifampiresaka sy mandefa cadeau visuel ianao.");
+  }catch(error){
+    target.innerHTML='<option value="">Tsy afaka mamaky mpilalao</option>';
+    msg("ludoRoomStatus","Erreur mpilalao: "+(error?.message||String(error)),true);
+  }
+}
+async function loadLudoChat(){
+  const feed=$("ludoChatFeed");
+  if(!currentLudoRoomId){feed.innerHTML='<p class="muted">Safidio aloha ny room.</p>';return;}
+  feed.innerHTML='<p class="muted">Ampidirina ny chat...</p>';
+  try{
+    const [{data:messages,error:messageError},{data:gifts,error:giftError},{data:catalog,error:catalogError}]=await Promise.all([
+      db.from("ludo_chat_messages").select("id,sender_member_id,message_type,content,created_at")
+        .eq("room_id",currentLudoRoomId).order("created_at",{ascending:true}).limit(100),
+      db.from("ludo_chat_gift_events").select("id,sender_member_id,recipient_member_id,gift_code,created_at")
+        .eq("room_id",currentLudoRoomId).order("created_at",{ascending:true}).limit(100),
+      db.from("ludo_gift_catalog").select("gift_code,gift_name,price_sc").eq("active",true)
+    ]);
+    if(messageError) throw messageError;
+    if(giftError) throw giftError;
+    if(catalogError) throw catalogError;
+    const names=new Map((ludoRoomMembers||[]).map(m=>[m.id,m.full_name||"Membre"]));
+    const items=[
+      ...(messages||[]).map(x=>({...x,kind:"message"})),
+      ...(gifts||[]).map(x=>({...x,kind:"gift"}))
+    ].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+    if(!items.length){feed.innerHTML='<p class="muted">Mbola tsy misy hafatra. Afaka manomboka ianao!</p>';}
+    else feed.innerHTML=items.map(x=>{
+      const sender=esc(names.get(x.sender_member_id)||"Membre");
+      const time=esc(new Date(x.created_at).toLocaleString());
+      if(x.kind==="gift"){
+        const g=(catalog||[]).find(c=>c.gift_code===x.gift_code);
+        const recipient=esc(names.get(x.recipient_member_id)||"Membre");
+        return '<div class="ludo-chat-item gift"><strong>🎁 '+sender+'</strong> nandefa <b>'+esc(g?.gift_name||x.gift_code)+'</b> ho an’i <strong>'+recipient+'</strong><small>'+time+'</small></div>';
+      }
+      return '<div class="ludo-chat-item"><strong>'+sender+'</strong><p>'+esc(x.content||"")+'</p><small>'+time+'</small></div>';
+    }).join("");
+    feed.scrollTop=feed.scrollHeight;
+    $("ludoGiftCode").innerHTML='<option value="">Safidio ny cadeau</option>'+(catalog||[]).map(g=>
+      '<option value="'+esc(g.gift_code)+'">'+esc(g.gift_name)+' · '+Number(g.price_sc||0)+' SC (visuel)</option>'
+    ).join("");
+  }catch(error){
+    feed.innerHTML='<p class="error">Tsy afaka mamaky chat: '+esc(error?.message||String(error))+'</p>';
+  }
+}
+
 $("adminRefresh").addEventListener("click",loadAdminData);
 $("communityRefresh").addEventListener("click",loadCommunityLists);
 $("rolePill").addEventListener("click",()=>{
