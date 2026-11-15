@@ -118,6 +118,17 @@ document.querySelectorAll("[data-close-forms]").forEach(b=>b.addEventListener("c
 let currentLudoRoomId = null;
 let ludoRoomMembers = [];
 
+async function initializeLudoVirtualBalance(){
+  if(!currentMember?.id || String(currentMember.status).toLowerCase()!=="active"){
+    throw new Error("Mpikambana ACTIVE ihany no mahazo bonus Ludo.");
+  }
+  const {data,error}=await db.rpc("initialize_ludo_virtual_balance");
+  if(error) throw error;
+  const balance=Number(data||0);
+  msg("ludoSocialMsg","Solde Ludo virtuel: "+balance.toLocaleString("fr-FR")+" SC. Bonus 5 000 SC indray mandeha ihany.");
+  return balance;
+}
+
 $("ludoRefreshBtn").addEventListener("click", loadLudoRooms);
 $("ludoCreateRoomBtn").addEventListener("click", async () => {
   const button=$("ludoCreateRoomBtn");
@@ -133,7 +144,8 @@ $("ludoCreateRoomBtn").addEventListener("click", async () => {
     });
     if(error) throw error;
     currentLudoRoomId=data;
-    msg("ludoSocialMsg","Voaforona ny room! Tsy misy mise na transfert SC.");
+    await initializeLudoVirtualBalance();
+    msg("ludoSocialMsg","Voaforona ny room! Solde Ludo virtuel voamarina.");
     await loadLudoRooms();
     $("ludoRoomSelect").value=data;
     await loadLudoRoomMembers();
@@ -152,7 +164,8 @@ $("ludoJoinRoomBtn").addEventListener("click", async () => {
     const {data,error}=await db.rpc("join_ludo_room",{p_room_id:roomId});
     if(error) throw error;
     currentLudoRoomId=data;
-    msg("ludoSocialMsg","Tafiditra soa aman-tsara ao amin'ny room!");
+    await initializeLudoVirtualBalance();
+    msg("ludoSocialMsg","Tafiditra soa aman-tsara ao amin'ny room! Solde Ludo virtuel voamarina.");
     await loadLudoRooms();
     $("ludoRoomSelect").value=data;
     await loadLudoRoomMembers();
@@ -164,6 +177,10 @@ $("ludoJoinRoomBtn").addEventListener("click", async () => {
 });
 $("ludoRoomSelect").addEventListener("change", async e => {
   currentLudoRoomId = e.target.value || null;
+  if(currentLudoRoomId){
+    try{ await initializeLudoVirtualBalance(); }
+    catch(error){ msg("ludoSocialMsg","Tsy afaka nanamarina ny solde Ludo: "+(error?.message||String(error)),true); }
+  }
   await loadLudoRoomMembers();
   await loadLudoChat();
 });
