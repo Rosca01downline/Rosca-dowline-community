@@ -117,6 +117,124 @@ document.querySelectorAll("[data-close-forms]").forEach(b=>b.addEventListener("c
 
 let currentLudoRoomId = null;
 let ludoRoomMembers = [];
+let ludoGameSnapshot = null;
+let ludoBoardBusy = false;
+
+const LUDO_TRACK = [
+  [6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],
+  [1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[7,14],[8,14],
+  [8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],
+  [14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],
+  [7,0],[6,0],[5,0],[4,0]
+];
+const LUDO_HOME_LANES = {
+  1:[[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],
+  2:[[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],
+  3:[[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],
+  4:[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]
+};
+const LUDO_YARDS = {
+  1:[[2,2],[2,4],[4,2],[4,4]],
+  2:[[2,10],[2,12],[4,10],[4,12]],
+  3:[[10,10],[10,12],[12,10],[12,12]],
+  4:[[10,2],[10,4],[12,2],[12,4]]
+};
+const LUDO_COLORS = {1:"red",2:"green",3:"yellow",4:"blue"};
+
+function ludoCoord(seat,pos,index){
+  if(pos===-1) return LUDO_YARDS[seat]?.[index] || [7,7];
+  if(pos>=52) return LUDO_HOME_LANES[seat]?.[Math.min(5,pos-52)] || [7,7];
+  return LUDO_TRACK[((seat-1)*13+pos)%52] || [7,7];
+}
+function renderLudoBoard(snapshot){
+  const board=$("ludoBoard");
+  if(!board) return;
+  if(!snapshot?.state){
+    board.innerHTML='<p class="muted ludo-board-empty">Miandry ny hanombohan’ny lalao...</p>';
+    $("ludoDiceValue").textContent="–";
+    $("ludoTurnInfo").textContent=snapshot?.status==="waiting"?"Miandry mpilalao":"Tsy misy lalao";
+    $("ludoRollBtn").disabled=true;
+    return;
+  }
+  const state=snapshot.state;
+  const players=snapshot.players||[];
+  const ownSeat=players.find(p=>p.member_id===currentMember?.id)?.seat_number;
+  const myTurn=Number(state.current_turn_seat)===Number(ownSeat);
+  const cells=[];
+  for(let r=0;r<15;r++) for(let c=0;c<15;c++){
+    const base=(r<6&&c<6)?"yard-red":(r<6&&c>8)?"yard-green":(r>8&&c>8)?"yard-yellow":(r>8&&c<6)?"yard-blue":"";
+    const track=LUDO_TRACK.some(([rr,cc])=>rr===r&&cc===c);
+    const lane=Object.entries(LUDO_HOME_LANES).some(([s,coords])=>coords.some(([rr,cc])=>rr===r&&cc===c));
+    cells.push('<div class="ludo-cell '+base+(track?' track':'')+(lane?' lane':'')+'"></div>');
+  }
+  board.innerHTML=cells.join("");
+  players.forEach(player=>{
+    const seat=Number(player.seat_number);
+    const positions=state.pawns?.[String(seat)]?.pawns||[-1,-1,-1,-1];
+    positions.forEach((pos,index)=>{
+      const [r,c]=ludoCoord(seat,Number(pos),index);
+      const pawn=document.createElement("button");
+      pawn.type="button";
+      pawn.className="ludo-pawn "+(LUDO_COLORS[seat]||"red");
+      pawn.textContent=String(index+1);
+      pawn.style.gridRow=String(r+1);
+      pawn.style.gridColumn=String(c+1);
+      pawn.title=(player.full_name||("Seat "+seat))+" · pion "+(index+1)+" · position "+pos;
+      pawn.dataset.pawnIndex=String(index);
+      pawn.dataset.seat=String(seat);
+      pawn.disabled=!myTurn||!state.dice_rolled||ludoBoardBusy;
+      pawn.addEventListener("click",()=>moveLudoPawn(index));
+      board.appendChild(pawn);
+    });
+  });
+  $("ludoDiceValue").textContent=state.dice_value==null?"–":String(state.dice_value);
+  const active=players.find(p=>Number(p.seat_number)===Number(state.current_turn_seat));
+  $("ludoTurnInfo").textContent="Tour: "+(active?.full_name||(active?.is_bot?"BOT":"Seat "+state.current_turn_seat))+(myTurn?" — ANJARANAO":" — Miandry");
+  $("ludoRollBtn").disabled=!myTurn||Boolean(state.dice_rolled)||ludoBoardBusy||snapshot.status!=="playing";
+}
+async function loadLudoGameState(){
+  if(!currentLudoRoomId) { renderLudoBoard(null); return; }
+  try{
+    const {data,error}=await db.rpc("get_ludo_game_state",{p_room_id:currentLudoRoomId});
+    if(error) throw error;
+    ludoGameSnapshot=data;
+    renderLudoBoard(data);
+  }catch(error){
+    $("ludoBoard").innerHTML='<p class="error ludo-board-empty">Tsy afaka mamaky ny lalao: '+esc(error?.message||String(error))+'</p>';
+  }
+}
+async function rollLudoDice(){
+  if(!currentLudoRoomId||ludoBoardBusy) return;
+  ludoBoardBusy=true;
+  $("ludoRollBtn").disabled=true;
+  try{
+    const {data,error}=await db.rpc("roll_ludo_dice",{p_room_id:currentLudoRoomId});
+    if(error) throw error;
+    await loadLudoGameState();
+    const state=ludoGameSnapshot?.state;
+    if(state&&!state.dice_rolled){
+      msg("ludoSocialMsg","Nahazo "+data+" ny dés, saingy tsy misy pion azo afindra. Nifindra ho azy ny tour.");
+    }else{
+      msg("ludoSocialMsg","Nahazo "+data+" tamin'ny dés. Safidio ny pion hafindra.");
+    }
+  }catch(error){
+    msg("ludoSocialMsg","Erreur dés: "+(error?.message||String(error)),true);
+  }finally{ludoBoardBusy=false;await loadLudoGameState();}
+}
+async function moveLudoPawn(index){
+  if(!currentLudoRoomId||ludoBoardBusy) return;
+  ludoBoardBusy=true;
+  try{
+    const {data,error}=await db.rpc("move_ludo_pawn",{p_room_id:currentLudoRoomId,p_pawn_index:index});
+    if(error) throw error;
+    msg("ludoSocialMsg",data?.winner?"🎉 Nandresy ianao!":("Pion nafindra. Voasambotra: "+Number(data?.captured_count||0)+". "+(data?.extra_turn?"Mahazo tour fanampiny ianao!":"")));
+    await loadLudoGameState();
+  }catch(error){
+    msg("ludoSocialMsg","Tsy afaka mamindra pion: "+(error?.message||String(error)),true);
+  }finally{ludoBoardBusy=false;await loadLudoGameState();}
+}
+$("ludoRollBtn").addEventListener("click",rollLudoDice);
+
 
 async function initializeLudoVirtualBalance(){
   if(!currentMember?.id || String(currentMember.status).toLowerCase()!=="active"){
@@ -334,6 +452,7 @@ async function loadLudoChat(){
       return '<div class="ludo-chat-item"><strong>'+sender+'</strong><p>'+esc(x.content||"")+'</p><small>'+time+'</small></div>';
     }).join("");
     feed.scrollTop=feed.scrollHeight;
+    await loadLudoGameState();
     $("ludoGiftCode").innerHTML='<option value="">Safidio ny cadeau</option>'+(catalog||[]).map(g=>
       '<option value="'+esc(g.gift_code)+'">'+esc(g.gift_name)+' · '+Number(g.price_sc||0)+' SC (visuel)</option>'
     ).join("");
