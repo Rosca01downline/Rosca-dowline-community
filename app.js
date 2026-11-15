@@ -276,7 +276,8 @@ async function loadLudoRoomMembers(){
     target.innerHTML='<option value="">Safidio ny mpandray</option>'+ludoRoomMembers
       .filter(m=>m.id!==currentMember?.id)
       .map(m=>'<option value="'+esc(m.id)+'">'+esc(m.full_name||"Membre")+'</option>').join("");
-    msg("ludoRoomStatus","Room voafidy. Afaka mifampiresaka sy mandefa cadeau visuel ianao.");
+    const debugNames=ludoRoomMembers.map(m=>m.full_name||"Membre").join(", ");
+    msg("ludoRoomStatus","Room voafidy. Mpikambana hitan'ny navigateur: "+ludoRoomMembers.length+(debugNames?" — "+debugNames:" — Tsy nisy anarana naverin'ny RPC."));
   }catch(error){
     ludoRoomMembers=[];
     target.innerHTML='<option value="">Tsy afaka mamaky mpilalao</option>';
