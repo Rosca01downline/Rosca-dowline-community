@@ -119,3 +119,25 @@
 .ludo-gift-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-top:10px}
 .ludo-chat-form button,.ludo-gift-row button{white-space:nowrap}
 @media(max-width:600px){.ludo-chat-form,.ludo-gift-row{grid-template-columns:1fr}.ludo-chat-form button,.ludo-gift-row button{width:100%}}
+
+/* Ludo interactive board */
+.ludo-game{margin:18px 0;padding:14px;background:#f7f9ff;border:1px solid #cbd8f1;border-radius:14px}
+.ludo-game-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}
+.ludo-game-head h3{margin:0 0 4px}
+.ludo-dice-box{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #dbe5f4;border-radius:12px;padding:8px}
+.ludo-dice-box span{font-size:10px;font-weight:800;color:#718293}
+.ludo-dice-box strong{font-size:25px;min-width:24px;text-align:center;color:#102a43}
+.ludo-dice-box .btn{padding:9px 11px}
+.ludo-board{width:min(100%,520px);aspect-ratio:1;margin:0 auto;display:grid;grid-template-columns:repeat(15,minmax(0,1fr));grid-template-rows:repeat(15,minmax(0,1fr));position:relative;background:#fff;border:3px solid #233b58;border-radius:8px;overflow:hidden}
+.ludo-cell{border:1px solid #e2e8f0;background:#fff;min-width:0;min-height:0}
+.ludo-cell.track{background:#edf2f8}
+.ludo-cell.lane{background:#dbeafe}
+.ludo-cell.yard-red{background:#fee2e2}
+.ludo-cell.yard-green{background:#dcfce7}
+.ludo-cell.yard-yellow{background:#fef3c7}
+.ludo-cell.yard-blue{background:#dbeafe}
+.ludo-pawn{z-index:2;align-self:center;justify-self:center;width:82%;height:82%;min-width:0;min-height:0;padding:0;border:2px solid #fff;border-radius:50%;font-size:clamp(8px,2vw,13px);font-weight:900;color:#fff;box-shadow:0 1px 4px #0005;cursor:pointer}
+.ludo-pawn:disabled{cursor:default;opacity:.9}
+.ludo-pawn.red{background:#dc2626}.ludo-pawn.green{background:#16a34a}.ludo-pawn.yellow{background:#d4a000;color:#172033}.ludo-pawn.blue{background:#2563eb}
+.ludo-board-empty{grid-column:1/-1;align-self:center;text-align:center;padding:20px}
+@media(max-width:560px){.ludo-game{padding:9px}.ludo-game-head{align-items:flex-start;flex-direction:column}.ludo-dice-box{width:100%;justify-content:space-between}.ludo-board{width:100%}}
