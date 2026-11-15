@@ -182,7 +182,11 @@ function renderLudoBoard(snapshot){
     if(r===13&&c===6) cls+=" start-blue";
     cells.push('<div class="'+cls+'"></div>');
   }
-  board.innerHTML=cells.join("")+'<div class="ludo-center" aria-hidden="true"><span class="center-red"></span><span class="center-green"></span><span class="center-yellow"></span><span class="center-blue"></span></div>';
+  const homes='<div class="ludo-home home-red"><i></i><i></i><i></i><i></i></div>'+
+    '<div class="ludo-home home-green"><i></i><i></i><i></i><i></i></div>'+
+    '<div class="ludo-home home-yellow"><i></i><i></i><i></i><i></i></div>'+
+    '<div class="ludo-home home-blue"><i></i><i></i><i></i><i></i></div>';
+  board.innerHTML=cells.join("")+homes+'<div class="ludo-center" aria-hidden="true"><span class="center-red"></span><span class="center-green"></span><span class="center-yellow"></span><span class="center-blue"></span></div>';
   players.forEach(player=>{
     const seat=Number(player.seat_number);
     const positions=state.pawns?.[String(seat)]?.pawns||[-1,-1,-1,-1];
