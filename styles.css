@@ -156,3 +156,20 @@
 .ludo-pawn.red{color:#c9151d}.ludo-pawn.green{color:#079447}.ludo-pawn.yellow{color:#e0b900}.ludo-pawn.blue{color:#0788c5}
 .ludo-board-empty{grid-column:1/-1;align-self:center;text-align:center;padding:20px}
 @media(max-width:560px){.ludo-game{padding:9px}.ludo-game-head{align-items:flex-start;flex-direction:column}.ludo-dice-box{width:100%;justify-content:space-between}.ludo-board{width:100%}}
+
+/* Ludo 3D cross-track redesign + virtual SC balances */
+.ludo-board{background:radial-gradient(circle at 50% 45%,#a8ef72 0,#75d34d 65%,#48a936 100%);border:8px solid #176b2d;border-radius:26px;box-shadow:0 9px 0 #104d24,0 16px 28px #102a4340,inset 0 0 0 4px #b9f58a}
+.ludo-cell{border:1px solid #b8c3bb;background:linear-gradient(145deg,#fff 0%,#f4f7f2 100%);box-shadow:inset 0 2px 3px #fff,0 1px 2px #213b2430}
+.ludo-cell.track{border:1px solid #a9b6aa;border-radius:2px}
+.ludo-cell.safe:after{font-size:clamp(8px,1.7vw,15px);font-weight:900}
+.ludo-home{border-width:5px;border-radius:22%;box-shadow:0 5px 10px #173b2550,inset 0 0 0 4px #fff}
+.ludo-home i{border-width:0;border-radius:50%;background:radial-gradient(circle at 32% 24%,#fff 0 7%,currentColor 8% 70%,#0003 100%);box-shadow:inset 0 4px 7px #fff8,0 4px 5px #0003}
+.ludo-player-balances{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:0 auto 12px;width:min(100%,560px)}
+.ludo-player-balance{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 4px;border-radius:12px;color:#fff;min-width:0;box-shadow:inset 0 2px 4px #fff5,0 3px 6px #102a4325}
+.ludo-player-balance strong{font-size:clamp(10px,2.7vw,14px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ludo-player-balance span{font-size:clamp(10px,2.8vw,15px);font-weight:800;white-space:nowrap}
+.ludo-player-balance.red{background:linear-gradient(145deg,#ff545b,#c90018)}
+.ludo-player-balance.green{background:linear-gradient(145deg,#36d96c,#007c35)}
+.ludo-player-balance.yellow{background:linear-gradient(145deg,#ffdc39,#d99b00)}
+.ludo-player-balance.blue{background:linear-gradient(145deg,#38baff,#0067bc)}
+@media(max-width:560px){.ludo-player-balances{gap:5px}.ludo-player-balance{padding:7px 2px;border-radius:9px}}
