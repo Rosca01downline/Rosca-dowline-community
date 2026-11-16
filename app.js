@@ -225,7 +225,7 @@ function renderLudoBoard(snapshot){
   });
   $("ludoDiceValue").textContent=state.dice_value==null?"–":String(state.dice_value);
   const active=players.find(p=>Number(p.seat_number)===Number(state.current_turn_seat));
-  $("ludoTurnInfo").textContent="Tour: "+(active?.full_name||(active?.is_bot?"BOT":"Seat "+state.current_turn_seat))+" — "+(myTurn?"Milalao":"Miandry");
+  $("ludoTurnInfo").textContent="Tour: "+(active?.full_name||(active?.is_bot?"BOT":"Seat "+state.current_turn_seat))+" — Miandry";
   $("ludoRollBtn").disabled=!myTurn||Boolean(state.dice_rolled)||ludoBoardBusy||snapshot.status!=="playing";
 }
 async function loadLudoGameState(){
