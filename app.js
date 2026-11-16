@@ -183,13 +183,23 @@ function renderLudoBoard(snapshot){
     if(r===1&&c===8) cls+=" start-green";
     if(r===8&&c===13) cls+=" start-yellow";
     if(r===13&&c===6) cls+=" start-blue";
-    cells.push('<div class="'+cls+'"></div>');
+    if(trackIndex<0&&!laneSeat) continue;
+    cells.push('<div class="'+cls+'" style="grid-row:'+(r+1)+';grid-column:'+(c+1)+'"></div>');
   }
   const homes='<div class="ludo-home home-red"><i></i><i></i><i></i><i></i></div>'+
     '<div class="ludo-home home-green"><i></i><i></i><i></i><i></i></div>'+
     '<div class="ludo-home home-yellow"><i></i><i></i><i></i><i></i></div>'+
     '<div class="ludo-home home-blue"><i></i><i></i><i></i><i></i></div>';
+  const balances=snapshot.virtualBalances||{};
+  const balanceStrip='<div class="ludo-player-balances">'+players.map(p=>{
+    const seat=Number(p.seat_number);
+    const amount=balances[p.member_id];
+    const shown=amount==null?"—":Number(amount).toLocaleString("fr-FR");
+    return '<div class="ludo-player-balance '+(LUDO_COLORS[seat]||"red")+'"><strong>'+esc(p.full_name||("Seat "+seat))+'</strong><span>🪙 '+shown+' SC</span></div>';
+  }).join("")+'</div>';
   board.innerHTML=cells.join("")+homes+'<div class="ludo-center" aria-hidden="true"><span class="center-red"></span><span class="center-green"></span><span class="center-yellow"></span><span class="center-blue"></span></div>';
+  const balanceHost=$("ludoPlayerBalances");
+  if(balanceHost) balanceHost.innerHTML=balanceStrip;
   players.forEach(player=>{
     const seat=Number(player.seat_number);
     const positions=state.pawns?.[String(seat)]?.pawns||[-1,-1,-1,-1];
@@ -215,7 +225,7 @@ function renderLudoBoard(snapshot){
   });
   $("ludoDiceValue").textContent=state.dice_value==null?"–":String(state.dice_value);
   const active=players.find(p=>Number(p.seat_number)===Number(state.current_turn_seat));
-  $("ludoTurnInfo").textContent="Tour: "+(active?.full_name||(active?.is_bot?"BOT":"Seat "+state.current_turn_seat))+(myTurn?" — ANJARANAO":" — Miandry");
+  $("ludoTurnInfo").textContent="Tour: "+(active?.full_name||(active?.is_bot?"BOT":"Seat "+state.current_turn_seat))+" — "+(myTurn?"Milalao":"Miandry");
   $("ludoRollBtn").disabled=!myTurn||Boolean(state.dice_rolled)||ludoBoardBusy||snapshot.status!=="playing";
 }
 async function loadLudoGameState(){
@@ -223,6 +233,15 @@ async function loadLudoGameState(){
   try{
     const {data,error}=await db.rpc("get_ludo_game_state",{p_room_id:currentLudoRoomId});
     if(error) throw error;
+    const playerIds=(data?.players||[]).map(p=>p.member_id).filter(Boolean);
+    let virtualBalances={};
+    if(playerIds.length){
+      const {data:wallets,error:walletError}=await db.from("ludo_virtual_balances")
+        .select("member_id,balance_sc").in("member_id",playerIds);
+      if(!walletError) (wallets||[]).forEach(w=>{virtualBalances[w.member_id]=Number(w.balance_sc||0);});
+      else console.warn("Ludo virtual balances not readable:",walletError.message);
+    }
+    data.virtualBalances=virtualBalances;
     ludoGameSnapshot=data;
     renderLudoBoard(data);
   }catch(error){
