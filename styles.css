@@ -147,7 +147,7 @@
 .ludo-center .center-red{background:linear-gradient(135deg,#ff6d6d,#d91025);clip-path:polygon(0 0,100% 50%,0 100%)}
 .ludo-center .center-green{background:linear-gradient(135deg,#8bf3a0,#078d3e);clip-path:polygon(0 0,100% 0,0 100%)}
 .ludo-center .center-yellow{background:linear-gradient(135deg,#fff17a,#e6ae00);clip-path:polygon(100% 0,100% 100%,0 50%)}
-.ludo-center .center-blue{background:linear-gradient(135deg,#7cddff,#0879bd);clip-path:polygon(0 0,100% 100%,0 100%)}
+.ludo-center .center-blue{background:linear-gradient(135deg,#7cddff,#0879bd);clip-path:polygon(100% 0,100% 100%,0 100%)}
 .ludo-pawn{z-index:3;align-self:center;justify-self:center;display:grid;place-items:center;width:94%;height:94%;min-width:0;min-height:0;padding:0;border:0;border-radius:0;background:transparent;cursor:pointer;filter:drop-shadow(0 2px 2px #0008);transition:transform .12s ease,filter .12s ease}
 .ludo-pawn svg{display:block;width:100%;height:100%;overflow:visible}
 .ludo-pawn .pawn-shape{stroke:#fff;stroke-width:3;stroke-linejoin:round}
