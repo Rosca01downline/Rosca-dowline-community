@@ -224,8 +224,11 @@ function renderLudoBoard(snapshot){
       pawn.title=(player.full_name||("Seat "+seat))+" · pion "+(index+1)+" · position "+pos;
       pawn.dataset.pawnIndex=String(index);
       pawn.dataset.seat=String(seat);
-      pawn.disabled=!myTurn||!state.dice_rolled||ludoBoardBusy;
-      pawn.addEventListener("click",()=>moveLudoPawn(index));
+      const isMyPawn=seat===Number(ownSeat);
+      pawn.disabled=!myTurn||!isMyPawn||!state.dice_rolled||ludoBoardBusy;
+      pawn.style.pointerEvents=isMyPawn&&myTurn?"auto":"none";
+      pawn.style.zIndex=isMyPawn?"5":"3";
+      pawn.addEventListener("click",()=>{if(isMyPawn&&myTurn) moveLudoPawn(index);});
       board.appendChild(pawn);
     });
   });
