@@ -184,3 +184,6 @@
 /* Correct arrival quadrants: blue enters from bottom-left, yellow from bottom-right */
 .ludo-center .center-yellow{grid-row:2;grid-column:2}
 .ludo-center .center-blue{grid-row:2;grid-column:1}
+
+/* Final Ludo path corrections from the marked screenshot */
+.ludo-cell.entry-yellow{background:linear-gradient(145deg,#fff59a,#f3c400)!important;border-color:#9aaea0!important}
