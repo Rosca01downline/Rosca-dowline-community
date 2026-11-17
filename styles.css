@@ -187,3 +187,6 @@
 
 /* Final Ludo path corrections from the marked screenshot */
 .ludo-cell.entry-yellow{background:linear-gradient(145deg,#fff59a,#f3c400)!important;border-color:#9aaea0!important}
+
+/* Screenshot correction: marked yellow-start outer square must be white */
+.ludo-cell.start-yellow{background:#fff!important;border-color:#9aaea0!important}
