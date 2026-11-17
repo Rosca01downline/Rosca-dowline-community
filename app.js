@@ -175,7 +175,10 @@ function renderLudoBoard(snapshot){
     const innerYard=inYard&&((r>=1&&r<=4&&(c<=4||c>=10))||(c>=1&&c<=4&&(r>=10&&r<=13))||(c>=10&&c<=13&&(r>=10&&r<=13)));
     const trackIndex=LUDO_TRACK.findIndex(([rr,cc])=>rr===r&&cc===c);
     const laneSeat=Object.entries(LUDO_HOME_LANES).find(([s,coords])=>coords.some(([rr,cc])=>rr===r&&cc===c))?.[0];
+    // Outer-track squares stay white even when they pass through a colored yard quadrant.
+    if(trackIndex>=0) base="";
     let cls="ludo-cell "+base;
+    if(r===7&&c===14) cls+=" entry-yellow";
     if(innerYard) cls+=" yard-inner";
     if(trackIndex>=0) cls+=" track"+(safeTrack.includes(trackIndex)?" safe":"");
     if(laneSeat) cls+=" lane lane-"+laneSeat;
