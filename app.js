@@ -181,8 +181,8 @@ function renderLudoBoard(snapshot){
     if(laneSeat) cls+=" lane lane-"+laneSeat;
     if(r===6&&c===1) cls+=" start-red";
     if(r===1&&c===8) cls+=" start-green";
-    if(r===8&&c===12) cls+=" start-yellow";
-    if(r===12&&c===6) cls+=" start-blue";
+    if(r===8&&c===13) cls+=" start-yellow";
+    if(r===13&&c===6) cls+=" start-blue";
     if(trackIndex<0&&!laneSeat) continue;
     cells.push('<div class="'+cls+'" style="grid-row:'+(r+1)+';grid-column:'+(c+1)+'"></div>');
   }
