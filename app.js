@@ -164,7 +164,7 @@ function renderLudoBoard(snapshot){
   const ownSeat=players.find(p=>p.member_id===currentMember?.id)?.seat_number;
   const myTurn=Number(state.current_turn_seat)===Number(ownSeat);
   const cells=[];
-  const safeTrack=[7,20,32,46];
+  const safeTrack=[8,21,33,46];
   for(let r=0;r<15;r++) for(let c=0;c<15;c++){
     let base="";
     if(r<6&&c<6) base="yard-red";
