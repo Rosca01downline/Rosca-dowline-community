@@ -233,12 +233,14 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
     if(r===8&&c===13) cls+=" start-yellow";
     if(r===13&&c===6) cls+=" start-blue";
 
-    if(trackIndex<0&&!laneSeat) continue;
-    // Remove only the exact unwanted left-edge square circled by the user.
-    // Keep the adjacent lower square; it is part of the normal track.
-    if(c===0&&r===6) continue;
-    // Ensure the right-side entry square remains a visible white track tile.
-    if(r===7&&c===14) cls+=" track entry-yellow";
+    // Build all four arms as complete 3-by-6 tile grids, matching the blue reference arms.
+    const inHorizontalArm=(r>=6&&r<=8&&((c>=0&&c<=5)||(c>=9&&c<=14)));
+    const inVerticalArm=(c>=6&&c<=8&&((r>=0&&r<=5)||(r>=9&&r<=14)));
+    if(trackIndex<0&&!laneSeat&&!inHorizontalArm&&!inVerticalArm) continue;
+    // Missing outer white squares are decorative track tiles, not pawn path coordinates.
+    if(trackIndex<0&&!laneSeat&&(inHorizontalArm||inVerticalArm)) cls+=" track";
+    // The yellow entry outer tile is white like the other track squares.
+    if(r===7&&c===14) cls+=" entry-yellow";
     cells.push('<div class="'+cls+'" style="grid-row:'+(r+1)+';grid-column:'+(c+1)+'"></div>');
   }
   const homes='<div class="ludo-home home-red"><i></i><i></i><i></i><i></i></div>'+
