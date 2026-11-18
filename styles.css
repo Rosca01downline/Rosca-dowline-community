@@ -221,3 +221,23 @@
 
 /* Keep the right-edge Ludo entry position as a clearly visible white square. */
 .ludo-cell.entry-yellow{display:block!important;visibility:visible!important;opacity:1!important;background:#fff!important;border:1px solid #9aaea0!important;box-shadow:inset 0 1px 2px #fff!important;}
+
+
+/* Fix left-edge Ludo path tiles: keep valid track squares white and pawn buttons transparent */
+.ludo-cell.track{
+  background:#fff!important;
+  background-image:linear-gradient(145deg,#fff 0%,#f4f8f3 100%)!important;
+  border:1px solid #a9b6aa!important;
+  color:#263b32!important;
+  box-shadow:inset 0 1px 2px #fff,0 1px 2px #213b2430!important;
+}
+.ludo-pawn,
+.ludo-pawn:disabled{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  background:transparent!important;
+  background-color:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.ludo-pawn svg{background:transparent!important;}
