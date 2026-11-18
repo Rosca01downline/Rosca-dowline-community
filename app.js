@@ -219,6 +219,9 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
     const innerYard=inYard&&((r>=1&&r<=4&&(c<=4||c>=10))||(c>=1&&c<=4&&(r>=10&&r<=13))||(c>=10&&c<=13&&(r>=10&&r<=13)));
     const trackIndex=LUDO_TRACK.findIndex(([rr,cc])=>rr===r&&cc===c);
     const laneSeat=Object.entries(LUDO_HOME_LANES).find(([s,coords])=>coords.some(([rr,cc])=>rr===r&&cc===c))?.[0];
+    // Hide the two excess outer-left tiles explicitly marked by the user.
+    // Keep LUDO_TRACK coordinates unchanged so pawn movement/history are preserved.
+    const userMarkedExcessTile=(c===0&&(r===5||r===6));
     // No decorative filler tiles: render only real track and home-lane squares.
     // Keep every coordinate in LUDO_TRACK visible as a real square.
     // Outer-track squares stay white even when they pass through a colored yard quadrant.
@@ -236,6 +239,7 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
     // Build all four arms as complete 3-by-6 tile grids, matching the blue reference arms.
     const inHorizontalArm=(r>=6&&r<=8&&((c>=0&&c<=5)||(c>=9&&c<=14)));
     const inVerticalArm=(c>=6&&c<=8&&((r>=0&&r<=5)||(r>=9&&r<=14)));
+    if(userMarkedExcessTile) continue;
     if(trackIndex<0&&!laneSeat&&!inHorizontalArm&&!inVerticalArm) continue;
     // Missing outer white squares are decorative track tiles, not pawn path coordinates.
     if(trackIndex<0&&!laneSeat&&(inHorizontalArm||inVerticalArm)) cls+=" track";
