@@ -219,7 +219,7 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
     const innerYard=inYard&&((r>=1&&r<=4&&(c<=4||c>=10))||(c>=1&&c<=4&&(r>=10&&r<=13))||(c>=10&&c<=13&&(r>=10&&r<=13)));
     const trackIndex=LUDO_TRACK.findIndex(([rr,cc])=>rr===r&&cc===c);
     const laneSeat=Object.entries(LUDO_HOME_LANES).find(([s,coords])=>coords.some(([rr,cc])=>rr===r&&cc===c))?.[0];
-    const addWhiteTrackTile=(r===6&&c===14)||(r===8&&c===0);
+    // No decorative filler tiles: render only real track and home-lane squares.
     // Keep every coordinate in LUDO_TRACK visible as a real square.
     // Outer-track squares stay white even when they pass through a colored yard quadrant.
     if(trackIndex>=0) base="";
@@ -233,7 +233,7 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
     if(r===8&&c===13) cls+=" start-yellow";
     if(r===13&&c===6) cls+=" start-blue";
 
-    if(trackIndex<0&&!laneSeat&&!addWhiteTrackTile) continue;
+    if(trackIndex<0&&!laneSeat) continue;
     cells.push('<div class="'+cls+'" style="grid-row:'+(r+1)+';grid-column:'+(c+1)+'"></div>');
   }
   const homes='<div class="ludo-home home-red"><i></i><i></i><i></i><i></i></div>'+
