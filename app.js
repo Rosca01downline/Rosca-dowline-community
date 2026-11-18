@@ -322,7 +322,7 @@ async function loadLudoGameState(){
     try{
       const {data:moves,error:moveError}=await db.from("ludo_moves")
         .select("move_number,move_data,created_at")
-        .eq("room_id",currentLudoRoomId).order("move_number",{ascending:false}).limit(8);
+        .eq("room_id",currentLudoRoomId).order("move_number",{ascending:false}).limit(50);
       if(!moveError) renderLudoActionFeed(data.players||[],moves||[]);
     }catch(feedError){ console.warn("Ludo move feed unavailable:",feedError?.message||feedError); }
   }catch(error){
