@@ -190,3 +190,11 @@
 
 /* Screenshot correction: marked yellow-start outer square must be white */
 .ludo-cell.start-yellow{background:linear-gradient(145deg,#fff59a,#f3c400)!important;border-color:#9aaea0!important}
+
+
+/* Ludo live action history, quick pawn hops, and readable stacked pawns */
+.ludo-action-feed{display:flex;flex-direction:column;gap:5px;width:min(100%,560px);margin:12px auto 0;max-height:190px;overflow:auto;padding:9px;border:1px solid #c9d8ce;border-radius:12px;background:#f7fbf7}
+.ludo-action-item{display:grid;grid-template-columns:minmax(70px,auto) 1fr auto;align-items:center;gap:7px;padding:6px 8px;border-radius:8px;background:#fff;font-size:12px;box-shadow:0 1px 3px #102a4315}
+.ludo-action-item strong{color:#176b2d;white-space:nowrap}.ludo-action-item span{min-width:0;overflow-wrap:anywhere}.ludo-action-item small{color:#64748b;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ludo-pawn{will-change:transform;transform-origin:center;transition:filter .1s ease}
+@media(max-width:560px){.ludo-action-item{grid-template-columns:1fr auto}.ludo-action-item span{grid-column:1/-1;grid-row:2}.ludo-action-item small{grid-column:2;grid-row:1}}
