@@ -234,6 +234,8 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
     if(r===13&&c===6) cls+=" start-blue";
 
     if(trackIndex<0&&!laneSeat) continue;
+    // Remove the two stray left-edge squares marked in the user screenshot.
+    if(c===0&&(r===6||r===7)) continue;
     cells.push('<div class="'+cls+'" style="grid-row:'+(r+1)+';grid-column:'+(c+1)+'"></div>');
   }
   const homes='<div class="ludo-home home-red"><i></i><i></i><i></i><i></i></div>'+
