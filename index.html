@@ -129,6 +129,17 @@
         <div id="ludoPlayerBalances" aria-label="Solde SC an’ny mpilalao"></div><div id="ludoBoard" class="ludo-board" aria-label="Plateau Ludo"><p class="muted ludo-board-empty">Safidio aloha ny room.</p></div>
         <p class="muted">Tsindrio ny pion-nao rehefa avy manipy dés. Mila 6 vao mivoaka ny pion. Mila isa marina vao tafiditra ao an-trano.</p>
         <div id="ludoActionFeed" class="ludo-action-feed" aria-live="polite" aria-label="Hetsika farany rehetra"></div>
+        <section id="ludoWinnerPanel" class="ludo-winner-panel hidden" role="status" aria-live="assertive">
+          <div class="ludo-winner-crown" aria-hidden="true">👑</div>
+          <div class="ludo-winner-eyebrow">FIN DE PARTIE</div>
+          <h3 id="ludoWinnerTitle">WIN !</h3>
+          <p id="ludoWinnerName">Le gagnant est...</p>
+          <p class="ludo-winner-help">Tehirizo ny mpilalao sy ny solde SC, na miala amin'ity room ity.</p>
+          <div class="ludo-winner-actions">
+            <button id="ludoContinueBtn" class="btn ludo-continue-btn" type="button">↻ CONTINUER</button>
+            <button id="ludoStopBtn" class="btn ludo-stop-btn" type="button">■ STOP</button>
+          </div>
+        </section>
       </div>
       <div class="ludo-chat-feed" id="ludoChatFeed" aria-live="polite"><p class="muted">Safidio aloha ny room.</p></div>
       <form id="ludoChatForm" class="ludo-chat-form">
@@ -226,6 +237,6 @@
   <p id="globalMsg" class="message" role="status"></p>
 </main>
 <footer>© ROSCA & DOWNLINE COMMUNITY · USDT</footer>
-<script src="app.js?v=20261118-ludo-remove-filler-squares"></script>
+<script src="app.js?v=20261118-ludo-win-continue-stop"></script>
 </body>
 </html>
