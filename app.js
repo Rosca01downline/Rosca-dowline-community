@@ -122,6 +122,8 @@ let ludoChatChannelRoomId = null;
 let ludoRoomMembers = [];
 let ludoGameSnapshot = null;
 let ludoBoardBusy = false;
+let ludoStatePoller = null;
+let ludoStateLoading = false;
 
 const LUDO_TRACK = [
   [6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],
@@ -149,7 +151,49 @@ function ludoCoord(seat,pos,index){
   if(pos>=52) return LUDO_HOME_LANES[seat]?.[Math.min(5,pos-52)] || [7,7];
   return LUDO_TRACK[((seat-1)*13+pos)%52] || [7,7];
 }
-function renderLudoBoard(snapshot){
+function animateLudoPawnPath(pawn,seat,oldPos,newPos,index){
+  if(!pawn || Number(oldPos)===Number(newPos)) return;
+  const steps=[];
+  if(Number(oldPos)<0){ steps.push(Number(newPos)); }
+  else if(Number(newPos)>Number(oldPos) && Number(newPos)<=57){
+    for(let p=Number(oldPos)+1;p<=Number(newPos);p++) steps.push(p);
+  }else{ steps.push(Number(newPos)); }
+  const board=$("ludoBoard");
+  if(!board || !steps.length) return;
+  const finalCoord=ludoCoord(seat,Number(newPos),index);
+  const cellSize=board.clientWidth/15;
+  const keyframes=[];
+  const startCoord=Number(oldPos)<0?(LUDO_YARDS[seat]?.[index]||finalCoord):ludoCoord(seat,Number(oldPos),index);
+  keyframes.push({transform:`translate(${(startCoord[1]-finalCoord[1])*cellSize}px, ${(startCoord[0]-finalCoord[0])*cellSize}px) scale(.78)`});
+  steps.forEach((pos,i)=>{
+    const coord=ludoCoord(seat,pos,index);
+    keyframes.push({transform:`translate(${(coord[1]-finalCoord[1])*cellSize}px, ${(coord[0]-finalCoord[0])*cellSize}px) scale(${i===steps.length-1?1:.86})`});
+  });
+  keyframes.push({transform:"translate(0,0) scale(1)"});
+  pawn.animate(keyframes,{duration:Math.min(650,Math.max(180,steps.length*72)),easing:"linear"});
+}
+function renderLudoActionFeed(players,moves){
+  const host=$("ludoActionFeed");
+  if(!host) return;
+  const names=new Map((players||[]).map(p=>[Number(p.seat_number),p.full_name||(p.is_bot?"BOT":"Seat "+p.seat_number)]));
+  const rows=(moves||[]).slice().reverse();
+  if(!rows.length){host.innerHTML='<p class="muted">Mbola tsy misy hetsika.</p>';return;}
+  host.innerHTML=rows.map(m=>{
+    const d=m.move_data||{};
+    const seat=Number(d.seat);
+    const who=esc(names.get(seat)||(seat===2?"BOT":"Seat "+seat));
+    const dice=d.dice==null?"":(' · 🎲 '+esc(d.dice));
+    let detail='Nanao hetsika';
+    if(d.passed_turn) detail='Tsy nisy pion azo afindra — nifindra ny tour';
+    else if(d.pawn_index!=null) detail='Pion '+(Number(d.pawn_index)+1)+' : '+(d.old_position<0?'Yard':('case '+d.old_position))+' → case '+d.new_position;
+    else if(d.action==='move') detail='Namindra pion';
+    if(Number(d.captured_count||0)>0) detail+=' · naka pion '+Number(d.captured_count);
+    if(d.extra_turn) detail+=' · tour fanampiny';
+    const time=new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    return '<div class="ludo-action-item"><strong>'+who+'</strong><span>'+esc(detail)+dice+'</span><small>'+esc(time)+'</small></div>';
+  }).join("");
+}
+function renderLudoBoard(snapshot,previousSnapshot=null){
   const board=$("ludoBoard");
   if(!board) return;
   if(!snapshot?.state){
@@ -230,6 +274,25 @@ function renderLudoBoard(snapshot){
       pawn.style.zIndex=isMyPawn?"5":"3";
       pawn.addEventListener("click",()=>{if(isMyPawn&&myTurn) moveLudoPawn(index);});
       board.appendChild(pawn);
+      const oldPos=previousSnapshot?.state?.pawns?.[String(seat)]?.pawns?.[index];
+      if(oldPos!==undefined && Number(oldPos)!==Number(pos)) animateLudoPawnPath(pawn,seat,Number(oldPos),Number(pos),index);
+    });
+  });
+  const stackGroups=new Map();
+  board.querySelectorAll('.ludo-pawn').forEach(pawn=>{
+    const key=pawn.style.gridRow+'|'+pawn.style.gridColumn;
+    if(!stackGroups.has(key)) stackGroups.set(key,[]);
+    stackGroups.get(key).push(pawn);
+  });
+  stackGroups.forEach(group=>{
+    const count=group.length;
+    if(count<2) return;
+    const size=count===2?68:count===3?58:50;
+    const offsets=count===2?[[-17,0],[17,0]]:count===3?[[-15,-13],[15,-13],[0,15]]:[[-15,-15],[15,-15],[-15,15],[15,15]];
+    group.forEach((pawn,i)=>{
+      pawn.style.width=size+'%'; pawn.style.height=size+'%';
+      pawn.style.translate=offsets[i][0]+'% '+offsets[i][1]+'%';
+      pawn.style.zIndex=String(8+i);
     });
   });
   $("ludoDiceValue").textContent=state.dice_value==null?"–":String(state.dice_value);
@@ -240,6 +303,8 @@ function renderLudoBoard(snapshot){
 async function loadLudoGameState(){
   if(!currentLudoRoomId) { renderLudoBoard(null); return; }
   try{
+    if(ludoStateLoading) return;
+    ludoStateLoading=true;
     const {data,error}=await db.rpc("get_ludo_game_state",{p_room_id:currentLudoRoomId});
     if(error) throw error;
     const playerIds=(data?.players||[]).map(p=>p.member_id).filter(Boolean);
@@ -251,10 +316,19 @@ async function loadLudoGameState(){
       else console.warn("Ludo virtual balances not readable:",walletError.message);
     }
     data.virtualBalances=virtualBalances;
+    const previous=ludoGameSnapshot;
     ludoGameSnapshot=data;
-    renderLudoBoard(data);
+    renderLudoBoard(data,previous);
+    try{
+      const {data:moves,error:moveError}=await db.from("ludo_moves")
+        .select("move_number,move_data,created_at")
+        .eq("room_id",currentLudoRoomId).order("move_number",{ascending:false}).limit(8);
+      if(!moveError) renderLudoActionFeed(data.players||[],moves||[]);
+    }catch(feedError){ console.warn("Ludo move feed unavailable:",feedError?.message||feedError); }
   }catch(error){
     $("ludoBoard").innerHTML='<p class="error ludo-board-empty">Tsy afaka mamaky ny lalao: '+esc(error?.message||String(error))+'</p>';
+  }finally{
+    ludoStateLoading=false;
   }
 }
 async function rollLudoDice(){
@@ -296,6 +370,8 @@ async function moveLudoPawn(index){
   }
 }
 $("ludoRollBtn").addEventListener("click",rollLudoDice);
+if(ludoStatePoller) clearInterval(ludoStatePoller);
+ludoStatePoller=setInterval(()=>{if(currentLudoRoomId && !ludoBoardBusy) loadLudoGameState();},1000);
 
 
 async function initializeLudoVirtualBalance(){
