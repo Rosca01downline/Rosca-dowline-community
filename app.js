@@ -296,6 +296,29 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
     });
   });
   $("ludoDiceValue").textContent=state.dice_value==null?"–":String(state.dice_value);
+  const winnerPlayer=players.find(p=>{
+    const pp=state.pawns?.[String(p.seat_number)]?.pawns||[];
+    return pp.length===4 && pp.every(pos=>Number(pos)===57);
+  });
+  const winnerPanel=$("ludoWinnerPanel");
+  const winnerSeat=winnerPlayer?Number(winnerPlayer.seat_number):null;
+  if(winnerPanel){
+    const hasWinner=snapshot.status==="completed";
+    winnerPanel.classList.toggle("hidden",!hasWinner);
+    if(hasWinner){
+      $("ludoWinnerTitle").textContent="🏆 WIN !";
+      $("ludoWinnerName").textContent=winnerPlayer?.full_name||(winnerPlayer?.is_bot?"BOT MASTER":"Vainqueur");
+    }
+  }
+  if(snapshot.status==="completed" && winnerSeat){
+    const crown=document.createElement("div");
+    crown.className="ludo-board-winner-crown";
+    crown.innerHTML='<span aria-hidden="true">👑</span><strong>WIN</strong>';
+    const crownCell={1:[4,4],2:[4,12],3:[12,12],4:[12,4]}[winnerSeat]||[8,8];
+    crown.style.gridRow=String(crownCell[0]);
+    crown.style.gridColumn=String(crownCell[1]);
+    board.appendChild(crown);
+  }
   const active=players.find(p=>Number(p.seat_number)===Number(state.current_turn_seat));
   $("ludoTurnInfo").textContent="Tour: "+(active?.full_name||(active?.is_bot?"BOT":"Seat "+state.current_turn_seat))+" — Miandry";
   $("ludoRollBtn").disabled=!myTurn||Boolean(state.dice_rolled)||ludoBoardBusy||snapshot.status!=="playing";
@@ -321,8 +344,8 @@ async function loadLudoGameState(){
     renderLudoBoard(data,previous);
     try{
       const {data:moves,error:moveError}=await db.from("ludo_moves")
-        .select("move_number,move_data,created_at")
-        .eq("room_id",currentLudoRoomId).order("move_number",{ascending:false}).limit(50);
+        .select("round_number,move_number,move_data,created_at")
+        .eq("room_id",currentLudoRoomId).order("created_at",{ascending:false}).limit(50);
       if(!moveError) renderLudoActionFeed(data.players||[],moves||[]);
     }catch(feedError){ console.warn("Ludo move feed unavailable:",feedError?.message||feedError); }
   }catch(error){
@@ -369,6 +392,32 @@ async function moveLudoPawn(index){
     if(ludoGameSnapshot) renderLudoBoard(ludoGameSnapshot);
   }
 }
+$("ludoContinueBtn").addEventListener("click",async()=>{
+  if(!currentLudoRoomId || ludoBoardBusy) return;
+  const button=$("ludoContinueBtn");
+  button.disabled=true;
+  msg("ludoSocialMsg","Manomboka manche vaovao ao amin'ity room ity...");
+  try{
+    const {error}=await db.rpc("continue_ludo_room",{p_room_id:currentLudoRoomId});
+    if(error) throw error;
+    ludoGameSnapshot=null;
+    await loadLudoGameState();
+    msg("ludoSocialMsg","Manche vaovao natomboka! Mbola ireo mpilalao sy BOT teo ihany, ary voatahiry ny solde SC sy ny historique.");
+  }catch(error){
+    msg("ludoSocialMsg","Tsy afaka manohy: "+(error?.message||String(error)),true);
+  }finally{button.disabled=false;}
+});
+$("ludoStopBtn").addEventListener("click",async()=>{
+  const stoppedRoom=currentLudoRoomId;
+  currentLudoRoomId=null;
+  ludoGameSnapshot=null;
+  $("ludoRoomSelect").value="";
+  renderLudoBoard(null);
+  $("ludoWinnerPanel").classList.add("hidden");
+  await loadLudoRoomMembers();
+  await loadLudoChat();
+  msg("ludoSocialMsg","Niala tamin'ny room "+String(stoppedRoom||"").slice(0,8)+". Tsy voafafa ny tantara na ny solde SC.");
+});
 $("ludoRollBtn").addEventListener("click",rollLudoDice);
 if(ludoStatePoller) clearInterval(ludoStatePoller);
 ludoStatePoller=setInterval(()=>{if(currentLudoRoomId && !ludoBoardBusy) loadLudoGameState();},1000);
