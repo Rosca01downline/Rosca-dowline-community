@@ -198,3 +198,23 @@
 .ludo-action-item strong{color:#176b2d;white-space:nowrap}.ludo-action-item span{min-width:0;overflow-wrap:anywhere}.ludo-action-item small{color:#64748b;white-space:nowrap;font-variant-numeric:tabular-nums}
 .ludo-pawn{will-change:transform;transform-origin:center;transition:filter .1s ease}
 @media(max-width:560px){.ludo-action-item{grid-template-columns:1fr auto}.ludo-action-item span{grid-column:1/-1;grid-row:2}.ludo-action-item small{grid-column:2;grid-row:1}}
+
+
+/* Ludo WIN screen: visible, high-contrast finish panel and crown in winner yard */
+.ludo-winner-panel{margin:16px auto 4px;padding:20px 16px;max-width:560px;text-align:center;border:3px solid #e2ad27;border-radius:18px;background:radial-gradient(circle at 50% 0%,#fff8d9,#fff 70%);box-shadow:0 8px 24px #6b4b1230;animation:ludoWinPop .35s ease-out}
+.ludo-winner-crown{font-size:clamp(42px,12vw,66px);line-height:1.1;filter:drop-shadow(0 4px 3px #a56b2740)}
+.ludo-winner-eyebrow{font-size:11px;font-weight:900;letter-spacing:.2em;color:#95640b;margin-top:6px}
+.ludo-winner-panel h3{font-size:clamp(30px,8vw,44px);font-weight:1000;color:#a46b00;margin:5px 0;text-shadow:0 2px #fff}
+.ludo-winner-panel p{margin:6px 0;color:#34465a}
+.ludo-winner-panel #ludoWinnerName{font-size:20px;font-weight:900;color:#102a43}
+.ludo-winner-help{font-size:12px}
+.ludo-winner-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:16px}
+.ludo-winner-actions .btn{min-width:145px;padding:14px 18px;font-size:14px;font-weight:950}
+.ludo-continue-btn{background:linear-gradient(135deg,#16a34a,#087c38);color:#fff;box-shadow:0 4px 0 #075c2b}
+.ludo-stop-btn{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;box-shadow:0 4px 0 #8f1515}
+.ludo-winner-actions .btn:disabled{opacity:.55;cursor:wait}
+.ludo-board-winner-crown{z-index:12;align-self:center;justify-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:145%;height:145%;border:2px solid #f2c94c;border-radius:14px;background:#fff9dfed;color:#8a5700;box-shadow:0 3px 12px #3d2a1640;pointer-events:none;transform:translate(-15%,-12%)}
+.ludo-board-winner-crown span{font-size:clamp(15px,4vw,27px);line-height:1}
+.ludo-board-winner-crown strong{font-size:clamp(9px,2.2vw,13px);font-weight:1000;letter-spacing:.08em}
+@keyframes ludoWinPop{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:560px){.ludo-winner-panel{padding:16px 10px}.ludo-winner-actions{gap:9px}.ludo-winner-actions .btn{flex:1;min-width:120px}}
