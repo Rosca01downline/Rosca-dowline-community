@@ -228,7 +228,9 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
     if(trackIndex>=0) base="";
     let cls="ludo-cell "+base;
     if(r===7&&c===14) cls+=" entry-yellow";
-    if(innerYard) cls+=" yard-inner";
+    // A real track coordinate inside the yard must stay an opaque white tile.
+    // Apply transparent yard-inner styling only to non-track yard decoration.
+    if(innerYard&&trackIndex<0) cls+=" yard-inner";
     if(trackIndex>=0) cls+=" track"+(safeTrack.includes(trackIndex)?" safe":"");
     if(laneSeat) cls+=" lane lane-"+laneSeat;
     if(r===6&&c===1) cls+=" start-red";
