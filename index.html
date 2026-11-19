@@ -96,7 +96,7 @@
 
     <section id="ludoSocialPanel" class="panel ludo-panel">
       <div class="section-head"><div><span class="eyebrow">ESPACE LUDO</span><h2>🎲 Ludo & Chat communautaire</h2></div><button id="ludoRefreshBtn" class="btn ghost small" type="button">Havaozy</button></div>
-      <p class="muted">Chat sy cadeau visuel ao amin'ny room. Tsy misy mise en jeu, retrait na famindrana SC amin'ity sehatra ity.</p>
+      <p class="muted">Lalao misy frais d'entrée 15 SC sy mise virtoaly voafidin'ny tompon'ny room. Tsy azo avadika ho vola ROSCA ny Ludo SC.</p>
       <div class="ludo-room-create">
         <h3>Mamorona room vaovao</h3>
         <label>Karazana lalao
@@ -105,6 +105,10 @@
         <label>Isan'ny mpilalao
           <select id="ludoPlayerCount"><option value="2">2 mpilalao</option><option value="4">4 mpilalao</option></select>
         </label>
+        <label>Mise (SC) — farafahakeliny 1 SC
+          <input id="ludoStakeSc" type="number" min="1" step="1" value="1" inputmode="numeric" required>
+        </label>
+        <small class="muted">Frais d'entrée: 15 SC + mise. Ny bot tsy mandoa.</small>
         <button id="ludoCreateRoomBtn" class="btn primary" type="button">＋ Créer room</button>
       </div>
       <div class="ludo-room-join">
