@@ -536,13 +536,18 @@ $("ludoSendGiftBtn").addEventListener("click", async () => {
   button.disabled=true;
   msg("ludoSocialMsg","Alefa ny cadeau...");
   try{
-    const {error}=await db.rpc("send_ludo_visual_gift",{
+    const {data,error}=await db.rpc("send_ludo_virtual_gift",{
       p_room_id:currentLudoRoomId,
       p_recipient_member_id:recipient,
       p_gift_code:gift
     });
     if(error) throw error;
-    msg("ludoSocialMsg","Voaray ny cadeau visuel! Tsy nisy SC nafindra.");
+    const transfer=Array.isArray(data)?data[0]:data;
+    if(transfer){
+      msg("ludoSocialMsg","Cadeau nalefa! Niala "+Number(transfer.charged_sc||0)+" SC taminao; nahazo "+Number(transfer.recipient_sc||0)+" SC ny mpandray. Sarany: "+Number(transfer.fee_sc||0)+" SC.");
+    }else{
+      msg("ludoSocialMsg","Cadeau nalefa ary voaisa ny SC.");
+    }
     await loadLudoChat();
   }catch(error){
     msg("ludoSocialMsg","Tsy tafavoaka ny cadeau: "+(error?.message||String(error)),true);
@@ -686,19 +691,23 @@ async function loadLudoChat(){
   feed.innerHTML='<p class="muted">Ampidirina ny chat...</p>';
   try{
     await loadLudoRoomMembers();
-    const [{data:messages,error:messageError},{data:gifts,error:giftError},{data:catalog,error:catalogError}]=await Promise.all([
+    const [{data:messages,error:messageError},{data:visualGifts,error:visualGiftError},{data:gifts,error:giftError},{data:catalog,error:catalogError}]=await Promise.all([
       db.from("ludo_chat_messages").select("id,sender_member_id,message_type,content,created_at")
         .eq("room_id",currentLudoRoomId).order("created_at",{ascending:true}).limit(100),
       db.from("ludo_chat_gift_events").select("id,sender_member_id,recipient_member_id,gift_code,created_at")
         .eq("room_id",currentLudoRoomId).order("created_at",{ascending:true}).limit(100),
+      db.from("ludo_gift_transfers").select("id,sender_member_id,recipient_member_id,gift_code,amount_sc,recipient_sc,fee_sc,created_at")
+        .eq("room_id",currentLudoRoomId).order("created_at",{ascending:true}).limit(100),
       db.from("ludo_gift_catalog").select("gift_code,gift_name,price_sc").eq("active",true)
     ]);
     if(messageError) throw messageError;
+    if(visualGiftError) throw visualGiftError;
     if(giftError) throw giftError;
     if(catalogError) throw catalogError;
     const names=new Map((ludoRoomMembers||[]).map(m=>[m.id,m.full_name||"Membre"]));
     const items=[
       ...(messages||[]).map(x=>({...x,kind:"message"})),
+      ...(visualGifts||[]).map(x=>({...x,kind:"gift"})),
       ...(gifts||[]).map(x=>({...x,kind:"gift"}))
     ].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
     if(!items.length){feed.innerHTML='<p class="muted">Mbola tsy misy hafatra. Afaka manomboka ianao!</p>';}
@@ -708,14 +717,15 @@ async function loadLudoChat(){
       if(x.kind==="gift"){
         const g=(catalog||[]).find(c=>c.gift_code===x.gift_code);
         const recipient=esc(names.get(x.recipient_member_id)||"Membre");
-        return '<div class="ludo-chat-item gift"><strong>🎁 '+sender+'</strong> nandefa <b>'+esc(g?.gift_name||x.gift_code)+'</b> ho an’i <strong>'+recipient+'</strong><small>'+time+'</small></div>';
+        const giftAmount=x.amount_sc?(' · '+Number(x.amount_sc)+' SC'): ' · cadeau visuel';
+        return '<div class="ludo-chat-item gift"><strong>🎁 '+sender+'</strong> nandefa <b>'+esc(g?.gift_name||x.gift_code)+'</b> ho an’i <strong>'+recipient+'</strong>'+esc(giftAmount)+'<small>'+time+'</small></div>';
       }
       return '<div class="ludo-chat-item"><strong>'+sender+'</strong><p>'+esc(x.content||"")+'</p><small>'+time+'</small></div>';
     }).join("");
     feed.scrollTop=feed.scrollHeight;
     await loadLudoGameState();
     $("ludoGiftCode").innerHTML='<option value="">Safidio ny cadeau</option>'+(catalog||[]).map(g=>
-      '<option value="'+esc(g.gift_code)+'">'+esc(g.gift_name)+' · '+Number(g.price_sc||0)+' SC (visuel)</option>'
+      '<option value="'+esc(g.gift_code)+'">'+esc(g.gift_name)+' · '+Number(g.price_sc||0)+' SC</option>'
     ).join("");
   }catch(error){
     feed.innerHTML='<p class="error">Tsy afaka mamaky chat: '+esc(error?.message||String(error))+'</p>';
