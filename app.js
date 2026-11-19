@@ -456,14 +456,17 @@ $("ludoCreateRoomBtn").addEventListener("click", async () => {
   button.disabled=true;
   msg("ludoSocialMsg","Mamorona room...");
   try{
+    const stakeSc=Number($("ludoStakeSc").value);
+    if(!Number.isSafeInteger(stakeSc) || stakeSc<1) throw new Error("Ny mise dia tsy maintsy 1 SC farafahakeliny.");
     const {data,error}=await db.rpc("create_ludo_room",{
       p_game_mode:$("ludoGameMode").value,
-      p_player_count:Number($("ludoPlayerCount").value)
+      p_player_count:Number($("ludoPlayerCount").value),
+      p_stake_sc:stakeSc
     });
     if(error) throw error;
     currentLudoRoomId=data;
     await initializeLudoVirtualBalance();
-    msg("ludoSocialMsg","Voaforona ny room! Solde Ludo virtuel voamarina.");
+    msg("ludoSocialMsg","Voaforona ny room! Frais 15 SC sy mise "+stakeSc+" SC no ampiharina rehefa manomboka ny match.");
     await loadLudoRooms();
     $("ludoRoomSelect").value=data;
     await loadLudoRoomMembers();
