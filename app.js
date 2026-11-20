@@ -381,7 +381,7 @@ async function loadLudoGameState(){
         .select("round_number,move_number,move_data,created_at")
         .eq("room_id",currentLudoRoomId)
         .eq("round_number",Number(data?.state?.round_number||1))
-        .order("created_at",{ascending:false}).limit(200);
+        .order("created_at",{ascending:false}).limit(1000);
       if(!moveError){
         renderLudoActionFeed(data.players||[],moves||[]);
         renderLudoDiceHistory(data.players||[],moves||[],data?.state?.round_number);
