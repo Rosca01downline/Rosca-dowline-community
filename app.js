@@ -193,6 +193,27 @@ function renderLudoActionFeed(players,moves){
     return '<div class="ludo-action-item"><strong>'+who+'</strong><span>'+esc(detail)+dice+'</span><small>'+esc(time)+'</small></div>';
   }).join("");
 }
+function renderLudoDiceHistory(players,moves,roundNumber){
+  const host=$("ludoDiceHistory");
+  if(!host) return;
+  const rollRows=(moves||[]).filter(m=>{
+    const d=m.move_data||{};
+    return d.action==="roll" && d.seat!=null && d.dice!=null;
+  });
+  host.innerHTML='<div class="ludo-dice-history-head"><strong>🎲 5 derniers lancers</strong><small>Manche '+esc(String(roundNumber||1))+'</small></div>'+
+    '<div class="ludo-dice-history-grid">'+(players||[]).map(p=>{
+      const seat=Number(p.seat_number);
+      const recent=rollRows.filter(m=>Number(m.move_data?.seat)===seat).slice(0,5);
+      const name=esc(p.full_name||(p.is_bot?"BOT":"Seat "+seat));
+      const color=esc(LUDO_COLORS[seat]||"red");
+      const chips=recent.length?recent.map(m=>{
+        const d=m.move_data||{};
+        const time=m.created_at?new Date(m.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
+        return '<span class="ludo-dice-history-chip" title="'+esc(time)+'">🎲 '+esc(String(d.dice))+'</span>';
+      }).join(""):'<span class="muted">Mbola tsy nisy tirage</span>';
+      return '<div class="ludo-dice-history-player '+color+'"><strong>'+name+(p.is_bot?' · BOT':'')+'</strong><div class="ludo-dice-history-rolls">'+chips+'</div></div>';
+    }).join("")+'</div>';
+}
 function renderLudoBoard(snapshot,previousSnapshot=null){
   const board=$("ludoBoard");
   if(!board) return;
@@ -358,8 +379,13 @@ async function loadLudoGameState(){
     try{
       const {data:moves,error:moveError}=await db.from("ludo_moves")
         .select("round_number,move_number,move_data,created_at")
-        .eq("room_id",currentLudoRoomId).order("created_at",{ascending:false}).limit(50);
-      if(!moveError) renderLudoActionFeed(data.players||[],moves||[]);
+        .eq("room_id",currentLudoRoomId)
+        .eq("round_number",Number(data?.state?.round_number||1))
+        .order("created_at",{ascending:false}).limit(200);
+      if(!moveError){
+        renderLudoActionFeed(data.players||[],moves||[]);
+        renderLudoDiceHistory(data.players||[],moves||[],data?.state?.round_number);
+      }
     }catch(feedError){ console.warn("Ludo move feed unavailable:",feedError?.message||feedError); }
   }catch(error){
     $("ludoBoard").innerHTML='<p class="error ludo-board-empty">Tsy afaka mamaky ny lalao: '+esc(error?.message||String(error))+'</p>';
