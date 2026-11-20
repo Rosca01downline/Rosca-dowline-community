@@ -115,7 +115,6 @@ $("openWithdrawBtn").addEventListener("click",()=>{show("transactionForms",true)
 $("openHistoryBtn").addEventListener("click",()=>{show("transactionForms",false);show("historyPanel",true);});
 document.querySelectorAll("[data-close-forms]").forEach(b=>b.addEventListener("click",()=>show("transactionForms",false)));
 
-
 let currentLudoRoomId = null;
 let ludoChatChannel = null;
 let ludoChatChannelRoomId = null;
@@ -124,6 +123,7 @@ let ludoGameSnapshot = null;
 let ludoBoardBusy = false;
 let ludoStatePoller = null;
 let ludoStateLoading = false;
+
 
 const LUDO_TRACK = [
   [6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],
@@ -456,9 +456,10 @@ $("ludoCreateRoomBtn").addEventListener("click", async () => {
   button.disabled=true;
   msg("ludoSocialMsg","Mamorona room...");
   try{
-    const {data,error}=await db.rpc("create_ludo_room",{
+        const {data,error}=await db.rpc("create_ludo_room",{
       p_game_mode:$("ludoGameMode").value,
-      p_player_count:Number($("ludoPlayerCount").value)
+      p_player_count:Number($("ludoPlayerCount").value),
+      p_stake_sc:Number($("ludoStakeSC").value)
     });
     if(error) throw error;
     currentLudoRoomId=data;
