@@ -208,7 +208,6 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
   const rollRows = (moves || [])
     .map(m => ({ ...m, parsedData: parseMoveData(m) }))
     .filter(m =>
-      m.parsedData.action === "roll" &&
       m.parsedData.seat != null &&
       m.parsedData.dice != null
     )
