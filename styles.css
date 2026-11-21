@@ -275,10 +275,3 @@
 @media(max-width:380px){.ludo-dice-history-grid{grid-template-columns:1fr}}
 
 
-/* Ludo dice history: streak colors apply to every player, human or BOT */
-.ludo-dice-history-player.streak-single{background:#fee2e2;border-color:#fca5a5;border-left-color:#dc2626}
-.ludo-dice-history-player.streak-double{background:#dbeafe;border-color:#93c5fd;border-left-color:#2563eb}
-.ludo-dice-history-player.streak-triple{background:#ede9fe;border-color:#c4b5fd;border-left-color:#7c3aed}
-.ludo-dice-history-player.streak-single .ludo-dice-history-chip{background:#fecaca;color:#7f1d1d}
-.ludo-dice-history-player.streak-double .ludo-dice-history-chip{background:#bfdbfe;color:#1e3a8a}
-.ludo-dice-history-player.streak-triple .ludo-dice-history-chip{background:#ddd6fe;color:#4c1d95}
