@@ -220,17 +220,6 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
     })
     .slice(0, 5);
 
-  // Isaina ny isan'ny tirage misesy ataon'ny seat iray ao amin'ireo 5 farany.
-  for (let i = 0; i < rollRows.length;) {
-    const seat = Number(rollRows[i].parsedData.seat);
-    let j = i + 1;
-    while (j < rollRows.length && Number(rollRows[j].parsedData.seat) === seat) j++;
-    const streak = j - i;
-    const streakClass = streak >= 3 ? "streak-triple" : streak === 2 ? "streak-double" : "streak-single";
-    for (let k = i; k < j; k++) rollRows[k].streakClass = streakClass;
-    i = j;
-  }
-
   let html =
     '<div class="ludo-dice-history-head">' +
       '<strong>🎲 5 derniers tirages</strong>' +
@@ -263,7 +252,6 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
     const who = esc(
       player?.full_name || (player?.is_bot ? "BOT" : "Seat " + seat)
     );
-    const streakClass = m.streakClass || "streak-single";
     const dice = esc(String(m.parsedData.dice));
     const time = m.created_at
       ? new Date(m.created_at).toLocaleTimeString([], {
@@ -274,7 +262,7 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
       : "";
 
     html +=
-      '<div class="ludo-dice-history-player ' + streakClass + '">' +
+      '<div class="ludo-dice-history-player ' + (LUDO_COLORS[seat] || "red") + '">' +
         '<strong>' + String(index + 1) + '. ' + who +
           (player?.is_bot ? ' · BOT' : '') + '</strong>' +
         '<div class="ludo-dice-history-rolls">' +
