@@ -193,52 +193,86 @@ function renderLudoActionFeed(players,moves){
     return '<div class="ludo-action-item"><strong>'+who+'</strong><span>'+esc(detail)+dice+'</span><small>'+esc(time)+'</small></div>';
   }).join("")
 }
-function renderLudoDiceHistory(players,moves,roundNumber){
-  const host=$("ludoDiceHistory");
-  if(!host) return;
+function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
+  const host = $("ludoDiceHistory");
+  if (!host) return;
 
-  const rollRows=(moves||[])
-    .filter(m=>{
-      const d=m.move_data||{};
-      return d.action==="roll" &&
-             d.seat!=null &&
-             d.dice!=null;
-    })
-    .sort((a,b)=>Number(b.move_number)-Number(a.move_number));
+  const parseMoveData = (move) => {
+    let d = move?.move_data || {};
+    if (typeof d === "string") {
+      try { d = JSON.parse(d); } catch (_) { d = {}; }
+    }
+    return d;
+  };
 
-  host.innerHTML=
-    '<div class="ludo-dice-history-head">'+
-      '<strong>🎲 5 derniers lancers</strong>'+
-      '<small>Manche '+esc(String(roundNumber||1))+'</small>'+
-    '</div>'+
-    '<div class="ludo-dice-history-grid">'+
-    (players||[]).map(p=>{
-      const seat=Number(p.seat_number);
+  const rollRows = (moves || [])
+    .map(m => ({ ...m, parsedData: parseMoveData(m) }))
+    .filter(m =>
+      m.parsedData.action === "roll" &&
+      m.parsedData.seat != null &&
+      m.parsedData.dice != null
+    )
+    .sort((a, b) => Number(b.move_number) - Number(a.move_number));
 
-      const recent=rollRows
-        .filter(m=>Number(m.move_data?.seat)===seat)
-        .slice(0,5)
-        .reverse();
-
-      const name=esc(p.full_name||(p.is_bot?"BOT":"Seat "+seat));
-      const color=esc(LUDO_COLORS[seat]||"red");
-
-      const chips=recent.length
-        ? recent.map(m=>{
-            const d=m.move_data||{};
-            const time=m.created_at
-              ? new Date(m.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})
-              : "";
-            return '<span class="ludo-dice-history-chip" title="'+esc(time)+'">🎲 '+esc(String(d.dice))+'</span>';
-          }).join("")
-        : '<span class="muted">Mbola tsy nisy tirage</span>';
-
-      return '<div class="ludo-dice-history-player '+color+'">'+
-        '<strong>'+name+(p.is_bot?' · BOT':'')+'</strong>'+
-        '<div class="ludo-dice-history-rolls">'+chips+'</div>'+
-      '</div>';
-    }).join("")+
+  let html =
+    '<div class="ludo-dice-history-head">' +
+      '<strong>🎲 5 derniers lancers</strong>' +
+      '<small>Manche ' + esc(String(roundNumber || 1)) + '</small>' +
     '</div>';
+
+  if (readError) {
+    host.innerHTML = html +
+      '<p class="error">Tsy afaka mamaky ny tirage: ' +
+      esc(readError) + '</p>';
+    return;
+  }
+
+  if (!players || !players.length) {
+    host.innerHTML = html +
+      '<p class="muted">Tsy mbola misy mpilalao.</p>';
+    return;
+  }
+
+  html += '<div class="ludo-dice-history-grid">';
+
+  players.forEach(p => {
+    const seat = Number(p.seat_number);
+
+    const recent = rollRows
+      .filter(m => Number(m.parsedData.seat) === seat)
+      .slice(0, 5)
+      .reverse();
+
+    const name = esc(
+      p.full_name || (p.is_bot ? "BOT" : "Seat " + seat)
+    );
+
+    const color = esc(LUDO_COLORS[seat] || "red");
+
+    const chips = recent.length
+      ? recent.map(m => {
+          const dice = esc(String(m.parsedData.dice));
+          const time = m.created_at
+            ? new Date(m.created_at).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+              })
+            : "";
+
+          return '<span class="ludo-dice-history-chip" title="' +
+            esc(time) + '">🎲 ' + dice + '</span>';
+        }).join("")
+      : '<span class="muted">Mbola tsy nisy tirage</span>';
+
+    html +=
+      '<div class="ludo-dice-history-player ' + color + '">' +
+        '<strong>' + name + (p.is_bot ? ' · BOT' : '') + '</strong>' +
+        '<div class="ludo-dice-history-rolls">' + chips + '</div>' +
+      '</div>';
+  });
+
+  html += '</div>';
+  host.innerHTML = html;
 }
 function renderLudoBoard(snapshot,previousSnapshot=null){
   const board=$("ludoBoard");
@@ -383,40 +417,108 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
   $("ludoTurnInfo").textContent="Tour: "+(active?.full_name||(active?.is_bot?"BOT":"Seat "+state.current_turn_seat))+" — Miandry";
   $("ludoRollBtn").disabled=!myTurn||Boolean(state.dice_rolled)||ludoBoardBusy||snapshot.status!=="playing";
 }
-async function loadLudoGameState(){
-  if(!currentLudoRoomId) { renderLudoBoard(null); return; }
-  try{
-    if(ludoStateLoading) return;
-    ludoStateLoading=true;
-    const {data,error}=await db.rpc("get_ludo_game_state",{p_room_id:currentLudoRoomId});
-    if(error) throw error;
-    const playerIds=(data?.players||[]).map(p=>p.member_id).filter(Boolean);
-    let virtualBalances={};
-    if(playerIds.length){
-      const {data:wallets,error:walletError}=await db.from("ludo_virtual_balances")
-        .select("member_id,balance_sc").in("member_id",playerIds);
-      if(!walletError) (wallets||[]).forEach(w=>{virtualBalances[w.member_id]=Number(w.balance_sc||0);});
-      else console.warn("Ludo virtual balances not readable:",walletError.message);
-    }
-    data.virtualBalances=virtualBalances;
-    const previous=ludoGameSnapshot;
-    ludoGameSnapshot=data;
-    renderLudoBoard(data,previous);
-    try{
-      const {data:moves,error:moveError}=await db.from("ludo_moves")
-        .select("round_number,move_number,move_data,created_at")
-        .eq("room_id",currentLudoRoomId)
-        .eq("round_number",Number(data?.state?.round_number||1))
-        .order("created_at",{ascending:false}).limit(1000);
-      if(!moveError){
-        renderLudoActionFeed(data.players||[],moves||[]);
-        renderLudoDiceHistory(data.players||[],moves||[],data?.state?.round_number);
+async function loadLudoGameState() {
+  if (!currentLudoRoomId) {
+    renderLudoBoard(null);
+    return;
+  }
+
+  if (ludoStateLoading) return;
+
+  const roomId = currentLudoRoomId;
+
+  try {
+    ludoStateLoading = true;
+
+    const { data, error } = await db.rpc(
+      "get_ludo_game_state",
+      { p_room_id: roomId }
+    );
+
+    if (error) throw error;
+
+    if (roomId !== currentLudoRoomId) return;
+
+    const players = data?.players || [];
+    const playerIds = players
+      .map(p => p.member_id)
+      .filter(Boolean);
+
+    let virtualBalances = {};
+
+    if (playerIds.length) {
+      const { data: wallets, error: walletError } = await db
+        .from("ludo_virtual_balances")
+        .select("member_id,balance_sc")
+        .in("member_id", playerIds);
+
+      if (!walletError) {
+        (wallets || []).forEach(w => {
+          virtualBalances[w.member_id] = Number(w.balance_sc || 0);
+        });
+      } else {
+        console.warn(
+          "Ludo virtual balances not readable:",
+          walletError.message
+        );
       }
-    }catch(feedError){ console.warn("Ludo move feed unavailable:",feedError?.message||feedError); }
-  }catch(error){
-    $("ludoBoard").innerHTML='<p class="error ludo-board-empty">Tsy afaka mamaky ny lalao: '+esc(error?.message||String(error))+'</p>';
-  }finally{
-    ludoStateLoading=false;
+    }
+
+    if (roomId !== currentLudoRoomId) return;
+
+    data.virtualBalances = virtualBalances;
+
+    const previous = ludoGameSnapshot;
+    ludoGameSnapshot = data;
+
+    renderLudoBoard(data, previous);
+
+    const roundNumber = Number(data?.state?.round_number || 1);
+
+    const { data: moves, error: moveError } = await db
+      .from("ludo_moves")
+      .select("round_number,move_number,move_data,created_at")
+      .eq("room_id", roomId)
+      .eq("round_number", roundNumber)
+      .order("move_number", { ascending: false })
+      .limit(1000);
+
+    if (roomId !== currentLudoRoomId) return;
+
+    if (moveError) {
+      console.error("Ludo moves read error:", moveError);
+
+      renderLudoDiceHistory(
+        players,
+        [],
+        roundNumber,
+        moveError.message
+      );
+
+      return;
+    }
+
+    renderLudoActionFeed(players, moves || []);
+
+    renderLudoDiceHistory(
+      players,
+      moves || [],
+      roundNumber
+    );
+
+  } catch (error) {
+    console.error("Ludo game state error:", error);
+
+    if (roomId === currentLudoRoomId) {
+      $("ludoBoard").innerHTML =
+        '<p class="error ludo-board-empty">' +
+        'Tsy afaka mamaky ny lalao: ' +
+        esc(error?.message || String(error)) +
+        '</p>';
+    }
+
+  } finally {
+    ludoStateLoading = false;
   }
 }
 async function rollLudoDice(){
