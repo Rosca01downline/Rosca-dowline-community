@@ -237,6 +237,21 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
     return;
   }
 
+  // Lokoina ny chiffre fotsiny: tirage mifanesy an'ny seat iray = loko iray.
+  // Ny fanisana dia atao amin'ny filaharana taloha -> vaovao, fa tsy ovaina ny tableau.
+  const sequenceColors = ["red", "green", "violet"];
+  const sequenceCounts = new Map();
+  let previousSeat = null;
+  [...rollRows].reverse().forEach(m => {
+    const seat = Number(m.parsedData.seat);
+    if (seat !== previousSeat) {
+      sequenceCounts.set(seat, (sequenceCounts.get(seat) || 0) + 1);
+    }
+    const sequenceIndex = Math.max(0, (sequenceCounts.get(seat) || 1) - 1);
+    m.sequenceColor = sequenceColors[sequenceIndex % sequenceColors.length];
+    previousSeat = seat;
+  });
+
   // Mpilalao iray = andalana iray, miaraka amin'ny tirage 5 farany nataony.
   const grouped = new Map();
   rollRows.forEach(m => {
@@ -279,7 +294,8 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
         })
       : "";
     const diceChips = group.rolls.map(m =>
-      '<span class="ludo-dice-history-chip">🎲 ' + esc(String(m.parsedData.dice)) + '</span>'
+      '<span class="ludo-dice-history-chip">🎲 <b class="ludo-dice-history-number ' +
+        esc(m.sequenceColor || "red") + '">' + esc(String(m.parsedData.dice)) + '</b></span>'
     ).join("");
 
     html +=
