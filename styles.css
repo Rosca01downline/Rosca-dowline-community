@@ -271,7 +271,7 @@
 .ludo-dice-history-player.blue{border-left-color:#1686d9}
 .ludo-dice-history-player>strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:#20344e;margin-bottom:6px}
 .ludo-dice-history-rolls{display:flex;flex-wrap:wrap;gap:4px}
-.ludo-dice-history-chip{display:inline-flex;align-items:center;justify-content:center;min-width:35px;padding:4px 6px;border-radius:7px;background:#eaf1ff;color:#17345c;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums}
+.ludo-dice-history-chip{display:inline-flex;align-items:center;justify-content:center;min-width:35px;padding:4px 6px;border-radius:7px;background:#eaf1ff;color:#17345c;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums}.ludo-dice-history-number{font-weight:1000;font-size:14px}.ludo-dice-history-number.red{color:#e11d2e}.ludo-dice-history-number.green{color:#16a34a}.ludo-dice-history-number.violet{color:#8b5cf6}
 @media(max-width:380px){.ludo-dice-history-grid{grid-template-columns:1fr}}
 
 
