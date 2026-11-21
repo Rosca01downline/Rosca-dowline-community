@@ -182,7 +182,7 @@ function renderLudoActionFeed(players,moves){
     const d=m.move_data||{};
     const seat=Number(d.seat);
     const who=esc(names.get(seat)||(seat===2?"BOT":"Seat "+seat));
-    const dice=d.dice==null?"":(' · 🎲 '+esc(d.dice));
+    const dice=d.dice==null?"":(' · 🎲 '+esc(String(d.dice)));
     let detail='Nanao hetsika';
     if(d.passed_turn) detail='Tsy nisy pion azo afindra — nifindra ny tour';
     else if(d.pawn_index!=null) detail='Pion '+(Number(d.pawn_index)+1)+' : '+(d.old_position<0?'Yard':('case '+d.old_position))+' → case '+d.new_position;
