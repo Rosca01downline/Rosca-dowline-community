@@ -205,7 +205,6 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
     return d;
   };
 
-  // Tirage tsirairay no andalana iray: tsy atambatra araka ny joueur na BOT.
   const rollRows = (moves || [])
     .map(m => ({ ...m, parsedData: parseMoveData(m) }))
     .filter(m =>
@@ -217,8 +216,7 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
       const byMove = Number(b.move_number || 0) - Number(a.move_number || 0);
       if (byMove !== 0) return byMove;
       return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
-    })
-    .slice(0, 5);
+    });
 
   let html =
     '<div class="ludo-dice-history-head">' +
@@ -239,35 +237,58 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
     return;
   }
 
-  if (!rollRows.length) {
+  // Mpilalao iray = andalana iray, miaraka amin'ny tirage 5 farany nataony.
+  const grouped = new Map();
+  rollRows.forEach(m => {
+    const seat = Number(m.parsedData.seat);
+    if (!grouped.has(seat)) grouped.set(seat, []);
+    const playerRolls = grouped.get(seat);
+    if (playerRolls.length < 5) playerRolls.push(m);
+  });
+
+  const playerGroups = Array.from(grouped.entries())
+    .map(([seat, rolls]) => ({
+      seat,
+      rolls,
+      latestMove: rolls[0]
+    }))
+    .sort((a, b) => {
+      const byMove = Number(b.latestMove.move_number || 0) - Number(a.latestMove.move_number || 0);
+      if (byMove !== 0) return byMove;
+      return new Date(b.latestMove.created_at || 0).getTime() - new Date(a.latestMove.created_at || 0).getTime();
+    });
+
+  if (!playerGroups.length) {
     host.innerHTML = html +
       '<p class="muted">Mbola tsy nisy tirage.</p>';
     return;
   }
 
   html += '<div class="ludo-dice-history-grid">';
-  rollRows.forEach((m, index) => {
-    const seat = Number(m.parsedData.seat);
+  playerGroups.forEach((group, index) => {
+    const seat = group.seat;
     const player = players.find(p => Number(p.seat_number) === seat);
     const who = esc(
       player?.full_name || (player?.is_bot ? "BOT" : "Seat " + seat)
     );
-    const dice = esc(String(m.parsedData.dice));
-    const time = m.created_at
-      ? new Date(m.created_at).toLocaleTimeString([], {
+    const latestTime = group.latestMove.created_at
+      ? new Date(group.latestMove.created_at).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit"
         })
       : "";
+    const diceChips = group.rolls.map(m =>
+      '<span class="ludo-dice-history-chip">🎲 ' + esc(String(m.parsedData.dice)) + '</span>'
+    ).join("");
 
     html +=
       '<div class="ludo-dice-history-player ' + (LUDO_COLORS[seat] || "red") + '">' +
         '<strong>' + String(index + 1) + '. ' + who +
           (player?.is_bot ? ' · BOT' : '') + '</strong>' +
         '<div class="ludo-dice-history-rolls">' +
-          '<span class="ludo-dice-history-chip">🎲 ' + dice + '</span>' +
-          (time ? '<small>' + esc(time) + '</small>' : '') +
+          diceChips +
+          (latestTime ? '<small>' + esc(latestTime) + '</small>' : '') +
         '</div>' +
       '</div>';
   });
