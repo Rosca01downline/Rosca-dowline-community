@@ -472,12 +472,6 @@ async function loadLudoGameState() {
     ludoGameSnapshot = data;
 
     renderLudoBoard(data, previous);
-    renderLudoDiceHistory(
-     players,
-     [],
-     Number(data?.state?.round_number || 1),
-    "TEST: Mbola mamaky ny tirages..."
-     );
     const roundNumber = Number(data?.state?.round_number || 1);
 
     const { data: moves, error: moveError } = await db
