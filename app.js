@@ -205,17 +205,24 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
     return d;
   };
 
+  // Tirage tsirairay no andalana iray: tsy atambatra araka ny joueur na BOT.
   const rollRows = (moves || [])
     .map(m => ({ ...m, parsedData: parseMoveData(m) }))
     .filter(m =>
+      m.parsedData.action === "roll" &&
       m.parsedData.seat != null &&
       m.parsedData.dice != null
     )
-    .sort((a, b) => Number(b.move_number) - Number(a.move_number));
+    .sort((a, b) => {
+      const byMove = Number(b.move_number || 0) - Number(a.move_number || 0);
+      if (byMove !== 0) return byMove;
+      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+    })
+    .slice(0, 5);
 
   let html =
     '<div class="ludo-dice-history-head">' +
-      '<strong>🎲 5 derniers lancers</strong>' +
+      '<strong>🎲 5 derniers tirages</strong>' +
       '<small>Manche ' + esc(String(roundNumber || 1)) + '</small>' +
     '</div>';
 
@@ -232,41 +239,37 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
     return;
   }
 
+  if (!rollRows.length) {
+    host.innerHTML = html +
+      '<p class="muted">Mbola tsy nisy tirage.</p>';
+    return;
+  }
+
   html += '<div class="ludo-dice-history-grid">';
-
-  players.forEach(p => {
-    const seat = Number(p.seat_number);
-
-    const recent = rollRows
-      .filter(m => Number(m.parsedData.seat) === seat)
-      .slice(0, 5)
-      .reverse();
-
-    const name = esc(
-      p.full_name || (p.is_bot ? "BOT" : "Seat " + seat)
+  rollRows.forEach((m, index) => {
+    const seat = Number(m.parsedData.seat);
+    const player = players.find(p => Number(p.seat_number) === seat);
+    const who = esc(
+      player?.full_name || (player?.is_bot ? "BOT" : "Seat " + seat)
     );
-
     const color = esc(LUDO_COLORS[seat] || "red");
-
-    const chips = recent.length
-      ? recent.map(m => {
-          const dice = esc(String(m.parsedData.dice));
-          const time = m.created_at
-            ? new Date(m.created_at).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit"
-              })
-            : "";
-
-          return '<span class="ludo-dice-history-chip" title="' +
-            esc(time) + '">🎲 ' + dice + '</span>';
-        }).join("")
-      : '<span class="muted">Mbola tsy nisy tirage</span>';
+    const dice = esc(String(m.parsedData.dice));
+    const time = m.created_at
+      ? new Date(m.created_at).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        })
+      : "";
 
     html +=
       '<div class="ludo-dice-history-player ' + color + '">' +
-        '<strong>' + name + (p.is_bot ? ' · BOT' : '') + '</strong>' +
-        '<div class="ludo-dice-history-rolls">' + chips + '</div>' +
+        '<strong>' + String(index + 1) + '. ' + who +
+          (player?.is_bot ? ' · BOT' : '') + '</strong>' +
+        '<div class="ludo-dice-history-rolls">' +
+          '<span class="ludo-dice-history-chip">🎲 ' + dice + '</span>' +
+          (time ? '<small>' + esc(time) + '</small>' : '') +
+        '</div>' +
       '</div>';
   });
 
