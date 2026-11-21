@@ -191,28 +191,54 @@ function renderLudoActionFeed(players,moves){
     if(d.extra_turn) detail+=' · tour fanampiny';
     const time=new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
     return '<div class="ludo-action-item"><strong>'+who+'</strong><span>'+esc(detail)+dice+'</span><small>'+esc(time)+'</small></div>';
-  }).join("");
+  }).join("")
 }
 function renderLudoDiceHistory(players,moves,roundNumber){
   const host=$("ludoDiceHistory");
   if(!host) return;
-  const rollRows=(moves||[]).filter(m=>{
-    const d=m.move_data||{};
-    return d.action==="roll" && d.seat!=null && d.dice!=null;
-  });
-  host.innerHTML='<div class="ludo-dice-history-head"><strong>🎲 5 derniers lancers</strong><small>Manche '+esc(String(roundNumber||1))+'</small></div>'+
-    '<div class="ludo-dice-history-grid">'+(players||[]).map(p=>{
+
+  const rollRows=(moves||[])
+    .filter(m=>{
+      const d=m.move_data||{};
+      return d.action==="roll" &&
+             d.seat!=null &&
+             d.dice!=null;
+    })
+    .sort((a,b)=>Number(b.move_number)-Number(a.move_number));
+
+  host.innerHTML=
+    '<div class="ludo-dice-history-head">'+
+      '<strong>🎲 5 derniers lancers</strong>'+
+      '<small>Manche '+esc(String(roundNumber||1))+'</small>'+
+    '</div>'+
+    '<div class="ludo-dice-history-grid">'+
+    (players||[]).map(p=>{
       const seat=Number(p.seat_number);
-      const recent=rollRows.filter(m=>Number(m.move_data?.seat)===seat).slice(0,5);
+
+      const recent=rollRows
+        .filter(m=>Number(m.move_data?.seat)===seat)
+        .slice(0,5)
+        .reverse();
+
       const name=esc(p.full_name||(p.is_bot?"BOT":"Seat "+seat));
       const color=esc(LUDO_COLORS[seat]||"red");
-      const chips=recent.length?recent.map(m=>{
-        const d=m.move_data||{};
-        const time=m.created_at?new Date(m.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
-        return '<span class="ludo-dice-history-chip" title="'+esc(time)+'">🎲 '+esc(String(d.dice))+'</span>';
-      }).join(""):'<span class="muted">Mbola tsy nisy tirage</span>';
-      return '<div class="ludo-dice-history-player '+color+'"><strong>'+name+(p.is_bot?' · BOT':'')+'</strong><div class="ludo-dice-history-rolls">'+chips+'</div></div>';
-    }).join("")+'</div>';
+
+      const chips=recent.length
+        ? recent.map(m=>{
+            const d=m.move_data||{};
+            const time=m.created_at
+              ? new Date(m.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})
+              : "";
+            return '<span class="ludo-dice-history-chip" title="'+esc(time)+'">🎲 '+esc(String(d.dice))+'</span>';
+          }).join("")
+        : '<span class="muted">Mbola tsy nisy tirage</span>';
+
+      return '<div class="ludo-dice-history-player '+color+'">'+
+        '<strong>'+name+(p.is_bot?' · BOT':'')+'</strong>'+
+        '<div class="ludo-dice-history-rolls">'+chips+'</div>'+
+      '</div>';
+    }).join("")+
+    '</div>';
 }
 function renderLudoBoard(snapshot,previousSnapshot=null){
   const board=$("ludoBoard");
