@@ -1206,10 +1206,21 @@ function turnStatusBadge(status){
 function renderTurnRows(target,rows,withActions){
   const el=$(target);
   if(!rows.length){el.innerHTML='<p class="muted">Tsy mbola misy tour.</p>';return;}
-  const heads=["Tour","Daty","Mpandray","Sata","FaucetPay TxID","Daty nandoavana"];
+  const heads=["Tour","Daty","Mpandray","Sata"];
+  if(withActions) heads.push("Gross","Épargne","Net à envoyer");
+  heads.push("FaucetPay TxID","Daty nandoavana");
   el.innerHTML="<table><thead><tr>"+heads.map(h=>'<th>'+esc(h)+'</th>').join("")+(withActions?"<th>Action</th>":"")+"</tr></thead><tbody>"+
-    rows.map(t=>'<tr><td>'+esc(String(t.turn_number??""))+'</td><td>'+esc(dateOnly(t.scheduled_date))+'</td><td>'+esc(t.receiver_name||"—")+'</td><td>'+turnStatusBadge(t.status)+'</td><td>'+esc(t.faucetpay_tx_id||"—")+'</td><td>'+esc(date(t.paid_at)||"—")+'</td>'+
-      (withActions?'<td>'+(String(t.status||"").toLowerCase()==="waiting"?'<button class="action" data-action="mark-turn-paid" data-type="turn" data-id="'+esc(String(t.id))+'">CONFIRMER PAIEMENT + TxID</button>':"—")+'</td>':"")+'</tr>').join("")+
+    rows.map(t=>{
+      const amountCells=withActions
+        ? '<td>'+esc(fmt(t.gross_amount))+'</td><td>'+esc(fmt(t.savings_amount))+'</td><td><strong>'+esc(fmt(t.net_amount))+'</strong></td>'
+        : "";
+      const actionCell=withActions
+        ? '<td>'+(String(t.status||"").toLowerCase()==="waiting"
+          ? '<button class="action" data-action="mark-turn-paid" data-type="turn" data-id="'+esc(String(t.id))+'" data-net-amount="'+esc(String(t.net_amount??0))+'" data-receiver-name="'+esc(t.receiver_name||"Mpandray")+'">CONFIRMER PAIEMENT + TxID</button>'
+          : "—")+'</td>'
+        : "";
+      return '<tr><td>'+esc(String(t.turn_number??""))+'</td><td>'+esc(dateOnly(t.scheduled_date))+'</td><td>'+esc(t.receiver_name||"—")+'</td><td>'+turnStatusBadge(t.status)+'</td>'+amountCells+'<td>'+esc(t.faucetpay_tx_id||"—")+'</td><td>'+esc(date(t.paid_at)||"—")+'</td>'+actionCell+'</tr>';
+    }).join("")+
     "</tbody></table>";
 }
 function dateOnly(s){
@@ -1297,8 +1308,8 @@ async function loadAdminData(){
 }
 async function loadAdminTurns(){
   const [{data:current,error:currentError},{data:history,error:historyError}]=await Promise.all([
-    db.from("member_turns").select("id,turn_number,scheduled_date,status,faucetpay_tx_id,paid_at,members(full_name)").order("turn_number",{ascending:true}),
-    db.from("member_turns_history").select("history_id,member_id,turn_number,scheduled_date,status,faucetpay_tx_id,paid_at").order("turn_number",{ascending:true})
+    db.from("member_turns").select("id,turn_number,scheduled_date,status,gross_amount,savings_amount,net_amount,faucetpay_tx_id,paid_at,members(full_name)").order("turn_number",{ascending:true}),
+    db.from("member_turns_history").select("history_id,member_id,turn_number,scheduled_date,status,gross_amount,savings_amount,net_amount,faucetpay_tx_id,paid_at").order("turn_number",{ascending:true})
   ]);
   if(currentError){msg("globalMsg","Lisitra tour admin: "+currentError.message,true);return;}
   if(historyError){msg("globalMsg","Historique tour admin: "+historyError.message,true);return;}
@@ -1309,8 +1320,8 @@ async function loadAdminTurns(){
   if(historyMembersError){msg("globalMsg","Anaran'ny mpandray ao amin'ny historique: "+historyMembersError.message,true);return;}
   const historyNames=new Map((historyMembers||[]).map(m=>[m.id,m.full_name]));
   const rows=[
-    ...(history||[]).map(t=>({id:t.history_id,status:t.status,turn_number:t.turn_number,scheduled_date:t.scheduled_date,receiver_name:historyNames.get(t.member_id)||"—",faucetpay_tx_id:t.faucetpay_tx_id,paid_at:t.paid_at})),
-    ...(current||[]).map(t=>({id:t.id,status:t.status,turn_number:t.turn_number,scheduled_date:t.scheduled_date,receiver_name:t.members?.full_name||"—",faucetpay_tx_id:t.faucetpay_tx_id,paid_at:t.paid_at}))
+    ...(history||[]).map(t=>({id:t.history_id,status:t.status,turn_number:t.turn_number,scheduled_date:t.scheduled_date,receiver_name:historyNames.get(t.member_id)||"—",gross_amount:t.gross_amount,savings_amount:t.savings_amount,net_amount:t.net_amount,faucetpay_tx_id:t.faucetpay_tx_id,paid_at:t.paid_at})),
+    ...(current||[]).map(t=>({id:t.id,status:t.status,turn_number:t.turn_number,scheduled_date:t.scheduled_date,receiver_name:t.members?.full_name||"—",gross_amount:t.gross_amount,savings_amount:t.savings_amount,net_amount:t.net_amount,faucetpay_tx_id:t.faucetpay_tx_id,paid_at:t.paid_at}))
   ].sort((x,y)=>Number(x.turn_number)-Number(y.turn_number));
   renderTurnRows("adminTurns",rows,true);
 }
@@ -1340,10 +1351,16 @@ document.addEventListener("click",async e=>{
   }
   if(decision==="mark-turn-paid"){
     if(type!=="turn")return;
-    const txid=prompt("Ampidiro ny FaucetPay Transaction ID rehefa avy nandefa ny vola tamin’ny mpandray tour:");
+    const netAmount=Number(b.dataset.netAmount||0);
+    const receiverName=b.dataset.receiverName||"mpandray tour";
+    if(!Number.isFinite(netAmount)||netAmount<=0){
+      alert("Tsy mbola voafaritra ny Net à envoyer. Havaozy ny liste Waiting ary aza manamarina aloha.");
+      return;
+    }
+    if(!confirm("Hamarino ny transfert: "+fmt(netAmount)+" no tokony halefa amin'i "+receiverName+". Efa nalefanao tokoa ve io vola io?"))return;
+    const txid=prompt("Ampidiro ny FaucetPay Transaction ID an'ilay transfert "+fmt(netAmount)+":");
     if(txid===null)return;
     if(!txid.trim())return alert("Tsy maintsy ampidirina ny FaucetPay Transaction ID.");
-    if(!confirm("Efa nalefanao tokoa ve ny vola ho an’ity mpandray tour ity? Rehefa manamarina ianao dia hiseho ho PAID amin’ny mpikambana rehetra."))return;
     b.disabled=true;
     const {error}=await db.rpc("admin_mark_turn_paid",{p_turn_id:id,p_tx_id:txid.trim()});
     if(error){msg("globalMsg",error.message,true);b.disabled=false;return;}
