@@ -512,13 +512,30 @@ async function loadLudoGameState() {
     renderLudoBoard(data, previous);
     const roundNumber = Number(data?.state?.round_number || 1);
 
-    const { data: moves, error: moveError } = await db
-      .from("ludo_moves")
-      .select("round_number,move_number,move_data,created_at")
-      .eq("room_id", roomId)
-      .order("round_number", { ascending: false })
-      .order("move_number", { ascending: false })
-      .limit(1000);
+    // Vakio ny historique manontolo ao amin'ny room, amin'ny pejy 1000 rows.
+    // Ny pagination dia misoroka ny fetra 1000 rows amin'ny Supabase.
+    const moves = [];
+    let moveOffset = 0;
+    let moveError = null;
+
+    while (true) {
+      const { data: page, error } = await db
+        .from("ludo_moves")
+        .select("round_number,move_number,move_data,created_at")
+        .eq("room_id", roomId)
+        .order("round_number", { ascending: false })
+        .order("move_number", { ascending: false })
+        .range(moveOffset, moveOffset + 999);
+
+      if (error) {
+        moveError = error;
+        break;
+      }
+
+      moves.push(...(page || []));
+      if (!page || page.length < 1000) break;
+      moveOffset += 1000;
+    }
 
     if (roomId !== currentLudoRoomId) return;
 
@@ -535,11 +552,15 @@ async function loadLudoGameState() {
       return;
     }
 
-    renderLudoActionFeed(players, moves || []);
+    // Ny action feed dia mijanona amin'ny manche ankehitriny; ny dice history kosa manerana ny lalao.
+    renderLudoActionFeed(
+      players,
+      moves.filter(m => Number(m.round_number) === roundNumber)
+    );
 
     renderLudoDiceHistory(
       players,
-      moves || [],
+      moves,
       roundNumber
     );
 
