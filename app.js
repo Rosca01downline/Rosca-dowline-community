@@ -213,6 +213,8 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
       m.parsedData.dice != null
     )
     .sort((a, b) => {
+      const byRound = Number(b.round_number || 0) - Number(a.round_number || 0);
+      if (byRound !== 0) return byRound;
       const byMove = Number(b.move_number || 0) - Number(a.move_number || 0);
       if (byMove !== 0) return byMove;
       return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
@@ -221,7 +223,7 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
   let html =
     '<div class="ludo-dice-history-head">' +
       '<strong>🎲 5 derniers tirages</strong>' +
-      '<small>Manche ' + esc(String(roundNumber || 1)) + '</small>' +
+      '<small>Lalao manontolo</small>' +
     '</div>';
 
   if (readError) {
@@ -514,7 +516,7 @@ async function loadLudoGameState() {
       .from("ludo_moves")
       .select("round_number,move_number,move_data,created_at")
       .eq("room_id", roomId)
-      .eq("round_number", roundNumber)
+      .order("round_number", { ascending: false })
       .order("move_number", { ascending: false })
       .limit(1000);
 
