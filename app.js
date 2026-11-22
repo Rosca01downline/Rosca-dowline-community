@@ -1050,7 +1050,7 @@ async function loadHoldingsWingsHistory(member){
 
 async function loadMemberData(){
   if(!currentUser)return;
-  const {data:member,error:memberError}=await db.from("members").select("id,status,membership_fee_paid").eq("auth_user_id",currentUser.id).maybeSingle();
+  const {data:member,error:memberError}=await db.from("members").select("id,status,membership_fee_paid,unpaid_weeks,total_penalty").eq("auth_user_id",currentUser.id).maybeSingle();
   if(memberError){msg("globalMsg","Erreur lecture membre: "+memberError.message,true);return;}
   currentMember=member;
   configureDepositOptions(member);
@@ -1059,6 +1059,22 @@ async function loadMemberData(){
   renderReferralLink(member);
   if(member){
     const {data:b}=await db.from("member_balances").select("savings_balance,commission_balance,reserved_savings,reserved_commission").eq("member_id",member.id).maybeSingle();
+    const penaltyTotal=Number(member.total_penalty||0);
+    const unpaidWeeks=Number(member.unpaid_weeks||0);
+    $("totalPenalty").textContent=fmt(penaltyTotal);
+    $("unpaidWeeks").textContent=String(unpaidWeeks)+" semaine(s)";
+    const {data:penalties,error:penaltyError}=await db.from("member_penalties").select("week_date,amount,status").eq("member_id",member.id).order("week_date",{ascending:false});
+    if(penaltyError){
+      msg("penaltyMsg","Tsy afaka mamaky ny historique pénalité: "+penaltyError.message,true);
+    }else{
+      const penaltyRows=(penalties||[]).map(x=>[
+        date(x.week_date),
+        fmt(x.amount),
+        String(x.status||"").toLowerCase()==="paid"?"Voaloa":String(x.status||"").toLowerCase()==="unpaid"?"Tsy mbola voaloa":x.status||""
+      ]);
+      renderTable("myPenalties",["Herinandro","Vola","Sata"],penaltyRows);
+      msg("penaltyMsg",penaltyTotal>0?"Pénalité voarakitra ao amin'ny kaontinao.":"Tsy mbola misy pénalité voarakitra.");
+    }
     const savings=Number(b?.savings_balance||0), commission=Number(b?.commission_balance||0);
     let mining=0;
     show("miningBonusPanel",String(member.status).toLowerCase()==="active");
@@ -1106,6 +1122,9 @@ async function loadMemberData(){
     $("miningBalance").textContent=fmt(0);$("totalBalance").textContent=fmt(0);
     show("miningBonusPanel",false);
     $("totalDeposits").textContent=fmt(0);$("totalWithdrawals").textContent=fmt(0);
+    $("totalPenalty").textContent=fmt(0);$("unpaidWeeks").textContent="0 semaine(s)";
+    msg("penaltyMsg","Tsy mbola misy pénalité.");
+    renderTable("myPenalties",["Herinandro","Vola","Sata"],[]);
     renderTable("myDeposits",["Dépôt"],[]);renderTable("myWithdrawals",["Retrait"],[]);
     msg("globalMsg","Tsy mbola mifandray amin'ny kaonty membre ny profil. Mifandraisa amin'ny Admin.",true);
   }
