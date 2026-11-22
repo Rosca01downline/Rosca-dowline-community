@@ -136,7 +136,24 @@
           <div><h3>🎲 Plateau Ludo</h3><p id="ludoTurnInfo" class="muted">Safidio ny room hanombohana.</p></div>
           <div class="ludo-dice-box"><span>DÉS</span><strong id="ludoDiceValue">–</strong><button id="ludoRollBtn" class="btn primary" type="button" disabled>🎲 Lancer</button></div>
         </div>
-        <div id="ludoPlayerBalances" aria-label="Solde SC an’ny mpilalao"></div><div id="ludoBoard" class="ludo-board" aria-label="Plateau Ludo"><p class="muted ludo-board-empty">Safidio aloha ny room.</p></div>
+        <div id="ludoPlayerBalances" aria-label="Solde SC an’ny mpilalao"></div>
+      <section class="ludo-sc-request panel">
+        <h3>💰 Mangataka SC fanampiny</h3>
+        <p class="muted">Afaka mangataka 5 000 hatramin'ny 100 000 SC ianao. Soraty ny antony. Ny Admin no manamarina azy.</p>
+        <form id="ludoSCRequestForm">
+          <label>Vola angatahina (SC)
+            <input id="ludoSCRequestAmount" type="number" min="5000" max="100000" step="1" required placeholder="5000">
+          </label>
+          <label>Hafatra / Antony
+            <textarea id="ludoSCRequestMessage" required maxlength="2000" rows="3" placeholder="Soraty eto ny fangatahanao..."></textarea>
+          </label>
+          <button class="btn primary" type="submit">DEMANDER SC</button>
+        </form>
+        <p id="ludoSCRequestMsg" class="message" role="status"></p>
+        <div class="section-head"><h3>Ny fangatahako SC</h3><button id="ludoSCRequestRefreshBtn" class="btn ghost small" type="button">Havaozy</button></div>
+        <div id="myLudoSCRequests" class="table-wrap"><p class="muted">Ampidirina...</p></div>
+      </section>
+<div id="ludoBoard" class="ludo-board" aria-label="Plateau Ludo"><p class="muted ludo-board-empty">Safidio aloha ny room.</p></div>
         <section id="ludoDiceHistory" class="ludo-dice-history" aria-live="polite" aria-label="Tirages farany dimy an'ny mpilalao rehetra"><div class="muted">Miandry tirage...</div></section>
         <p class="muted">Tsindrio ny pion-nao rehefa avy manipy dés. Mila 6 vao mivoaka ny pion. Mila isa marina vao tafiditra ao an-trano.</p>
         <div id="ludoActionFeed" class="ludo-action-feed" aria-live="polite" aria-label="Hetsika farany rehetra"></div>
@@ -263,6 +280,8 @@
       <div class="section-head"><div><span class="eyebrow">ADMINISTRATION</span><h2>Fitantanana</h2></div><button class="btn ghost small" id="adminRefresh">Havaozy</button></div>
       <div class="admin-block"><h3>Fangatahana dépôt</h3><div id="adminDeposits" class="table-wrap"></div></div>
       <div class="admin-block"><h3>Fangatahana retrait</h3><div id="adminWithdrawals" class="table-wrap"></div></div>
+      <div class="admin-block"><h3>Fangatahana SC Ludo</h3><p class="muted">CONFIRMER: crédit SC ao amin'ny wallet Ludo ihany. REFUSER: tsy maintsy misy fanazavana.</p><div id="adminLudoSCRequests" class="table-wrap"></div></div>
+
       <div class="admin-block"><h3>Fandoavana ny tour — FaucetPay Transaction ID</h3><p class="muted">Rehefa avy nandefa ny vola tamin’ny mpandray tour ianao dia tsindrio ny bokotra, ampidiro ny FaucetPay TxID, ary hamafiso. Hiseho amin’ny lisitry ny mpikambana ny porofo.</p><div id="adminTurns" class="table-wrap"></div></div>
       <div class="admin-block"><h3>Mpikambana</h3><div id="adminMembers" class="table-wrap"></div></div>
       <p class="warning">Fampitandremana: ny fanekena dépôt eto dia manova ny sata ho “approved” fotsiny. Tsy manamarina TxID ary tsy mampiditra vola amin’ny épargne. Aza manamarina vola raha tsy efa voamarina amin’ny rafitra ofisialy.</p>
