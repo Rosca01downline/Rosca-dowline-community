@@ -1371,7 +1371,6 @@ async function loadAdminData(){
   await loadAdminLudoSCRequests();
 
 }
-async function loadAdminTurns(){
 async function loadAdminLudoSCRequests(){
   const host=$("adminLudoSCRequests");
   if(!host) return;
@@ -1389,6 +1388,7 @@ async function loadAdminLudoSCRequests(){
     data.map(x=>'<tr><td>'+esc(names.get(x.member_id)||"—")+'</td><td>'+Number(x.requested_sc).toLocaleString("fr-FR")+'</td><td>'+esc(x.request_message)+'</td><td>'+esc(x.status.toUpperCase())+'</td><td>'+esc(x.admin_message||"—")+'</td><td>'+esc(date(x.created_at))+'</td><td>'+(x.status==="pending"?'<button class="action" data-action="review-ludo-sc" data-decision="approved" data-id="'+esc(x.id)+'">CONFIRMER</button> <button class="action reject" data-action="review-ludo-sc" data-decision="rejected" data-id="'+esc(x.id)+'">REFUSER</button>':"—")+'</td></tr>').join("")+
     "</tbody></table>";
 }
+async function loadAdminTurns(){
 
   const [{data:current,error:currentError},{data:history,error:historyError}]=await Promise.all([
     db.from("member_turns").select("id,turn_number,scheduled_date,status,gross_amount,savings_amount,net_amount,faucetpay_tx_id,paid_at,members(full_name)").order("turn_number",{ascending:true}),
