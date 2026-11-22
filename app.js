@@ -267,11 +267,8 @@ function renderLudoDiceHistory(players, moves, roundNumber, readError = null) {
       rolls,
       latestMove: rolls[0]
     }))
-    .sort((a, b) => {
-      const byMove = Number(b.latestMove.move_number || 0) - Number(a.latestMove.move_number || 0);
-      if (byMove !== 0) return byMove;
-      return new Date(b.latestMove.created_at || 0).getTime() - new Date(a.latestMove.created_at || 0).getTime();
-    });
+    // Filaharana raikitra araka ny seat: tsy mihetsika rehefa misy manao tirage.
+    .sort((a, b) => a.seat - b.seat);
 
   if (!playerGroups.length) {
     host.innerHTML = html +
@@ -323,7 +320,8 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
     return;
   }
   const state=snapshot.state;
-  const players=snapshot.players||[];
+  // Filaharana raikitra araka ny seat_number, na dia miova aza ny current turn.
+  const players=[...(snapshot.players||[])].sort((a,b)=>Number(a.seat_number)-Number(b.seat_number));
   const ownSeat=players.find(p=>p.member_id===currentMember?.id)?.seat_number;
   const myTurn=Number(state.current_turn_seat)===Number(ownSeat);
   const cells=[];
