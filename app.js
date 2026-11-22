@@ -64,7 +64,7 @@ $("signupForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const full_name=$("fullName").value.trim();
   const phone=$("signupPhone").value.trim();
-  if(!/^\\+[1-9][0-9]{7,14}$/.test(phone)){
+  if(!/^\+[1-9][0-9]{7,14}$/.test(phone)){
     return msg("authMsg","Ampidiro ny numéro amin'ny endrika iraisam-pirenena, ohatra +261341234567.",true);
   }
   msg("authMsg","Mamorona kaonty...");
