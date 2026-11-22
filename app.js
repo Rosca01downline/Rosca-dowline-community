@@ -1091,6 +1091,7 @@ async function loadMemberData(){
   const {data:member,error:memberError}=await db.from("members").select("id,status,membership_fee_paid,unpaid_weeks,total_penalty").eq("auth_user_id",currentUser.id).maybeSingle();
   if(memberError){msg("globalMsg","Erreur lecture membre: "+memberError.message,true);return;}
   currentMember=member;
+  if(member) await loadMyLudoSCRequests();
   configureDepositOptions(member);
   await loadHoldingsWingsHistory(member);
   if(member)msg("globalMsg","Membre trouvé dans l’application : "+member.status);
