@@ -61,9 +61,14 @@ $("loginForm").addEventListener("submit",async e=>{
   await boot();
 });
 $("signupForm").addEventListener("submit",async e=>{
-  e.preventDefault(); msg("authMsg","Mamorona kaonty...");
+  e.preventDefault();
   const full_name=$("fullName").value.trim();
-  const {data,error}=await db.auth.signUp({email:$("signupEmail").value.trim(),password:$("signupPassword").value,options:{data:{full_name,...(new URLSearchParams(window.location.search).get("ref")?{sponsor_id:new URLSearchParams(window.location.search).get("ref")}: {})}}});
+  const phone=$("signupPhone").value.trim();
+  if(!/^\\+[1-9][0-9]{7,14}$/.test(phone)){
+    return msg("authMsg","Ampidiro ny numéro amin'ny endrika iraisam-pirenena, ohatra +261341234567.",true);
+  }
+  msg("authMsg","Mamorona kaonty...");
+  const {data,error}=await db.auth.signUp({email:$("signupEmail").value.trim(),password:$("signupPassword").value,options:{data:{full_name,phone,...(new URLSearchParams(window.location.search).get("ref")?{sponsor_id:new URLSearchParams(window.location.search).get("ref")}: {})}}});
   if(error) return msg("authMsg",error.message,true);
   if(data.session){
     await boot();
