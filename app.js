@@ -1195,7 +1195,22 @@ async function loadCommunityLists(){
     }
   }
   if(turnError) turnEl.innerHTML='<p class="error">Tsy afaka mamaky ny lisitry ny tours: '+esc(turnError.message)+'</p>';
-  else renderTable("publicTurnList",["Tour","Daty","Mpandray","Sata","FaucetPay TxID","Daty nandoavana"],(turns||[]).map(x=>[x.turn_number,dateOnly(x.scheduled_date),x.receiver_name,x.turn_status,x.faucetpay_tx_id||"—",date(x.paid_at)]));
+  else renderTurnRows("publicTurnList",(turns||[]).map(x=>({turn_number:x.turn_number,scheduled_date:x.scheduled_date,receiver_name:x.receiver_name,status:x.turn_status,faucetpay_tx_id:x.faucetpay_tx_id,paid_at:x.paid_at})),false);
+}
+function turnStatusBadge(status){
+  const value=String(status||"").toLowerCase();
+  const label=value==="paid"?"PAID":value==="waiting"?"WAITING":String(status||"—").toUpperCase();
+  const cls=value==="paid"?"paid":value==="waiting"?"waiting":"other";
+  return '<span class="turn-status-badge '+cls+'">'+esc(label)+'</span>';
+}
+function renderTurnRows(target,rows,withActions){
+  const el=$(target);
+  if(!rows.length){el.innerHTML='<p class="muted">Tsy mbola misy tour.</p>';return;}
+  const heads=["Tour","Daty","Mpandray","Sata","FaucetPay TxID","Daty nandoavana"];
+  el.innerHTML="<table><thead><tr>"+heads.map(h=>'<th>'+esc(h)+'</th>').join("")+(withActions?"<th>Action</th>":"")+"</tr></thead><tbody>"+
+    rows.map(t=>'<tr><td>'+esc(String(t.turn_number??""))+'</td><td>'+esc(dateOnly(t.scheduled_date))+'</td><td>'+esc(t.receiver_name||"—")+'</td><td>'+turnStatusBadge(t.status)+'</td><td>'+esc(t.faucetpay_tx_id||"—")+'</td><td>'+esc(date(t.paid_at)||"—")+'</td>'+
+      (withActions?'<td>'+(String(t.status||"").toLowerCase()==="waiting"?'<button class="action" data-action="mark-turn-paid" data-type="turn" data-id="'+esc(String(t.id))+'">CONFIRMER PAIEMENT + TxID</button>':"—")+'</td>':"")+'</tr>').join("")+
+    "</tbody></table>";
 }
 function dateOnly(s){
   if(!s)return "";
@@ -1281,10 +1296,17 @@ async function loadAdminData(){
   await loadAdminTurns();
 }
 async function loadAdminTurns(){
-  const {data,error}=await db.from("member_turns").select("id,turn_number,scheduled_date,status,faucetpay_tx_id,paid_at,members(full_name)").order("turn_number",{ascending:true});
-  if(error){msg("globalMsg","Lisitra tour admin: "+error.message,true);return;}
-  const rows=(data||[]).map(t=>({id:t.id,status:t.status,values:[t.turn_number,dateOnly(t.scheduled_date),t.members?.full_name||"—",t.status,t.faucetpay_tx_id||"—",date(t.paid_at)]}));
-  $("adminTurns").innerHTML=tableWithActions(["Tour","Daty","Mpandray","Sata","FaucetPay TxID","Daty nandoavana"],rows,"turn");
+  const [{data:current,error:currentError},{data:history,error:historyError}]=await Promise.all([
+    db.from("member_turns").select("id,turn_number,scheduled_date,status,faucetpay_tx_id,paid_at,members(full_name)").order("turn_number",{ascending:true}),
+    db.from("member_turns_history").select("history_id,turn_number,scheduled_date,status,faucetpay_tx_id,paid_at,members(full_name)").order("turn_number",{ascending:true})
+  ]);
+  if(currentError){msg("globalMsg","Lisitra tour admin: "+currentError.message,true);return;}
+  if(historyError){msg("globalMsg","Historique tour admin: "+historyError.message,true);return;}
+  const rows=[
+    ...(history||[]).map(t=>({id:t.history_id,status:t.status,turn_number:t.turn_number,scheduled_date:t.scheduled_date,receiver_name:t.members?.full_name||"—",faucetpay_tx_id:t.faucetpay_tx_id,paid_at:t.paid_at})),
+    ...(current||[]).map(t=>({id:t.id,status:t.status,turn_number:t.turn_number,scheduled_date:t.scheduled_date,receiver_name:t.members?.full_name||"—",faucetpay_tx_id:t.faucetpay_tx_id,paid_at:t.paid_at}))
+  ].sort((x,y)=>Number(x.turn_number)-Number(y.turn_number));
+  renderTurnRows("adminTurns",rows,true);
 }
 function renderMemberTable(members){
   const el=$("adminMembers");
