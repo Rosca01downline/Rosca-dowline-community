@@ -665,6 +665,44 @@ async function initializeLudoVirtualBalance(){
 }
 
 $("ludoRefreshBtn").addEventListener("click", loadLudoRooms);
+$("ludoSCRequestRefreshBtn").addEventListener("click",loadMyLudoSCRequests);
+
+
+// Fangatahana SC fanampiny: wallet Ludo ihany.
+async function loadMyLudoSCRequests(){
+  if(!currentMember?.id) return;
+  const host=$("myLudoSCRequests");
+  if(!host) return;
+  host.innerHTML='<p class="muted">Ampidirina...</p>';
+  const {data,error}=await db.from("ludo_sc_requests")
+    .select("id,requested_sc,request_message,status,admin_message,created_at,reviewed_at")
+    .eq("member_id",currentMember.id)
+    .order("created_at",{ascending:false});
+  if(error){host.innerHTML='<p class="error">'+esc(error.message)+'</p>';return;}
+  if(!data?.length){host.innerHTML='<p class="muted">Mbola tsy nandefa fangatahana SC ianao.</p>';return;}
+  host.innerHTML="<table><thead><tr><th>SC</th><th>Hafatra</th><th>Sata</th><th>Valin'ny Admin</th><th>Daty</th></tr></thead><tbody>"+
+    data.map(x=>'<tr><td>'+Number(x.requested_sc).toLocaleString("fr-FR")+'</td><td>'+esc(x.request_message)+'</td><td>'+esc(x.status.toUpperCase())+'</td><td>'+esc(x.admin_message||"—")+'</td><td>'+esc(date(x.created_at))+'</td></tr>').join("")+
+    "</tbody></table>";
+}
+$("ludoSCRequestForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!currentUser||!currentMember?.id){msg("ludoSCRequestMsg","Midira amin'ny kaontinao aloha.",true);return;}
+  const form=e.currentTarget,button=form.querySelector('button[type="submit"]');
+  const amount=Number($("ludoSCRequestAmount").value);
+  const message=$("ludoSCRequestMessage").value.trim();
+  if(!Number.isInteger(amount)||amount<5000||amount>100000){msg("ludoSCRequestMsg","5 000 hatramin'ny 100 000 SC ihany no azo angatahina.",true);return;}
+  if(!message){msg("ludoSCRequestMsg","Tsy maintsy manoratra hafatra ianao.",true);return;}
+  button.disabled=true;
+  try{
+    const {error}=await db.rpc("request_ludo_sc",{p_requested_sc:amount,p_request_message:message});
+    if(error) throw error;
+    form.reset();
+    msg("ludoSCRequestMsg","Voaray ny fangatahanao. Miandry fanamarinana Admin.");
+    await loadMyLudoSCRequests();
+  }catch(error){msg("ludoSCRequestMsg","Tsy tafiditra: "+(error?.message||String(error)),true);}
+  finally{button.disabled=false;}
+});
+
 $("ludoCreateRoomBtn").addEventListener("click", async () => {
   const button=$("ludoCreateRoomBtn");
   if(!currentMember?.id || String(currentMember.status).toLowerCase()!=="active"){
@@ -1329,8 +1367,28 @@ async function loadAdminData(){
   if(me){msg("globalMsg","Membre admin: "+me.message,true);return;}
   renderMemberTable(m||[]);
   await loadAdminTurns();
+  await loadAdminLudoSCRequests();
+
 }
 async function loadAdminTurns(){
+async function loadAdminLudoSCRequests(){
+  const host=$("adminLudoSCRequests");
+  if(!host) return;
+  host.innerHTML='<p class="muted">Ampidirina...</p>';
+  const {data,error}=await db.from("ludo_sc_requests")
+    .select("id,member_id,requested_sc,request_message,status,admin_message,created_at")
+    .order("created_at",{ascending:false});
+  if(error){host.innerHTML='<p class="error">'+esc(error.message)+'</p>';return;}
+  if(!data?.length){host.innerHTML='<p class="muted">Tsy mbola misy fangatahana SC.</p>';return;}
+  const ids=[...new Set(data.map(x=>x.member_id))];
+  const {data:members,error:memberError}=await db.from("members").select("id,full_name").in("id",ids);
+  if(memberError){host.innerHTML='<p class="error">'+esc(memberError.message)+'</p>';return;}
+  const names=new Map((members||[]).map(x=>[x.id,x.full_name]));
+  host.innerHTML="<table><thead><tr><th>Mpikambana</th><th>SC angatahina</th><th>Hafatra</th><th>Sata</th><th>Valin'ny Admin</th><th>Daty</th><th>Action</th></tr></thead><tbody>"+
+    data.map(x=>'<tr><td>'+esc(names.get(x.member_id)||"—")+'</td><td>'+Number(x.requested_sc).toLocaleString("fr-FR")+'</td><td>'+esc(x.request_message)+'</td><td>'+esc(x.status.toUpperCase())+'</td><td>'+esc(x.admin_message||"—")+'</td><td>'+esc(date(x.created_at))+'</td><td>'+(x.status==="pending"?'<button class="action" data-action="review-ludo-sc" data-decision="approved" data-id="'+esc(x.id)+'">CONFIRMER</button> <button class="action reject" data-action="review-ludo-sc" data-decision="rejected" data-id="'+esc(x.id)+'">REFUSER</button>':"—")+'</td></tr>').join("")+
+    "</tbody></table>";
+}
+
   const [{data:current,error:currentError},{data:history,error:historyError}]=await Promise.all([
     db.from("member_turns").select("id,turn_number,scheduled_date,status,gross_amount,savings_amount,net_amount,faucetpay_tx_id,paid_at,members(full_name)").order("turn_number",{ascending:true}),
     db.from("member_turns_history").select("history_id,member_id,turn_number,scheduled_date,status,gross_amount,savings_amount,net_amount,faucetpay_tx_id,paid_at").order("turn_number",{ascending:true})
@@ -1363,6 +1421,23 @@ function tableWithActions(heads,rows,type){
 document.addEventListener("click",async e=>{
   const b=e.target.closest("button[data-action]");if(!b)return;
   const decision=b.dataset.action;const type=b.dataset.type;const id=b.dataset.id;
+  if(decision==="review-ludo-sc"){
+    const review=b.dataset.decision;
+    let adminMessage=null;
+    if(review==="rejected"){
+      adminMessage=prompt("Antony na hafatra fanazavana (tsy maintsy fenoina):");
+      if(adminMessage===null)return;
+      if(!adminMessage.trim()){alert("Ilaina ny hafatra fanazavana rehefa mandà.");return;}
+    }else if(!confirm("Hampiditra ny SC angatahina ao amin'ny solde Ludo ve? Tsy azo averina indroa ity crédit ity."))return;
+    b.disabled=true;
+    const {error}=await db.rpc("review_ludo_sc_request",{p_request_id:id,p_decision:review,p_admin_message:adminMessage});
+    if(error){msg("globalMsg","Fangatahana SC: "+error.message,true);b.disabled=false;return;}
+    msg("globalMsg",review==="approved"?"Voamarina ny fangatahana ary nampidirina ao amin'ny solde Ludo ny SC.":"Nolavina ny fangatahana ary voatahiry ny fanazavana.");
+    await loadAdminLudoSCRequests();
+    await loadLudoGameState();
+    return;
+  }
+
   if(decision==="activate-member"){
     if(!confirm("Hampavitrika ity mpikambana ity ve?"))return;
     b.disabled=true;
