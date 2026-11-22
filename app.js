@@ -1298,12 +1298,18 @@ async function loadAdminData(){
 async function loadAdminTurns(){
   const [{data:current,error:currentError},{data:history,error:historyError}]=await Promise.all([
     db.from("member_turns").select("id,turn_number,scheduled_date,status,faucetpay_tx_id,paid_at,members(full_name)").order("turn_number",{ascending:true}),
-    db.from("member_turns_history").select("history_id,turn_number,scheduled_date,status,faucetpay_tx_id,paid_at,members(full_name)").order("turn_number",{ascending:true})
+    db.from("member_turns_history").select("history_id,member_id,turn_number,scheduled_date,status,faucetpay_tx_id,paid_at").order("turn_number",{ascending:true})
   ]);
   if(currentError){msg("globalMsg","Lisitra tour admin: "+currentError.message,true);return;}
   if(historyError){msg("globalMsg","Historique tour admin: "+historyError.message,true);return;}
+  const historyMemberIds=[...new Set((history||[]).map(t=>t.member_id).filter(Boolean))];
+  const {data:historyMembers,error:historyMembersError}=historyMemberIds.length
+    ? await db.from("members").select("id,full_name").in("id",historyMemberIds)
+    : {data:[],error:null};
+  if(historyMembersError){msg("globalMsg","Anaran'ny mpandray ao amin'ny historique: "+historyMembersError.message,true);return;}
+  const historyNames=new Map((historyMembers||[]).map(m=>[m.id,m.full_name]));
   const rows=[
-    ...(history||[]).map(t=>({id:t.history_id,status:t.status,turn_number:t.turn_number,scheduled_date:t.scheduled_date,receiver_name:t.members?.full_name||"—",faucetpay_tx_id:t.faucetpay_tx_id,paid_at:t.paid_at})),
+    ...(history||[]).map(t=>({id:t.history_id,status:t.status,turn_number:t.turn_number,scheduled_date:t.scheduled_date,receiver_name:historyNames.get(t.member_id)||"—",faucetpay_tx_id:t.faucetpay_tx_id,paid_at:t.paid_at})),
     ...(current||[]).map(t=>({id:t.id,status:t.status,turn_number:t.turn_number,scheduled_date:t.scheduled_date,receiver_name:t.members?.full_name||"—",faucetpay_tx_id:t.faucetpay_tx_id,paid_at:t.paid_at}))
   ].sort((x,y)=>Number(x.turn_number)-Number(y.turn_number));
   renderTurnRows("adminTurns",rows,true);
