@@ -1,59 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 470">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560">
 <defs>
- <linearGradient id="case" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#dceeff"/><stop offset=".18" stop-color="#365879"/><stop offset=".42" stop-color="#07172d"/><stop offset=".76" stop-color="#1b3555"/><stop offset="1" stop-color="#b7d8f5"/></linearGradient>
- <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#06162b"/><stop offset=".55" stop-color="#0b3764"/><stop offset="1" stop-color="#020a18"/></linearGradient>
- <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#dffaff"/><stop offset=".45" stop-color="#18bfff"/><stop offset="1" stop-color="#0346b5"/></linearGradient>
- <radialGradient id="fan"><stop stop-color="#8df5ff"/><stop offset=".18" stop-color="#147ed0"/><stop offset=".65" stop-color="#07172d"/><stop offset="1" stop-color="#020916"/></radialGradient>
- <filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
- <filter id="shadow"><feGaussianBlur stdDeviation="13"/></filter>
- <g id="smallFan">
-  <circle r="49" fill="#020b18" stroke="#6edfff" stroke-width="4"/>
-  <circle r="42" fill="url(#fan)" stroke="#117fcb" stroke-width="3"/>
-  <g fill="#167dc2" stroke="#70eaff" stroke-width="1.5">
-   <path d="M-4 -7 Q-20 -43 3 -36 Q19 -29 7 -7Z"/>
-   <path d="M7 -4 Q43 -20 36 3 Q29 19 7 7Z"/>
-   <path d="M4 7 Q20 43 -3 36 Q-19 29 -7 7Z"/>
-   <path d="M-7 4 Q-43 20 -36 -3 Q-29 -19 -7 -7Z"/>
-  </g><circle r="11" fill="#091d35" stroke="#a5f5ff" stroke-width="4"/>
- </g>
+<linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4fbff"/><stop offset=".16" stop-color="#829bb5"/><stop offset=".34" stop-color="#172b43"/><stop offset=".55" stop-color="#d4e6f4"/><stop offset=".78" stop-color="#263d57"/><stop offset="1" stop-color="#071322"/></linearGradient>
+<linearGradient id="dark" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#020812"/><stop offset=".5" stop-color="#1d3855"/><stop offset="1" stop-color="#020812"/></linearGradient>
+<linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d7ffff"/><stop offset=".25" stop-color="#20caff"/><stop offset=".58" stop-color="#075eff"/><stop offset="1" stop-color="#031b65"/></linearGradient>
+<radialGradient id="fanbg"><stop stop-color="#1a5d9e"/><stop offset=".65" stop-color="#06152a"/><stop offset="1" stop-color="#020711"/></radialGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="shadow"><feGaussianBlur stdDeviation="16"/></filter>
+<g id="fan"><circle r="92" fill="#020812" stroke="#9abbd4" stroke-width="7"/><circle r="83" fill="url(#fanbg)" stroke="#09aaff" stroke-width="5"/><circle r="72" fill="none" stroke="#062d64" stroke-width="5"/>
+<g fill="url(#blue)" stroke="#75eaff" stroke-width="2">
+<path d="M-9 -12 Q-40 -76 0 -72 Q37 -65 12 -10 Q3 2 -9 -12Z"/><path d="M12 -9 Q76 -40 72 0 Q65 37 10 12 Q-2 3 12 -9Z"/><path d="M9 12 Q40 76 0 72 Q-37 65 -12 10 Q-3 -2 9 12Z"/><path d="M-12 9 Q-76 40 -72 0 Q-65 -37 -10 -12 Q2 -3 -12 9Z"/>
+<path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(45)"/><path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(135)"/><path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(225)"/><path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(315)"/></g>
+<circle r="28" fill="url(#steel)" stroke="#baf5ff" stroke-width="5"/><circle r="12" fill="#062449" stroke="#19cfff" stroke-width="5"/></g>
 </defs>
-<ellipse cx="360" cy="424" rx="300" ry="25" fill="#009dff" opacity=".38" filter="url(#shadow)"/>
-<!-- full chassis -->
-<path d="M48 345 74 130 145 78 526 39 658 101 648 358 564 408 125 397Z" fill="url(#case)" stroke="#b7e8ff" stroke-width="7"/>
-<path d="M78 144 155 100 520 62 624 113 617 337 552 382 135 374 91 334Z" fill="#06172d" stroke="#168fe0" stroke-width="5"/>
-<!-- top armored rails -->
-<path d="M145 80 526 39 574 62 167 111Z" fill="#294d70" stroke="#b6eaff" stroke-width="4"/>
-<path d="M166 100 520 62" stroke="#25caff" stroke-width="8" filter="url(#glow)"/>
-<!-- transparent side window -->
-<path d="M111 155 428 119 433 326 128 352Z" fill="url(#panel)" stroke="#5edcff" stroke-width="6"/>
-<path d="M128 169 411 137 415 309 143 333Z" fill="#06172b" stroke="#174e80" stroke-width="3"/>
-<!-- three cooling fans -->
-<g transform="translate(190 246)"><use href="#smallFan"/></g>
-<g transform="translate(294 235)"><use href="#smallFan"/></g>
-<g transform="translate(398 224)"><use href="#smallFan"/></g>
-<!-- GPU modules behind fans -->
-<g fill="#102c4a" stroke="#6ecbff" stroke-width="3">
- <path d="M150 313 151 330 413 302 413 284Z"/>
- <path d="M155 174 160 188 405 161 401 147Z"/>
-</g>
-<g stroke="#16c5ff" stroke-width="5" filter="url(#glow)"><path d="M146 343 433 316"/><path d="M143 151 421 120"/></g>
-<!-- front fan housing -->
-<path d="M448 96 594 123 589 343 449 369Z" fill="#07182d" stroke="#b1eaff" stroke-width="7"/>
-<path d="M463 115 578 137 574 325 463 346Z" fill="url(#panel)" stroke="#178fe0" stroke-width="5"/>
-<circle cx="520" cy="235" r="94" fill="#020b18" stroke="#12bfff" stroke-width="10" filter="url(#glow)"/>
-<circle cx="520" cy="235" r="78" fill="url(#fan)" stroke="#9cefff" stroke-width="4"/>
-<g fill="#1684c9" stroke="#7deaff" stroke-width="2">
- <path d="M514 165 Q556 154 565 194 Q536 204 524 226 Q515 197 514 165Z"/>
- <path d="M590 229 Q600 271 560 280 Q550 251 528 239 Q558 230 590 229Z"/>
- <path d="M526 305 Q484 315 475 275 Q504 265 516 243 Q526 272 526 305Z"/>
- <path d="M450 240 Q440 198 480 189 Q490 218 512 230 Q482 240 450 240Z"/>
-</g>
-<circle cx="520" cy="235" r="25" fill="#102d4b" stroke="#b5f6ff" stroke-width="7"/>
-<circle cx="520" cy="235" r="8" fill="#20cfff" filter="url(#glow)"/>
-<!-- handle and feet -->
-<path d="M355 58 375 25 500 12 544 47" fill="none" stroke="#a9dfff" stroke-width="15" stroke-linecap="round"/>
-<path d="M357 58 378 35 497 24 526 49" fill="none" stroke="#087bd0" stroke-width="7" filter="url(#glow)"/>
-<path d="M94 354 138 386 562 398 638 356" fill="none" stroke="url(#edge)" stroke-width="12" filter="url(#glow)"/>
-<path d="M116 393 102 423 177 427 188 394M552 397 564 428 630 416 620 377" fill="url(#case)" stroke="#7edfff" stroke-width="5"/>
-<g fill="#bff7ff" filter="url(#glow)"><circle cx="112" cy="144" r="5"/><circle cx="602" cy="126" r="5"/><circle cx="610" cy="342" r="5"/><circle cx="143" cy="372" r="5"/></g>
+<ellipse cx="455" cy="512" rx="370" ry="24" fill="#009dff" opacity=".4" filter="url(#shadow)"/>
+<path d="M38 385 58 163 118 105 704 35 855 95 858 391 776 472 112 465Z" fill="url(#steel)" stroke="#e3f5ff" stroke-width="8"/>
+<path d="M59 174 130 120 699 55 833 109 834 370 764 445 127 440 72 384Z" fill="url(#dark)" stroke="#4b789e" stroke-width="7"/>
+<path d="M119 103 701 34 792 69 161 143Z" fill="url(#steel)" stroke="#dff6ff" stroke-width="5"/>
+<path d="M145 91 705 25 745 42 164 113Z" fill="#0b1a2b" stroke="#27bfff" stroke-width="4"/>
+<g stroke="#6e9bbd" stroke-width="4"><path d="M185 82 188 113M213 78 216 110M241 75 244 106M269 72 272 103M297 69 300 100M325 66 328 97M353 63 356 94M381 60 384 91M409 57 412 88M437 54 440 85M465 51 468 82M493 48 496 79M521 45 524 76M549 42 552 73M577 39 580 70M605 36 608 67M633 33 636 64"/></g>
+<path d="M151 120 710 54" stroke="#21d4ff" stroke-width="8" filter="url(#glow)"/>
+<path d="M85 180 628 120 635 390 103 420Z" fill="#07182c" stroke="#9ecce8" stroke-width="8"/><path d="M101 193 613 137 619 373 117 400Z" fill="#061225" stroke="#0b85d5" stroke-width="4"/>
+<g fill="#193653" stroke="#7db9df" stroke-width="4"><path d="M112 177 620 121 620 149 114 207Z"/><path d="M113 378 622 326 623 357 115 407Z"/></g>
+<g transform="translate(205 282) scale(.82)"><use href="#fan"/></g><g transform="translate(378 263) scale(.82)"><use href="#fan"/></g><g transform="translate(551 244) scale(.82)"><use href="#fan"/></g>
+<path d="M663 102 811 131 811 397 668 430Z" fill="url(#steel)" stroke="#e5f7ff" stroke-width="8"/><path d="M678 122 795 145 795 378 681 404Z" fill="#07172a" stroke="#21bfff" stroke-width="6"/>
+<g stroke="#23547d" stroke-width="3"><path d="M690 145 785 164M689 164 785 183M688 183 785 202M687 202 785 221M686 221 785 240M685 240 785 259M684 259 785 278M683 278 785 297M682 297 785 316M681 316 785 335M680 335 785 354"/></g>
+<g transform="translate(738 266) scale(.78)"><use href="#fan"/></g>
+<path d="M90 425 643 390 659 418 104 456Z" fill="url(#steel)" stroke="#c9edff" stroke-width="5"/><path d="M112 437 641 405" stroke="#12caff" stroke-width="10" filter="url(#glow)"/>
+<path d="M145 455 145 480 217 486 220 451M688 422 696 460 765 449 761 407" fill="url(#steel)" stroke="#b9e9ff" stroke-width="5"/>
+<g fill="#25d8ff" filter="url(#glow)"><rect x="178" y="132" width="72" height="7" rx="3"/><rect x="350" y="112" width="65" height="7" rx="3"/><rect x="523" y="92" width="72" height="7" rx="3"/><rect x="145" y="414" width="90" height="7" rx="3"/><rect x="390" y="398" width="100" height="7" rx="3"/></g>
+<path d="M93 452 84 497 172 506 184 464ZM740 452 752 501 840 481 826 430Z" fill="url(#steel)" stroke="#c9f1ff" stroke-width="6"/>
+<path d="M103 490 168 497M763 491 832 475" stroke="#1acaff" stroke-width="8" filter="url(#glow)"/>
+<g fill="#d9f4ff" stroke="#193c5d" stroke-width="4"><circle cx="91" cy="177" r="8"/><circle cx="633" cy="117" r="8"/><circle cx="667" cy="410" r="8"/><circle cx="119" cy="421" r="8"/><circle cx="827" cy="124" r="8"/><circle cx="831" cy="387" r="8"/></g>
 </svg>
