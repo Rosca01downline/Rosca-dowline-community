@@ -307,3 +307,25 @@
   z-index:1;
   max-width:64%;
 }
+
+
+/* Mining card: keep the complete machine visible in the lower-right, with readable text above/left. */
+.balance-details > .mining-card{
+  background-color:#2563eb;
+  background-image:
+    linear-gradient(180deg,rgba(37,99,235,1) 0%,rgba(37,99,235,.99) 34%,rgba(37,99,235,.78) 52%,rgba(37,99,235,.06) 76%),
+    url("images/mining-vip.svg");
+  background-repeat:no-repeat;
+  background-position:center, right 5px bottom 7px;
+  background-size:100% 100%, 86% auto;
+}
+.balance-details > .mining-card > span{
+  max-width:100%;
+}
+.balance-details > .mining-card > strong{
+  max-width:75%;
+}
+.balance-details > .mining-card > small{
+  max-width:48%;
+  min-height:2.7em;
+}
