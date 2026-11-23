@@ -289,20 +289,21 @@
 }
 
 
-/* Mining card artwork: fifth VIP-style blue machine. Text and live values remain unchanged. */
+/* Mining card artwork: enlarge and brighten the VIP rig without changing its text or live balance. */
 .balance-details .mining-card{
   position:relative;
   overflow:hidden;
   isolation:isolate;
-  background-image:linear-gradient(90deg,rgba(37,99,235,1) 0%,rgba(37,99,235,.96) 48%,rgba(37,99,235,.12) 100%),url("images/mining-vip.svg");
+  background-color:#2563eb;
+  background-image:linear-gradient(90deg,rgba(37,99,235,1) 0%,rgba(37,99,235,.98) 30%,rgba(37,99,235,.62) 49%,rgba(37,99,235,.04) 76%),url("images/mining-vip.svg");
   background-repeat:no-repeat;
-  background-position:center, right bottom;
-  background-size:100% 100%, 68% auto;
+  background-position:center, right center;
+  background-size:100% 100%, 100% auto;
 }
 .balance-details .mining-card > span,
 .balance-details .mining-card > strong,
 .balance-details .mining-card > small{
   position:relative;
   z-index:1;
-  max-width:72%;
+  max-width:64%;
 }
