@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1000">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200">
 <defs>
 <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4fbff"/><stop offset=".16" stop-color="#829bb5"/><stop offset=".34" stop-color="#172b43"/><stop offset=".55" stop-color="#d4e6f4"/><stop offset=".78" stop-color="#263d57"/><stop offset="1" stop-color="#071322"/></linearGradient>
 <linearGradient id="dark" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#020812"/><stop offset=".5" stop-color="#1d3855"/><stop offset="1" stop-color="#020812"/></linearGradient>
@@ -98,7 +98,7 @@
   <filter id="glowRed" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10" result="b"/><feGaussianBlur stdDeviation="4" in="SourceGraphic" result="s"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <filter id="glowGreen" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10" result="b"/><feGaussianBlur stdDeviation="4" in="SourceGraphic" result="s"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <filter id="glowWhite" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10" result="b"/><feGaussianBlur stdDeviation="4" in="SourceGraphic" result="s"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g transform="scale(1 2)">>
+<g transform="scale(1 2)">
 <!-- Bright RGB light strips around the complete mining rig -->
 <g>
   <path class="rgb-edge" d="M62 170 126 111 701 43 844 102 849 390 771 456 111 451 57 389Z"/>
@@ -127,5 +127,19 @@
 </g>
 <g stroke="#183c5a" stroke-width="2" stroke-linecap="round">
 <path d="M88 194 96 194M92 190 92 198M606 137 614 137M610 133 610 141M109 399 117 399M113 395 113 403M616 370 624 370M620 366 620 374M676 145 684 145M680 141 680 149M790 164 798 164M794 160 794 168M678 382 686 382M682 378 682 386M790 365 798 365M794 361 794 369"/></g>
+</g>
+
+<!-- Sturdy illuminated metal workbench supporting the mining rig -->
+<ellipse cx="450" cy="1168" rx="385" ry="18" fill="#008dff" opacity=".32" filter="url(#shadow)"/>
+<path d="M65 1035 835 1035 875 1070 25 1070Z" fill="url(#steel)" stroke="#e6f8ff" stroke-width="8"/>
+<path d="M85 1043 815 1043 840 1061 60 1061Z" fill="url(#dark)" stroke="#20cfff" stroke-width="5"/>
+<path d="M50 1068 850 1068" stroke="#21d4ff" stroke-width="9" filter="url(#glow)"/>
+<path d="M105 1070 145 1070 132 1150 92 1150Z M755 1070 795 1070 808 1150 768 1150Z" fill="url(#steel)" stroke="#d9f4ff" stroke-width="7"/>
+<path d="M105 1090 137 1090M763 1090 795 1090" stroke="#20cfff" stroke-width="7" filter="url(#glow)"/>
+<path d="M75 1148 150 1148 158 1170 66 1170Z M742 1148 817 1148 826 1170 734 1170Z" fill="url(#steel)" stroke="#d9f4ff" stroke-width="6"/>
+<path d="M83 1158 143 1158M750 1158 810 1158" stroke="#24ff65" stroke-width="5" filter="url(#glow)"/>
+<g fill="#f5fdff" stroke="#355875" stroke-width="3">
+<circle cx="90" cy="1052" r="7"/><circle cx="810" cy="1052" r="7"/>
+<circle cx="116" cy="1082" r="6"/><circle cx="784" cy="1082" r="6"/>
 </g>
 </svg>
