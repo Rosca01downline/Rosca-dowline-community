@@ -295,7 +295,7 @@
   overflow:hidden;
   isolation:isolate;
   background-color:#2563eb;
-  background-image:linear-gradient(90deg,rgba(37,99,235,1) 0%,rgba(37,99,235,.98) 27%,rgba(37,99,235,.68) 47%,rgba(37,99,235,.08) 72%),url("images/mining-vip.svg");
+  background-image:linear-gradient(90deg,rgba(37,99,235,1) 0%,rgba(37,99,235,1) 0%,rgba(37,99,235,.94) 24%,rgba(37,99,235,.52) 45%,rgba(37,99,235,.02) 68%),url("images/mining-vip.svg");
   background-repeat:no-repeat;
   background-position:center, right center;
   background-size:100% 100%, 100% auto;
