@@ -17,6 +17,19 @@
 <path d="M8 -20 C19 -34 42 -60 66 -67 C77 -70 82 -63 75 -53 C62 -34 37 -19 14 -8 Q8 -8 8 -20Z" transform="rotate(257.15)"/>
 <path d="M8 -20 C19 -34 42 -60 66 -67 C77 -70 82 -63 75 -53 C62 -34 37 -19 14 -8 Q8 -8 8 -20Z" transform="rotate(308.58)"/>
 </g>
+<!-- RGB fan-edge LEDs orbit in the same direction as the spinning blades -->
+<g class="fan-led-orbit" fill="none" stroke-linecap="round">
+  <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 0 0" to="360 0 0" dur="1.15s" repeatCount="indefinite"/>
+  <circle r="88" stroke="#28d9ff" stroke-width="3" stroke-dasharray="10 13" opacity=".9"/>
+  <circle cx="0" cy="-88" r="7" fill="#ff1738" stroke="#ffd5dc" stroke-width="2"/>
+  <circle cx="62" cy="-62" r="6" fill="#24ff65" stroke="#d5ffe2" stroke-width="2"/>
+  <circle cx="88" cy="0" r="7" fill="#ffffff" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="62" cy="62" r="6" fill="#ff1738" stroke="#ffd5dc" stroke-width="2"/>
+  <circle cx="0" cy="88" r="7" fill="#24ff65" stroke="#d5ffe2" stroke-width="2"/>
+  <circle cx="-62" cy="62" r="6" fill="#ffffff" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="-88" cy="0" r="7" fill="#ff1738" stroke="#ffd5dc" stroke-width="2"/>
+  <circle cx="-62" cy="-62" r="6" fill="#24ff65" stroke="#d5ffe2" stroke-width="2"/>
+</g>
 <circle r="28" fill="url(#steel)" stroke="#baf5ff" stroke-width="5"/><circle r="12" fill="#062449" stroke="#19cfff" stroke-width="5"/><circle r="5" fill="#dffaff" stroke="#17466b" stroke-width="2"/>
 <g fill="#dcecf6" stroke="#385a76" stroke-width="2">
 <circle cx="0" cy="-75" r="5"/><circle cx="53" cy="-53" r="5"/><circle cx="75" cy="0" r="5"/><circle cx="53" cy="53" r="5"/><circle cx="0" cy="75" r="5"/><circle cx="-53" cy="53" r="5"/><circle cx="-75" cy="0" r="5"/><circle cx="-53" cy="-53" r="5"/>
