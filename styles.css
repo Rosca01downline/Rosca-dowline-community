@@ -329,3 +329,36 @@
   max-width:48%;
   min-height:2.7em;
 }
+
+
+/* Final mining-card framing: show the complete chassis width and keep the value readable. */
+.balance-details > .mining-card{
+  min-height:285px;
+  background-color:#2563eb;
+  background-image:
+    linear-gradient(180deg,
+      rgba(37,99,235,1) 0%,
+      rgba(37,99,235,1) 43%,
+      rgba(37,99,235,.94) 49%,
+      rgba(37,99,235,.38) 60%,
+      rgba(37,99,235,0) 72%),
+    url("images/mining-vip.svg");
+  background-repeat:no-repeat;
+  background-position:center, center bottom 5px;
+  background-size:100% 100%, 94% auto;
+  overflow:hidden;
+}
+.balance-details > .mining-card > span,
+.balance-details > .mining-card > strong{
+  position:relative;
+  z-index:2;
+  max-width:100%;
+}
+.balance-details > .mining-card > small{
+  position:relative;
+  z-index:2;
+  max-width:100%;
+  font-size:.78rem;
+  line-height:1.18;
+  text-shadow:0 1px 3px rgba(0,20,65,.55);
+}
