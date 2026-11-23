@@ -43,27 +43,56 @@
 <g fill="#d9f4ff" stroke="#193c5d" stroke-width="4"><circle cx="91" cy="177" r="8"/><circle cx="633" cy="117" r="8"/><circle cx="667" cy="410" r="8"/><circle cx="119" cy="421" r="8"/><circle cx="827" cy="124" r="8"/><circle cx="831" cy="387" r="8"/></g>
 
 
-<!-- Additional luminous perimeter lighting -->
-<g fill="none" stroke="#00cfff" stroke-linecap="round" filter="url(#glow)">
-  <path d="M62 170 126 111 701 43 844 102 849 390 771 456 111 451 57 389Z" stroke-width="5" opacity=".95"/>
-  <path d="M80 388 112 435 645 402M674 421 759 439 824 385" stroke="#42eaff" stroke-width="7" opacity=".9"/>
-  <path d="M143 103 704 37M119 425 640 393" stroke="#b4faff" stroke-width="3" opacity=".95"/>
+<style>
+@keyframes rgbFrame {
+  0%, 29% { stroke:#ff1738; fill:#ff1738; }
+  33%, 62% { stroke:#24ff65; fill:#24ff65; }
+  66%, 95% { stroke:#ffffff; fill:#ffffff; }
+  100% { stroke:#ff1738; fill:#ff1738; }
+}
+@keyframes rgbGlow {
+  0%, 29% { opacity:1; filter:url(#glowRed); }
+  33%, 62% { opacity:1; filter:url(#glowGreen); }
+  66%, 95% { opacity:1; filter:url(#glowWhite); }
+  100% { opacity:1; filter:url(#glowRed); }
+}
+@keyframes chase {
+  0%, 100% { opacity:1; }
+  50% { opacity:.22; }
+}
+.rgb-edge { fill:none; stroke-width:6; stroke-linecap:round; animation:rgbFrame 2.4s infinite, rgbGlow 2.4s infinite; }
+.rgb-edge-inner { fill:none; stroke-width:4; stroke-linecap:round; animation:rgbFrame 2.4s infinite; animation-delay:.35s; }
+.rgb-bulb { stroke-width:3; animation:rgbFrame 2.4s infinite, rgbGlow 2.4s infinite; }
+.rgb-bulb:nth-of-type(2n) { animation-delay:.25s; }
+.rgb-bulb:nth-of-type(3n) { animation-delay:.5s; }
+.rgb-strip { animation:rgbFrame 2.4s infinite, chase 1.2s infinite; }
+@media (prefers-reduced-motion: reduce) { .rgb-edge,.rgb-edge-inner,.rgb-bulb,.rgb-strip { animation:none; } }
+</style>
+<defs>
+  <filter id="glowRed" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10" result="b"/><feGaussianBlur stdDeviation="4" in="SourceGraphic" result="s"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="glowGreen" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10" result="b"/><feGaussianBlur stdDeviation="4" in="SourceGraphic" result="s"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="glowWhite" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10" result="b"/><feGaussianBlur stdDeviation="4" in="SourceGraphic" result="s"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<!-- Bright RGB light strips around the complete mining rig -->
+<g>
+  <path class="rgb-edge" d="M62 170 126 111 701 43 844 102 849 390 771 456 111 451 57 389Z"/>
+  <path class="rgb-edge-inner" d="M80 388 112 435 645 402M674 421 759 439 824 385M143 103 704 37M119 425 640 393"/>
 </g>
+<!-- Individual RGB bulbs around the case -->
 <g filter="url(#glow)">
-  <g fill="#eaffff" stroke="#00bfff" stroke-width="4">
-    <circle cx="72" cy="174" r="7"/><circle cx="125" cy="117" r="7"/><circle cx="270" cy="100" r="6"/>
-    <circle cx="420" cy="82" r="6"/><circle cx="575" cy="64" r="6"/><circle cx="704" cy="45" r="7"/>
-    <circle cx="835" cy="105" r="7"/><circle cx="847" cy="245" r="6"/><circle cx="844" cy="386" r="7"/>
-    <circle cx="771" cy="450" r="7"/><circle cx="612" cy="453" r="6"/><circle cx="454" cy="457" r="6"/>
-    <circle cx="285" cy="458" r="6"/><circle cx="111" cy="448" r="7"/><circle cx="55" cy="386" r="6"/>
+  <g fill="#ffffff" stroke="#ffffff" class="rgb-bulb">
+    <circle cx="72" cy="174" r="8"/><circle cx="125" cy="117" r="8"/><circle cx="270" cy="100" r="7"/>
+    <circle cx="420" cy="82" r="7"/><circle cx="575" cy="64" r="7"/><circle cx="704" cy="45" r="8"/>
+    <circle cx="835" cy="105" r="8"/><circle cx="847" cy="245" r="7"/><circle cx="844" cy="386" r="8"/>
+    <circle cx="771" cy="450" r="8"/><circle cx="612" cy="453" r="7"/><circle cx="454" cy="457" r="7"/>
+    <circle cx="285" cy="458" r="7"/><circle cx="111" cy="448" r="8"/><circle cx="55" cy="386" r="7"/>
   </g>
-  <g fill="#38eaff">
-    <rect x="90" y="154" width="28" height="5" rx="2.5"/><rect x="760" y="119" width="28" height="5" rx="2.5"/>
-    <rect x="816" y="300" width="6" height="25" rx="3"/><rect x="88" y="326" width="6" height="25" rx="3"/>
-    <rect x="246" y="446" width="42" height="5" rx="2.5"/><rect x="524" y="430" width="42" height="5" rx="2.5"/>
+  <g fill="#ffffff" class="rgb-strip">
+    <rect x="90" y="154" width="28" height="6" rx="3"/><rect x="760" y="119" width="28" height="6" rx="3"/>
+    <rect x="816" y="300" width="7" height="25" rx="3.5"/><rect x="88" y="326" width="7" height="25" rx="3.5"/>
+    <rect x="246" y="446" width="42" height="6" rx="3"/><rect x="524" y="430" width="42" height="6" rx="3"/>
   </g>
 </g>
-
 <!-- Visible chassis fasteners and metal corner brackets -->
 <g fill="#e8f8ff" stroke="#355875" stroke-width="3">
 <circle cx="92" cy="194" r="7"/><circle cx="610" cy="137" r="7"/><circle cx="113" cy="399" r="7"/><circle cx="620" cy="370" r="7"/>
