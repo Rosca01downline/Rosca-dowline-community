@@ -362,3 +362,37 @@
   line-height:1.18;
   text-shadow:0 1px 3px rgba(0,20,65,.55);
 }
+
+
+/* Final layout: show the complete four-fan mining rig, uncropped, below the unchanged Mining text. */
+.balance-details > .mining-card {
+  position: relative;
+  overflow: hidden;
+  background-color: #2563eb;
+  background-image: url("images/mining-vip.svg");
+  background-repeat: no-repeat;
+  background-position: center bottom 10px;
+  background-size: 96% auto;
+}
+.balance-details > .mining-card > span,
+.balance-details > .mining-card > strong,
+.balance-details > .mining-card > small {
+  position: relative;
+  z-index: 1;
+  display: block;
+  max-width: 100%;
+  text-shadow: 0 1px 3px rgba(5, 35, 100, .35);
+}
+.balance-details > .mining-card > small {
+  max-width: 100%;
+  margin-bottom: 185px;
+}
+@media (max-width: 480px) {
+  .balance-details > .mining-card {
+    background-size: 98% auto;
+    background-position: center bottom 8px;
+  }
+  .balance-details > .mining-card > small {
+    margin-bottom: 178px;
+  }
+}
