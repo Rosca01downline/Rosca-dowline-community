@@ -10,7 +10,11 @@
 <g fill="url(#blue)" stroke="#75eaff" stroke-width="2">
 <path d="M-9 -12 Q-40 -76 0 -72 Q37 -65 12 -10 Q3 2 -9 -12Z"/><path d="M12 -9 Q76 -40 72 0 Q65 37 10 12 Q-2 3 12 -9Z"/><path d="M9 12 Q40 76 0 72 Q-37 65 -12 10 Q-3 -2 9 12Z"/><path d="M-12 9 Q-76 40 -72 0 Q-65 -37 -10 -12 Q2 -3 -12 9Z"/>
 <path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(45)"/><path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(135)"/><path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(225)"/><path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(315)"/></g>
-<circle r="28" fill="url(#steel)" stroke="#baf5ff" stroke-width="5"/><circle r="12" fill="#062449" stroke="#19cfff" stroke-width="5"/></g>
+<circle r="28" fill="url(#steel)" stroke="#baf5ff" stroke-width="5"/><circle r="12" fill="#062449" stroke="#19cfff" stroke-width="5"/><circle r="5" fill="#dffaff" stroke="#17466b" stroke-width="2"/>
+<g fill="#dcecf6" stroke="#385a76" stroke-width="2">
+<circle cx="0" cy="-75" r="5"/><circle cx="53" cy="-53" r="5"/><circle cx="75" cy="0" r="5"/><circle cx="53" cy="53" r="5"/><circle cx="0" cy="75" r="5"/><circle cx="-53" cy="53" r="5"/><circle cx="-75" cy="0" r="5"/><circle cx="-53" cy="-53" r="5"/>
+</g>
+<g stroke="#effaff" stroke-width="2" stroke-linecap="round"><path d="M-2 -75 2 -75M51 -55 55 -51M75 -2 75 2M51 51 55 55M-2 75 2 75M-55 51 -51 55M-75 -2 -75 2M-55 -55 -51 -51"/></g></g>
 </defs>
 <ellipse cx="455" cy="512" rx="370" ry="24" fill="#009dff" opacity=".4" filter="url(#shadow)"/>
 <path d="M38 385 58 163 118 105 704 35 855 95 858 391 776 472 112 465Z" fill="url(#steel)" stroke="#e3f5ff" stroke-width="8"/>
@@ -31,4 +35,13 @@
 <path d="M93 452 84 497 172 506 184 464ZM740 452 752 501 840 481 826 430Z" fill="url(#steel)" stroke="#c9f1ff" stroke-width="6"/>
 <path d="M103 490 168 497M763 491 832 475" stroke="#1acaff" stroke-width="8" filter="url(#glow)"/>
 <g fill="#d9f4ff" stroke="#193c5d" stroke-width="4"><circle cx="91" cy="177" r="8"/><circle cx="633" cy="117" r="8"/><circle cx="667" cy="410" r="8"/><circle cx="119" cy="421" r="8"/><circle cx="827" cy="124" r="8"/><circle cx="831" cy="387" r="8"/></g>
+
+<!-- Visible chassis fasteners and metal corner brackets -->
+<g fill="#e8f8ff" stroke="#355875" stroke-width="3">
+<circle cx="92" cy="194" r="7"/><circle cx="610" cy="137" r="7"/><circle cx="113" cy="399" r="7"/><circle cx="620" cy="370" r="7"/>
+<circle cx="680" cy="145" r="7"/><circle cx="794" cy="164" r="7"/><circle cx="682" cy="382" r="7"/><circle cx="794" cy="365" r="7"/>
+<circle cx="160" cy="454" r="6"/><circle cx="700" cy="442" r="6"/><circle cx="105" cy="482" r="6"/><circle cx="819" cy="473" r="6"/>
+</g>
+<g stroke="#183c5a" stroke-width="2" stroke-linecap="round">
+<path d="M88 194 96 194M92 190 92 198M606 137 614 137M610 133 610 141M109 399 117 399M113 395 113 403M616 370 624 370M620 366 620 374M676 145 684 145M680 141 680 149M790 164 798 164M794 160 794 168M678 382 686 382M682 378 682 386M790 365 798 365M794 361 794 369"/></g>
 </svg>
