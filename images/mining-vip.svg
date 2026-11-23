@@ -44,11 +44,23 @@
 
 
 <style>
-@keyframes rgbFrame {
+@keyframes rgbStroke {
+  0%, 29% { stroke:#ff1738; }
+  33%, 62% { stroke:#24ff65; }
+  66%, 95% { stroke:#ffffff; }
+  100% { stroke:#ff1738; }
+}
+@keyframes rgbBulbColor {
   0%, 29% { stroke:#ff1738; fill:#ff1738; }
   33%, 62% { stroke:#24ff65; fill:#24ff65; }
   66%, 95% { stroke:#ffffff; fill:#ffffff; }
   100% { stroke:#ff1738; fill:#ff1738; }
+}
+@keyframes rgbStripColor {
+  0%, 29% { fill:#ff1738; }
+  33%, 62% { fill:#24ff65; }
+  66%, 95% { fill:#ffffff; }
+  100% { fill:#ff1738; }
 }
 @keyframes rgbGlow {
   0%, 29% { opacity:1; filter:url(#glowRed); }
@@ -60,12 +72,12 @@
   0%, 100% { opacity:1; }
   50% { opacity:.22; }
 }
-.rgb-edge { fill:none; stroke-width:6; stroke-linecap:round; animation:rgbFrame 2.4s infinite, rgbGlow 2.4s infinite; }
-.rgb-edge-inner { fill:none; stroke-width:4; stroke-linecap:round; animation:rgbFrame 2.4s infinite; animation-delay:.35s; }
-.rgb-bulb { stroke-width:3; animation:rgbFrame 2.4s infinite, rgbGlow 2.4s infinite; }
+.rgb-edge { fill:none; stroke-width:6; stroke-linecap:round; animation:rgbStroke 2.4s infinite, rgbGlow 2.4s infinite; }
+.rgb-edge-inner { fill:none; stroke-width:4; stroke-linecap:round; animation:rgbStroke 2.4s infinite; animation-delay:.35s; }
+.rgb-bulb { stroke-width:3; animation:rgbBulbColor 2.4s infinite, rgbGlow 2.4s infinite; }
 .rgb-bulb:nth-of-type(2n) { animation-delay:.25s; }
 .rgb-bulb:nth-of-type(3n) { animation-delay:.5s; }
-.rgb-strip { animation:rgbFrame 2.4s infinite, chase 1.2s infinite; }
+.rgb-strip { animation:rgbStripColor 2.4s infinite, chase 1.2s infinite; }
 @media (prefers-reduced-motion: reduce) { .rgb-edge,.rgb-edge-inner,.rgb-bulb,.rgb-strip { animation:none; } }
 </style>
 <defs>
