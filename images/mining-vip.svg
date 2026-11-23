@@ -7,9 +7,15 @@
 <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 <filter id="shadow"><feGaussianBlur stdDeviation="16"/></filter>
 <g id="fan"><circle r="92" fill="#020812" stroke="#9abbd4" stroke-width="7"/><circle r="83" fill="url(#fanbg)" stroke="#09aaff" stroke-width="5"/><circle r="72" fill="none" stroke="#062d64" stroke-width="5"/>
-<g fill="url(#blue)" stroke="#75eaff" stroke-width="2">
-<path d="M-9 -12 Q-40 -76 0 -72 Q37 -65 12 -10 Q3 2 -9 -12Z"/><path d="M12 -9 Q76 -40 72 0 Q65 37 10 12 Q-2 3 12 -9Z"/><path d="M9 12 Q40 76 0 72 Q-37 65 -12 10 Q-3 -2 9 12Z"/><path d="M-12 9 Q-76 40 -72 0 Q-65 -37 -10 -12 Q2 -3 -12 9Z"/>
-<path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(45)"/><path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(135)"/><path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(225)"/><path d="M-8 -12 Q-20 -83 13 -66 Q38 -45 7 -9Z" transform="rotate(315)"/></g>
+<g fill="url(#blue)" stroke="#75eaff" stroke-width="2.5" stroke-linejoin="round">
+<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z"/>
+<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(51.43)"/>
+<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(102.86)"/>
+<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(154.29)"/>
+<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(205.72)"/>
+<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(257.15)"/>
+<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(308.58)"/>
+</g>
 <circle r="28" fill="url(#steel)" stroke="#baf5ff" stroke-width="5"/><circle r="12" fill="#062449" stroke="#19cfff" stroke-width="5"/><circle r="5" fill="#dffaff" stroke="#17466b" stroke-width="2"/>
 <g fill="#dcecf6" stroke="#385a76" stroke-width="2">
 <circle cx="0" cy="-75" r="5"/><circle cx="53" cy="-53" r="5"/><circle cx="75" cy="0" r="5"/><circle cx="53" cy="53" r="5"/><circle cx="0" cy="75" r="5"/><circle cx="-53" cy="53" r="5"/><circle cx="-75" cy="0" r="5"/><circle cx="-53" cy="-53" r="5"/>
