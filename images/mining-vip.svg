@@ -7,14 +7,14 @@
 <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 <filter id="shadow"><feGaussianBlur stdDeviation="16"/></filter>
 <g id="fan"><circle r="92" fill="#020812" stroke="#9abbd4" stroke-width="7"/><circle r="83" fill="url(#fanbg)" stroke="#09aaff" stroke-width="5"/><circle r="72" fill="none" stroke="#062d64" stroke-width="5"/>
-<g fill="url(#blue)" stroke="#75eaff" stroke-width="2.5" stroke-linejoin="round">
-<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z"/>
-<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(51.43)"/>
-<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(102.86)"/>
-<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(154.29)"/>
-<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(205.72)"/>
-<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(257.15)"/>
-<path d="M-7 -18 C-17 -37 -27 -58 -18 -73 C-12 -83 -2 -78 4 -67 C11 -51 8 -31 7 -17 Q0 -10 -7 -18Z" transform="rotate(308.58)"/>
+<g fill="url(#blue)" stroke="#75eaff" stroke-width="2.2" stroke-linejoin="round">
+<path d="M8 -20 C19 -34 42 -60 66 -67 C77 -70 82 -63 75 -53 C62 -34 37 -19 14 -8 Q8 -8 8 -20Z"/>
+<path d="M8 -20 C19 -34 42 -60 66 -67 C77 -70 82 -63 75 -53 C62 -34 37 -19 14 -8 Q8 -8 8 -20Z" transform="rotate(51.43)"/>
+<path d="M8 -20 C19 -34 42 -60 66 -67 C77 -70 82 -63 75 -53 C62 -34 37 -19 14 -8 Q8 -8 8 -20Z" transform="rotate(102.86)"/>
+<path d="M8 -20 C19 -34 42 -60 66 -67 C77 -70 82 -63 75 -53 C62 -34 37 -19 14 -8 Q8 -8 8 -20Z" transform="rotate(154.29)"/>
+<path d="M8 -20 C19 -34 42 -60 66 -67 C77 -70 82 -63 75 -53 C62 -34 37 -19 14 -8 Q8 -8 8 -20Z" transform="rotate(205.72)"/>
+<path d="M8 -20 C19 -34 42 -60 66 -67 C77 -70 82 -63 75 -53 C62 -34 37 -19 14 -8 Q8 -8 8 -20Z" transform="rotate(257.15)"/>
+<path d="M8 -20 C19 -34 42 -60 66 -67 C77 -70 82 -63 75 -53 C62 -34 37 -19 14 -8 Q8 -8 8 -20Z" transform="rotate(308.58)"/>
 </g>
 <circle r="28" fill="url(#steel)" stroke="#baf5ff" stroke-width="5"/><circle r="12" fill="#062449" stroke="#19cfff" stroke-width="5"/><circle r="5" fill="#dffaff" stroke="#17466b" stroke-width="2"/>
 <g fill="#dcecf6" stroke="#385a76" stroke-width="2">
