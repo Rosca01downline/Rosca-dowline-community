@@ -1,4 +1,4 @@
-const CACHE="rosca-pwa-v49-mining-vip-zoom-crop3";
+const CACHE="rosca-pwa-v50-mining-vip-fullbody4";
 const ASSETS=["./","./index.html","./styles.css","./app.js","./manifest.webmanifest","./icons/rosca-logo.svg"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
