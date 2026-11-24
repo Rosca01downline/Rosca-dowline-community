@@ -13,6 +13,55 @@ let currentUser = null, currentProfile = null, currentMember = null;
 let miningTicker = null;
 let miningDisplayState = null;
 
+let miningAudio = null;
+function toggleMiningSound(){
+  const button=$("miningSoundBtn");
+  if(!button)return;
+  if(miningAudio){
+    const old=miningAudio;
+    old.master.gain.setTargetAtTime(0,old.context.currentTime,0.06);
+    miningAudio=null;
+    setTimeout(()=>{try{old.context.close()}catch(_){}},180);
+    button.classList.remove("is-playing");
+    button.setAttribute("aria-pressed","false");
+    button.title="Alefaso ny feon'ny machine";
+    button.innerHTML='<span aria-hidden="true">🎧</span><span class="sound-label">FEo</span>';
+    return;
+  }
+  const AudioCtx=window.AudioContext||window.webkitAudioContext;
+  if(!AudioCtx){button.title="Tsy tohanan'ity navigateur ity ny feo";return;}
+  try{
+    const context=new AudioCtx();
+    const master=context.createGain();
+    master.gain.value=0.0001;
+    master.connect(context.destination);
+    const length=context.sampleRate*3;
+    const buffer=context.createBuffer(1,length,context.sampleRate);
+    const samples=buffer.getChannelData(0);
+    for(let i=0;i<length;i++)samples[i]=(Math.random()*2-1)*0.32;
+    const noise=context.createBufferSource();
+    noise.buffer=buffer;noise.loop=true;
+    const fanFilter=context.createBiquadFilter();
+    fanFilter.type="bandpass";fanFilter.frequency.value=235;fanFilter.Q.value=0.7;
+    const fanGain=context.createGain();fanGain.gain.value=0.24;
+    noise.connect(fanFilter).connect(fanGain).connect(master);noise.start();
+    const hum=context.createOscillator();hum.type="sawtooth";hum.frequency.value=58;
+    const humFilter=context.createBiquadFilter();humFilter.type="lowpass";humFilter.frequency.value=115;
+    const humGain=context.createGain();humGain.gain.value=0.035;
+    hum.connect(humFilter).connect(humGain).connect(master);hum.start();
+    const pulse=context.createOscillator();pulse.type="sine";pulse.frequency.value=116;
+    const pulseGain=context.createGain();pulseGain.gain.value=0.012;
+    pulse.connect(pulseGain).connect(master);pulse.start();
+    context.resume().then(()=>master.gain.setTargetAtTime(0.34,context.currentTime,0.35));
+    miningAudio={context,master,noise,hum,pulse};
+    button.classList.add("is-playing");
+    button.setAttribute("aria-pressed","true");
+    button.title="Ajanony ny feon'ny machine";
+    button.innerHTML='<span aria-hidden="true">🎧</span><span class="sound-label">MUTE</span>';
+  }catch(error){console.warn("Mining audio unavailable:",error);button.title="Tsy afaka manomboka ny feo";}
+}
+
+
 function startMiningTicker(serverBalance, bonusActive, bonusUntil, referralCount, savings, commission){
   if(miningTicker) clearInterval(miningTicker);
   const startedAt = Date.now();
@@ -78,6 +127,7 @@ $("signupForm").addEventListener("submit",async e=>{
 });
 $("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();currentUser=null;show("appView",false);show("authView",true);show("logoutBtn",false);});
 $("refreshBtn").addEventListener("click",loadMemberData);
+$("miningSoundBtn").addEventListener("click",toggleMiningSound);
 $("challengeCard").addEventListener("click",async()=>{
   show("challengePanel",true);
   await loadChallengeData();
