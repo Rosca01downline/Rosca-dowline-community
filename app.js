@@ -128,6 +128,8 @@ $("signupForm").addEventListener("submit",async e=>{
 $("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();currentUser=null;show("appView",false);show("authView",true);show("logoutBtn",false);});
 $("refreshBtn").addEventListener("click",loadMemberData);
 $("miningSoundBtn").addEventListener("click",toggleMiningSound);
+$("openPenaltyHistoryBtn").addEventListener("click",()=>{show("penaltyPanel",true);$("penaltyPanel").scrollIntoView({behavior:"smooth",block:"start"});});
+$("closePenaltyHistoryBtn").addEventListener("click",()=>show("penaltyPanel",false));
 $("challengeCard").addEventListener("click",async()=>{
   show("challengePanel",true);
   await loadChallengeData();
