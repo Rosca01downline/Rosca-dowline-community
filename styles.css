@@ -397,3 +397,15 @@
     margin-bottom: 145px;
   }
 }
+
+/* Bouton écouteur : activation volontaire du son Mining */
+.balance-details > .mining-card{position:relative;padding-right:86px}
+.mining-sound-btn{
+ position:absolute;right:12px;top:12px;z-index:3;display:flex;align-items:center;gap:5px;
+ min-width:54px;min-height:38px;padding:7px 9px;border:1px solid rgba(255,255,255,.65);
+ border-radius:22px;background:rgba(5,25,58,.78);color:#fff;font-size:16px;font-weight:800;
+ cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.2)
+}
+.mining-sound-btn .sound-label{font-size:9px;letter-spacing:.04em}
+.mining-sound-btn.is-playing{background:#0b7b54;border-color:#a9f5d2}
+.mining-sound-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
