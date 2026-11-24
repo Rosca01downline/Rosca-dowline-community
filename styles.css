@@ -364,15 +364,16 @@
 }
 
 
-/* Final layout: show the complete four-fan mining rig, uncropped, below the unchanged Mining text. */
+/* Final mining artwork: full machine resting directly on its illuminated metal table. */
 .balance-details > .mining-card {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
   background-color: #2563eb;
   background-image: url("images/mining-vip.svg");
   background-repeat: no-repeat;
-  background-position: center bottom 10px;
-  background-size: 96% auto;
+  background-position: center bottom 8px;
+  background-size: 100% auto;
 }
 .balance-details > .mining-card > span,
 .balance-details > .mining-card > strong,
@@ -385,14 +386,14 @@
 }
 .balance-details > .mining-card > small {
   max-width: 100%;
-  margin-bottom: 185px;
+  margin-bottom: 150px;
 }
 @media (max-width: 480px) {
   .balance-details > .mining-card {
-    background-size: 98% auto;
+    background-size: 100% auto;
     background-position: center bottom 8px;
   }
   .balance-details > .mining-card > small {
-    margin-bottom: 178px;
+    margin-bottom: 145px;
   }
 }
