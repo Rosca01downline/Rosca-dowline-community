@@ -52,7 +52,7 @@ function toggleMiningSound(){
     const pulse=context.createOscillator();pulse.type="sine";pulse.frequency.value=116;
     const pulseGain=context.createGain();pulseGain.gain.value=0.012;
     pulse.connect(pulseGain).connect(master);pulse.start();
-    context.resume().then(()=>master.gain.setTargetAtTime(0.34,context.currentTime,0.35));
+    context.resume().then(()=>master.gain.setTargetAtTime(0.46,context.currentTime,0.35));
     miningAudio={context,master,noise,hum,pulse};
     button.classList.add("is-playing");
     button.setAttribute("aria-pressed","true");
