@@ -432,3 +432,9 @@ body.admin-mode #appView > :not(.welcome):not(#adminView) {
 .rules-accordion[open]>.rules-toggle .rules-toggle-state::before{content:"Tsindrio raha hidio"}
 .rules-accordion-content{padding:14px}
 .rules-accordion-content>.rule-item:first-child{margin-top:0}
+
+
+/* Force the outer community-rules accordion to stay collapsed until tapped. */
+.rules-accordion:not([open])>.rules-accordion-content{display:none!important}
+.rules-accordion[open]>.rules-accordion-content{display:block!important}
+.rules-accordion>.rules-toggle{user-select:none}
