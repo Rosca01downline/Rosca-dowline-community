@@ -719,6 +719,25 @@ if(ludoStatePoller) clearInterval(ludoStatePoller);
 ludoStatePoller=setInterval(()=>{if(currentLudoRoomId && !ludoBoardBusy) loadLudoGameState();},1000);
 
 
+async function loadLudoHeaderBalance(){
+  const host=$("ludoHeaderBalance");
+  if(!host) return;
+  if(!currentMember?.id){
+    host.textContent="Solde : — SC";
+    return;
+  }
+  const {data,error}=await db.from("ludo_virtual_balances")
+    .select("balance_sc")
+    .eq("member_id",currentMember.id)
+    .maybeSingle();
+  if(error){
+    host.textContent="Solde : — SC";
+    console.warn("Ludo header balance not readable:",error.message);
+    return;
+  }
+  host.textContent="Solde : "+Number(data?.balance_sc||0).toLocaleString("fr-FR")+" SC";
+}
+
 async function initializeLudoVirtualBalance(){
   if(!currentMember?.id || String(currentMember.status).toLowerCase()!=="active"){
     throw new Error("Mpikambana ACTIVE ihany no mahazo bonus Ludo.");
@@ -727,6 +746,7 @@ async function initializeLudoVirtualBalance(){
   if(error) throw error;
   const balance=Number(data||0);
   msg("ludoSocialMsg","Solde Ludo virtuel: "+balance.toLocaleString("fr-FR")+" SC. Bonus 5 000 SC indray mandeha ihany.");
+  await loadLudoHeaderBalance();
   return balance;
 }
 
@@ -1219,6 +1239,7 @@ async function loadMemberData(){
   const {data:member,error:memberError}=await db.from("members").select("id,status,membership_fee_paid,unpaid_weeks,total_penalty").eq("auth_user_id",currentUser.id).maybeSingle();
   if(memberError){msg("globalMsg","Erreur lecture membre: "+memberError.message,true);return;}
   currentMember=member;
+  await loadLudoHeaderBalance();
   if(member) await loadMyLudoSCRequests();
   configureDepositOptions(member);
   await loadDepositDue(member);
