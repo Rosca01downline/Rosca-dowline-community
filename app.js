@@ -1612,7 +1612,6 @@ async function loadAdminWeeklyContributions(members){
       fmt(x.oldAmount+x.newAmount+x.penaltyAmount),
       x.penaltyWeeks.length?"Misy pénalité tsy voaloa":"Contribution tsy vita"
     ]);
-  const paidHost=$( "adminContributionsPaid" );
   if(!paidRows.length){
     paidHost.innerHTML='<p class="muted">Tsy mbola misy contribution voaloa.</p>';
   }else{
