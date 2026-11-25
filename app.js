@@ -1086,30 +1086,90 @@ $("shareReferralBtn").addEventListener("click",async()=>{
   else {try{await navigator.clipboard.writeText(value);$("referralMsg").textContent="Voacopy ilay lien; azonao apetaka amin’ny WhatsApp na Messenger."; }catch(e){$("referralLink").focus();$("referralLink").select();$("referralMsg").textContent="Adikao ilay lien dia zarao amin’ny namanao.";}}
 });
 
+let currentDepositDue = null;
+
 function configureDepositOptions(member){
   const select=$("depositType");
   const status=String(member?.status||"").toLowerCase();
   const pending=status==="pending";
   const active=status==="active";
-
   const combinedOption=select.querySelector('option[value="combined"]');
   const contributionOption=select.querySelector('option[value="contribution"]');
 
   if(combinedOption) combinedOption.hidden=!pending;
   if(contributionOption) contributionOption.hidden=!active;
+  select.value=pending?"combined":active?"contribution":"";
+  select.disabled=!(pending||active);
+  $("depositAmount").value="";
+  $("depositAmount").step="any";
 
-  if(pending){
-    select.value="combined";
-    $("depositAmount").value=4;
-  }else if(active){
-    select.value="contribution";
-    $("depositAmount").value=3;
-  }else{
-    select.value="";
-    $("depositAmount").value="";
-    select.disabled=true;
+  const button=$("depositForm").querySelector('button[type="submit"]');
+  if(button) button.disabled=true;
+
+  let breakdown=$("depositDueBreakdown");
+  if(!breakdown){
+    breakdown=document.createElement("div");
+    breakdown.id="depositDueBreakdown";
+    breakdown.className="muted";
+    breakdown.style.margin="8px 0 12px";
+    $("depositAmount").closest("label").insertAdjacentElement("afterend",breakdown);
   }
-  if(pending||active) select.disabled=false;
+  breakdown.textContent=member?"Kajiana ny vola tokony haloanao...":"Tsy misy kaonty mpikambana.";
+}
+
+async function loadDepositDue(member){
+  currentDepositDue=null;
+  const button=$("depositForm").querySelector('button[type="submit"]');
+  const amountInput=$("depositAmount");
+  const breakdown=$("depositDueBreakdown");
+  if(!member){
+    amountInput.value="";
+    if(button) button.disabled=true;
+    if(breakdown) breakdown.textContent="Tsy misy kaonty mpikambana.";
+    return null;
+  }
+
+  try{
+    const {data,error}=await db.rpc("get_my_deposit_due");
+    if(error) throw error;
+    const due=typeof data==="string"?JSON.parse(data):data;
+    if(!due || !Number.isFinite(Number(due.amount)) || Number(due.amount)<0){
+      throw new Error("Valin'ny kajy dépôt tsy marina.");
+    }
+
+    const status=String(member.status||"").toLowerCase();
+    const expectedType=status==="pending"?"combined":status==="active"?"contribution":null;
+    if(!expectedType || due.payment_type!==expectedType){
+      throw new Error("Tsy mifanaraka amin'ny sata-nao ny kajy dépôt.");
+    }
+
+    currentDepositDue=due;
+    $("depositType").value=expectedType;
+    amountInput.value=Number(due.amount).toFixed(2);
+    if(breakdown){
+      if(expectedType==="combined"){
+        breakdown.textContent="Droit d’adhésion: 1.00 USDT · Contribution initiale: 3.00 USDT · Total: 4.00 USDT";
+      }else{
+        const weeks=Array.isArray(due.due_weeks)?due.due_weeks:[];
+        breakdown.textContent=
+          "Contributions ("+Number(due.week_count||0)+" semaine): "+Number(due.contribution_due||0).toFixed(2)+
+          " USDT · Pénalités ("+Number(due.penalty_count||0)+"): "+Number(due.penalty_due||0).toFixed(2)+
+          " USDT · Total: "+Number(due.amount).toFixed(2)+" USDT"+
+          (weeks.length?" · Herinandro: "+weeks.map(dateOnly).join(", "):"");
+      }
+    }
+    if(button) button.disabled=Number(due.amount)<=0;
+    if(Number(due.amount)<=0 && breakdown){
+      breakdown.textContent="Tsy misy contribution na pénalité tokony haloanao amin'izao fotoana izao.";
+    }
+    return due;
+  }catch(error){
+    amountInput.value="";
+    if(button) button.disabled=true;
+    if(breakdown) breakdown.textContent="Tsy afaka maka ny vola tokony haloanao: "+(error?.message||String(error));
+    console.error("get_my_deposit_due:",error);
+    return null;
+  }
 }
 async function loadHoldingsWingsHistory(member){
   const targets=["holdingsWingsHistory","myHoldingsWingsHistory"];
@@ -1145,6 +1205,7 @@ async function loadMemberData(){
   currentMember=member;
   if(member) await loadMyLudoSCRequests();
   configureDepositOptions(member);
+  await loadDepositDue(member);
   await loadHoldingsWingsHistory(member);
   if(member)msg("globalMsg","Membre trouvé dans l’application : "+member.status);
   renderReferralLink(member);
@@ -1351,8 +1412,7 @@ function renderTable(target,heads,rows){
 function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 
 $("depositType").addEventListener("change",()=>{
-  const amounts={membership_fee:1,contribution:3,combined:4};
-  $("depositAmount").value=amounts[$("depositType").value];
+  loadDepositDue(currentMember);
 });
 const depositMessage=(text,error=false)=>{
   msg("depositMsg",text,error);
@@ -1372,22 +1432,22 @@ $("depositForm").addEventListener("submit",async e=>{
     depositMessage("Tsy hita ny session-nao. Mivoaha (Déconnexion), dia midira indray vao mandefa dépôt.",true);
     return;
   }
-  if(!form.reportValidity()) return;
-  const status=String(currentMember?.status||"").toLowerCase();
-  const expectedType=status==="pending"?"combined":status==="active"?"contribution":null;
-  const expectedAmount=status==="pending"?4:status==="active"?3:null;
-  if(!expectedType || $("depositType").value!==expectedType || Number($("depositAmount").value)!==expectedAmount){
-    depositMessage("Tsy mifanaraka amin'ny sata-nao ny dépôt. Havaozy ny pejy ary jereo ny vola tokony haloanao.",true);
-    return;
-  }
   if(button) button.disabled=true;
-  depositMessage("Alefa any amin'ny serveur ny fangatahana dépôt...");
+  depositMessage("Havaozina aloha ny kajy contribution sy pénalité...");
   try{
+    const due=await loadDepositDue(currentMember);
+    if(!due) throw new Error("Tsy afaka nanamarina ny vola tokony haloanao. Havaozy ny pejy ary andramo indray.");
+    if(Number(due.amount)<=0) throw new Error("Tsy misy vola tokony haloanao amin'izao fotoana izao.");
+    if(!form.reportValidity()) return;
+    if(Number($("depositAmount").value)!==Number(due.amount) || $("depositType").value!==due.payment_type){
+      throw new Error("Niova ny kajy dépôt. Hamarino indray ny vola aseho.");
+    }
+    depositMessage("Alefa any amin'ny serveur ny fangatahana dépôt...");
     const {data,error}=await db.rpc("submit_deposit_request",{
-      p_amount:Number($("depositAmount").value),
+      p_amount:Number(due.amount),
       p_faucetpay_email:$("depositEmail").value.trim(),
       p_tx_hash:$("depositTx").value.trim(),
-      p_payment_type:$("depositType").value
+      p_payment_type:due.payment_type
     });
     if(error) throw error;
     form.reset();
