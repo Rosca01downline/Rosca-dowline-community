@@ -502,3 +502,13 @@ body.admin-mode #appView > :not(.welcome):not(#adminView) {
 .ludo-unread-badge[hidden]{display:none}
 .ludo-sound-setting{display:flex;flex-direction:column;gap:7px;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:var(--soft-bg,#eef4fa);font-weight:700}
 .ludo-sound-setting select{width:100%;min-height:40px}
+
+
+/* Community lists: one expandable button */
+.community-list-accordion{border:1px solid var(--border-color,#d8e1ea);border-radius:14px;overflow:hidden;background:var(--panel-bg,#fff)}
+.community-list-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;padding:15px 17px;font-weight:800;color:var(--text-color,inherit);background:var(--soft-bg,#eef4fa)}
+.community-list-toggle::-webkit-details-marker{display:none}
+.community-list-chevron{font-size:1.3rem;font-weight:800;transition:transform .18s ease}
+.community-list-accordion[open] .community-list-chevron{transform:rotate(45deg)}
+.community-list-content{padding:14px;border-top:1px solid var(--border-color,#d8e1ea)}
+.community-list-accordion:not([open])>.community-list-content{display:none!important}
