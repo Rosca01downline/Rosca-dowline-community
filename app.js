@@ -1601,12 +1601,27 @@ $("depositForm").addEventListener("submit",async e=>{
     if(button) button.disabled=!currentDepositDue || Number(currentDepositDue.amount)<=0;
   }
 });
+function updateWithdrawalMinimum(){
+  const type=$("withdrawType").value;
+  const minimum=type==="commission"?1:15;
+  $("withdrawAmount").min=String(minimum);
+  $("withdrawAmount").placeholder="Minimum "+minimum+" USDT";
+  $("withdrawMinimumInfo").textContent="Minimum: "+minimum+" USDT";
+}
+$("withdrawType").addEventListener("change",updateWithdrawalMinimum);
+updateWithdrawalMinimum();
 $("withdrawForm").addEventListener("submit",async e=>{
   e.preventDefault(); if(!currentUser)return;
+  const type=$("withdrawType").value;
+  const amount=Number($("withdrawAmount").value);
+  const minimum=type==="commission"?1:15;
+  if(!Number.isFinite(amount)||amount<minimum){
+    return msg("globalMsg","Minimum retrait "+(type==="commission"?"Commission":"Épargne/Mining")+" = "+minimum+" USDT.",true);
+  }
   msg("globalMsg","Alefa ny fangatahana retrait...");
-  const {data,error}=await db.rpc("submit_withdrawal_request",{p_amount:Number($("withdrawAmount").value),p_faucetpay_email:$("withdrawEmail").value.trim(),p_withdrawal_type:$("withdrawType").value});
+  const {data,error}=await db.rpc("submit_withdrawal_request",{p_amount:amount,p_faucetpay_email:$("withdrawEmail").value.trim(),p_withdrawal_type:type});
   if(error)return msg("globalMsg",error.message,true);
-  e.target.reset();msg("globalMsg","Voaray ny fangatahana retrait. Ny vola dia voatokana mandra-pitsarana.");
+  e.target.reset();updateWithdrawalMinimum();msg("globalMsg","Voaray ny fangatahana retrait. Ny vola dia voatokana mandra-pitsarana.");
   await loadMemberData();
 });
 
