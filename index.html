@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/rosca-logo.svg" type="image/svg+xml">\n  <link rel="apple-touch-icon" href="icons/rosca-logo.svg">
   <title>ROSCA & DOWNLINE COMMUNITY</title>
-  <link rel="stylesheet" href="styles.css?v=20261125-ludo-crown-counter">
+  <link rel="stylesheet" href="styles.css?v=20261125-ludo-withdrawal-1">
 </head>
 <body>
 <header class="top">
@@ -178,6 +178,30 @@
         <div id="myLudoSCRequests" class="table-wrap"><p class="muted">Ampidirina...</p></div>
         </section>
       </details>
+
+      <details class="ludo-sc-request-accordion ludo-withdrawal-accordion">
+        <summary class="ludo-sc-request-toggle">
+          <span>💸 RETRAIT SC LUDO</span>
+          <span class="ludo-sc-request-chevron" aria-hidden="true">＋</span>
+        </summary>
+        <section class="ludo-sc-request panel">
+          <p class="muted">Conversion: 1 000 SC = 1 USDT · Retrait minimum: 1 000 SC. Ity wallet Ludo ity dia misaraka tanteraka amin'ny solde ROSCA.</p>
+          <div id="ludoWithdrawalStatus" class="ludo-withdrawal-status"><p class="muted">Ampidirina...</p></div>
+          <form id="ludoWithdrawalForm" class="hidden">
+            <label>Vola alaina (SC)
+              <input id="ludoWithdrawalAmount" type="number" min="1000" step="1" required placeholder="1000">
+            </label>
+            <label>Email FaucetPay
+              <input id="ludoWithdrawalEmail" type="email" required autocomplete="email" placeholder="email@example.com">
+            </label>
+            <p id="ludoWithdrawalMsg" class="message" role="status"></p>
+            <button class="btn primary" type="submit">DEMANDER LE RETRAIT</button>
+          </form>
+          <div class="section-head"><h3>Historique retrait Ludo</h3><button id="ludoWithdrawalRefreshBtn" class="btn ghost small" type="button">Havaozy</button></div>
+          <div id="myLudoWithdrawals" class="table-wrap"><p class="muted">Ampidirina...</p></div>
+        </section>
+      </details>
+
         <p class="muted">Tsindrio ny pion-nao rehefa avy manipy dés. Mila 6 vao mivoaka ny pion. Mila isa marina vao tafiditra ao an-trano.</p>
         <div id="ludoActionFeed" class="ludo-action-feed" aria-live="polite" aria-label="Hetsika farany rehetra"></div>
         <section id="ludoWinnerPanel" class="ludo-winner-panel hidden" role="status" aria-live="assertive">
@@ -333,6 +357,7 @@
       <div class="admin-block"><h3>Fangatahana retrait</h3><div id="adminWithdrawals" class="table-wrap"></div></div>
       <div class="admin-block"><h3>Contribution hebdomadaire — Vita ($3)</h3><div id="adminContributionsPaid" class="table-wrap"></div></div>
       <div class="admin-block"><h3>Contribution hebdomadaire — Tsy vita sy pénalité</h3><p class="muted">Aseho eto ny contribution $3 tsy mbola voaloa sy ny pénalité $0.50 raha efa voarakitra.</p><div id="adminContributionsUnpaid" class="table-wrap"></div></div>
+      <div class="admin-block"><h3>Fangatahana retrait SC Ludo</h3><p class="muted">APPROUVER: miandry ny paiement. CONFIRMER PAIEMENT: tsy maintsy ampidirina ny FaucetPay TxID.</p><div id="adminLudoWithdrawals" class="table-wrap"></div></div>
       <div class="admin-block"><h3>Fangatahana SC Ludo</h3><p class="muted">CONFIRMER: crédit SC ao amin'ny wallet Ludo ihany. REFUSER: tsy maintsy misy fanazavana.</p><div id="adminLudoSCRequests" class="table-wrap"></div></div>
 
       <div class="admin-block"><h3>Fandoavana ny tour — FaucetPay Transaction ID</h3><p class="muted">Rehefa avy nandefa ny vola tamin’ny mpandray tour ianao dia tsindrio ny bokotra, ampidiro ny FaucetPay TxID, ary hamafiso. Hiseho amin’ny lisitry ny mpikambana ny porofo.</p><div id="adminTurns" class="table-wrap"></div></div>
@@ -356,7 +381,7 @@
       return;
     }
     const app=document.createElement("script");
-    app.src="app.js?v=20261125-ludo-crown-db";
+    app.src="app.js?v=20261125-ludo-withdrawal-1";
     app.onerror=function(){if(status)status.textContent="Tsy afaka nampiditra ny application. Havaozy ny pejy na andramo Chrome."};
     document.body.appendChild(app);
   }
