@@ -1554,7 +1554,7 @@ async function loadAdminWeeklyContributions(members){
     if(!prev||String(p.status).toLowerCase()==="unpaid")penaltyByWeek.set(key,p);
   });
   const paidRows=[];
-  const unpaidRows=[];
+  const unpaidByMember=new Map();
   active.forEach(m=>{
     const activated=dateKey(m.activated_at||m.created_at);
     if(!activated)return;
@@ -1569,16 +1569,38 @@ async function loadAdminWeeklyContributions(members){
         paidRows.push([m.full_name||"—",dateOnly(wk),fmt(payment.amount),date(payment.paid_at||payment.created_at)||"—"]);
       }
       if(!payment||penaltyAmount>0){
-        const contributionAmount=payment?0:3;
-        unpaidRows.push([m.full_name||"—",dateOnly(wk),fmt(contributionAmount),penaltyAmount?fmt(penaltyAmount):"0.00",fmt(contributionAmount+penaltyAmount),payment?"Pénalité tsy voaloa":"Contribution tsy vita"]);
+        let summary=unpaidByMember.get(m.id);
+        if(!summary){
+          summary={name:m.full_name||"—",oldWeeks:[],oldAmount:0,newAmount:0,penaltyAmount:0,penaltyWeeks:[]};
+          unpaidByMember.set(m.id,summary);
+        }
+        if(!payment){
+          if(wk===endWeek)summary.newAmount+=3;
+          else {summary.oldWeeks.push(dateOnly(wk));summary.oldAmount+=3;}
+        }
+        if(penaltyAmount>0){
+          summary.penaltyAmount+=penaltyAmount;
+          summary.penaltyWeeks.push(dateOnly(wk));
+        }
       }
       wk=plusDays(wk,7);
     }
   });
   paidRows.sort((a,b)=>String(b[1]).localeCompare(String(a[1]))||String(a[0]).localeCompare(String(b[0])));
-  unpaidRows.sort((a,b)=>String(b[1]).localeCompare(String(a[1]))||String(a[0]).localeCompare(String(b[0])));
+  const unpaidRows=[...unpaidByMember.values()]
+    .filter(x=>x.oldAmount+x.newAmount+x.penaltyAmount>0)
+    .sort((a,b)=>a.name.localeCompare(b.name))
+    .map(x=>[
+      x.name,
+      x.oldWeeks.length?x.oldWeeks.join(", "):"—",
+      fmt(x.oldAmount),
+      fmt(x.newAmount),
+      fmt(x.penaltyAmount),
+      fmt(x.oldAmount+x.newAmount+x.penaltyAmount),
+      x.penaltyWeeks.length?"Misy pénalité tsy voaloa":"Contribution tsy vita"
+    ]);
   renderTable("adminContributionsPaid",["Mpikambana","Herinandro","Contribution","Daty nandoavana"],paidRows);
-  renderTable("adminContributionsUnpaid",["Mpikambana","Herinandro","Contribution tokony haloana","Pénalité tsy voaloa","Total","Sata"],unpaidRows);
+  renderTable("adminContributionsUnpaid",["Mpikambana","Herinandro taloha tsy voaloa","Trosa taloha","Contribution vaovao","Pénalité tsy voaloa","TOTAL tokony haloana","Sata"],unpaidRows);
 }
 async function loadAdminLudoSCRequests(){
   const host=$("adminLudoSCRequests");
