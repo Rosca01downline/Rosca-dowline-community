@@ -465,3 +465,6 @@ body.admin-mode #appView > :not(.welcome):not(#adminView) {
 .referrals-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;font-weight:800;padding:15px 18px;border-radius:13px}.referrals-toggle-icon{font-size:1.25rem;line-height:1}.referrals-content{padding-top:14px}.referrals-content.hidden{display:none!important}
 
 .referrals-toggle{gap:10px}.referrals-earned-total{margin-left:auto;font-size:.9rem;font-weight:800;color:#ffe08a;white-space:nowrap}.referrals-toggle-icon{margin-left:2px}@media(max-width:420px){.referrals-earned-total{font-size:.75rem}}
+
+/* Ludo extra SC request accordion */
+.ludo-sc-request-accordion{margin:14px 0;border:1px solid var(--border-color,#d8e1ea);border-radius:14px;overflow:hidden;background:var(--panel-bg,#fff)}.ludo-sc-request-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;padding:15px 17px;font-weight:800;color:var(--text-color,inherit);background:var(--soft-bg,#eef4fa)}.ludo-sc-request-toggle::-webkit-details-marker{display:none}.ludo-sc-request-chevron{font-size:1.3rem;font-weight:800}.ludo-sc-request-accordion[open] .ludo-sc-request-chevron{transform:rotate(45deg)}.ludo-sc-request-accordion>.ludo-sc-request{margin:0;border:0;border-top:1px solid var(--border-color,#d8e1ea);border-radius:0}
