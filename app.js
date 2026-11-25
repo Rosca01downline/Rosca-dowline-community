@@ -1479,9 +1479,105 @@ async function loadAdminData(){
   const {data:m,error:me}=await db.from("members").select("id,full_name,phone,status,created_at").order("created_at",{ascending:false});
   if(me){msg("globalMsg","Membre admin: "+me.message,true);return;}
   renderMemberTable(m||[]);
+  await loadAdminWeeklyContributions(m||[]);
   await loadAdminTurns();
   await loadAdminLudoSCRequests();
 
+}
+async function loadAdminWeeklyContributions(members){
+  const paidHost=$("adminContributionsPaid");
+  const unpaidHost=$("adminContributionsUnpaid");
+  if(!paidHost||!unpaidHost)return;
+  paidHost.innerHTML='<p class="muted">Ampidirina...</p>';
+  unpaidHost.innerHTML='<p class="muted">Ampidirina...</p>';
+  const active=(members||[]).filter(m=>String(m.status||"").toLowerCase()==="active");
+  if(!active.length){
+    paidHost.innerHTML='<p class="muted">Tsy mbola misy mpikambana ACTIVE.</p>';
+    unpaidHost.innerHTML='<p class="muted">Tsy mbola misy mpikambana ACTIVE.</p>';
+    return;
+  }
+  const ids=active.map(m=>m.id);
+  const [{data:contributions,error:ce},{data:penalties,error:pe}]=await Promise.all([
+    db.from("contributions").select("id,member_id,amount,paid_at,status,week_date,created_at").in("member_id",ids).eq("status","approved").order("paid_at",{ascending:false}),
+    db.from("member_penalties").select("id,member_id,week_date,amount,status,created_at").in("member_id",ids).order("week_date",{ascending:false})
+  ]);
+  if(ce||pe){
+    const errorText=[ce&&("Contribution: "+ce.message),pe&&("Pénalité: "+pe.message)].filter(Boolean).join(" · ");
+    paidHost.innerHTML='<p class="muted">Tsy afaka namaky ny angona: '+esc(errorText)+'</p>';
+    unpaidHost.innerHTML='<p class="muted">Tsy afaka namaky ny angona: '+esc(errorText)+'</p>';
+    return;
+  }
+  const localDateKey=value=>{
+    if(!value)return "";
+    const d=new Date(value);
+    if(Number.isNaN(d.getTime()))return "";
+    const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Indian/Antananarivo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d);
+    const get=t=>parts.find(p=>p.type===t)?.value||"";
+    return get("year")+"-"+get("month")+"-"+get("day");
+  };
+  const dateKey=value=>{
+    if(!value)return "";
+    const str=String(value);
+    if(/^\\d{4}-\\d{2}-\\d{2}$/.test(str))return str;
+    return localDateKey(str);
+  };
+  const plusDays=(key,n)=>{
+    const [y,m,d]=key.split("-").map(Number);
+    const x=new Date(Date.UTC(y,m-1,d+n));
+    return x.toISOString().slice(0,10);
+  };
+  const saturdayOnOrAfter=key=>{
+    const [y,m,d]=key.split("-").map(Number);
+    const weekday=new Date(Date.UTC(y,m-1,d)).getUTCDay();
+    return plusDays(key,(6-weekday+7)%7);
+  };
+  const today=localDateKey(new Date());
+  const endWeek=saturdayOnOrAfter(today);
+  const names=new Map(active.map(m=>[m.id,m.full_name||"—"]));
+  const paidByWeek=new Map();
+  (contributions||[]).forEach(c=>{
+    let wk=dateKey(c.week_date);
+    if(!wk&&c.paid_at){
+      const paidDay=localDateKey(c.paid_at);
+      const [y,mo,d]=paidDay.split("-").map(Number);
+      if(new Date(Date.UTC(y,mo-1,d)).getUTCDay()===6)wk=paidDay;
+    }
+    if(!wk)return;
+    const key=c.member_id+"|"+wk;
+    const existing=paidByWeek.get(key);
+    if(!existing||new Date(c.paid_at||c.created_at||0)>new Date(existing.paid_at||existing.created_at||0))paidByWeek.set(key,c);
+  });
+  const penaltyByWeek=new Map();
+  (penalties||[]).forEach(p=>{
+    const key=p.member_id+"|"+dateKey(p.week_date);
+    const prev=penaltyByWeek.get(key);
+    if(!prev||String(p.status).toLowerCase()==="unpaid")penaltyByWeek.set(key,p);
+  });
+  const paidRows=[];
+  const unpaidRows=[];
+  active.forEach(m=>{
+    const activated=dateKey(m.activated_at||m.created_at);
+    if(!activated)return;
+    let wk=saturdayOnOrAfter(activated);
+    while(wk<=endWeek){
+      const key=m.id+"|"+wk;
+      const payment=paidByWeek.get(key);
+      const penalty=penaltyByWeek.get(key);
+      if(payment){
+        paidRows.push([m.full_name||"—",dateOnly(wk),fmt(payment.amount),date(payment.paid_at||payment.created_at)||"—"]);
+      }else{
+        const penaltyStatus=String(penalty?.status||"").toLowerCase();
+        const penaltyAmount=penaltyStatus==="unpaid"?Number(penalty.amount||0):0;
+        const contributionAmount=3;
+        unpaidRows.push([m.full_name||"—",dateOnly(wk),fmt(contributionAmount),penaltyAmount?fmt(penaltyAmount):"0.00",fmt(contributionAmount+penaltyAmount),penaltyAmount?"Tsy vita + pénalité":"Tsy vita"]);
+      }
+      wk=plusDays(wk,7);
+    }
+  });
+  paidRows.sort((a,b)=>String(b[1]).localeCompare(String(a[1]))||String(a[0]).localeCompare(String(b[0])));
+  unpaidRows.sort((a,b)=>String(b[1]).localeCompare(String(a[1]))||String(a[0]).localeCompare(String(b[0])));
+  renderTable("adminContributionsPaid",["Mpikambana","Herinandro","Contribution","Daty nandoavana"],paidRows);
+  renderTable("adminContributionsUnpaid",["Mpikambana","Herinandro","Contribution tokony haloana","Pénalité tsy voaloa","Total","Sata"],unpaidRows);
 }
 async function loadAdminLudoSCRequests(){
   const host=$("adminLudoSCRequests");
