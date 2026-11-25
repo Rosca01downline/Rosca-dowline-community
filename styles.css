@@ -419,3 +419,16 @@
 body.admin-mode #appView > :not(.welcome):not(#adminView) {
   display: none !important;
 }
+
+
+/* Single-button accordion for the full community rules and agreement. */
+.rules-accordion{border:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:14px;overflow:hidden}
+.rules-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;padding:16px 18px;font-weight:700;background:var(--panel-soft,rgba(100,140,180,.10))}
+.rules-toggle::-webkit-details-marker{display:none}
+.rules-toggle::after{content:"＋";font-size:20px;line-height:1}
+.rules-accordion[open]>.rules-toggle::after{content:"−"}
+.rules-toggle-state{font-size:12px;font-weight:600;opacity:.72}
+.rules-toggle-state::before{content:"Tsindrio raha hijery"}
+.rules-accordion[open]>.rules-toggle .rules-toggle-state::before{content:"Tsindrio raha hidio"}
+.rules-accordion-content{padding:14px}
+.rules-accordion-content>.rule-item:first-child{margin-top:0}
