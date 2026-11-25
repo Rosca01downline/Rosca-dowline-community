@@ -11,6 +11,7 @@ const fmt = (n) => `${Number(n||0).toFixed(8)} USDT`;
 const fmtMining = (n) => `${Number(n||0).toFixed(12)} USDT`;
 let currentUser = null, currentProfile = null, currentMember = null;
 let miningTicker = null;
+let communityRosterChannel = null;
 let miningDisplayState = null;
 
 let miningAudio = null;
@@ -1077,6 +1078,7 @@ async function boot(){
   show("adminView",profile.role==="admin");
   await loadMemberData();
   await loadCommunityLists();
+  subscribeCommunityRoster();
   await loadLudoRooms();
   if(profile.role==="admin") await loadAdminData();
 }
@@ -1362,6 +1364,15 @@ async function loadMyReferrals(member){
     date(x.joined_at)
   ]));
 }
+function subscribeCommunityRoster(){
+  if(communityRosterChannel) db.removeChannel(communityRosterChannel);
+  communityRosterChannel=db.channel("community-roster-live")
+    .on("postgres_changes",{event:"*",schema:"public",table:"members"},()=>{
+      loadCommunityLists();
+    })
+    .subscribe();
+}
+
 async function loadCommunityLists(){
   const rosterEl=$("memberRoster"),turnEl=$("publicTurnList");
   rosterEl.innerHTML='<p class="muted">Ampidirina...</p>';
