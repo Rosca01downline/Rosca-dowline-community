@@ -1457,7 +1457,7 @@ $("depositForm").addEventListener("submit",async e=>{
   }catch(error){
     depositMessage("Tsy tafiditra ny fangatahana dépôt: "+(error?.message||String(error)),true);
   }finally{
-    if(button) button.disabled=false;
+    if(button) button.disabled=!currentDepositDue || Number(currentDepositDue.amount)<=0;
   }
 });
 $("withdrawForm").addEventListener("submit",async e=>{
