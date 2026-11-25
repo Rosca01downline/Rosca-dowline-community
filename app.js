@@ -802,7 +802,7 @@ async function loadLudoWithdrawalData(){
     statusHost.innerHTML='<p class="error">Statut retrait: '+esc(statusError.message)+'</p>';
   }else{
     const unlocked=Boolean(status?.unlocked);
-    const method=status?.unlock_method==="referrals"?"15 filleuls directs L1 ACTIVE":"24 couronnes (envoyées + reçues, avec au moins 1 de chaque)";
+    const method=status?.unlock_method==="referrals"?"15 filleuls directs L1 ACTIVE":"20 couronnes (envoyées + reçues, avec au moins 1 de chaque)";
     statusHost.innerHTML=
       '<div class="ludo-withdrawal-metrics">'+
         '<div><small>Solde Ludo</small><strong>'+Number(status?.balance_sc||0).toLocaleString("fr-FR")+' SC</strong></div>'+
@@ -812,7 +812,7 @@ async function loadLudoWithdrawalData(){
       '</div>'+
       (unlocked
         ? '<p class="success-text">Déblocage acquis définitivement · '+esc(method)+'.</p>'
-        : '<p class="muted">Premier retrait mbola mihidy. Déblocage raha mahafeno ny iray amin’ireto: 15 filleuls directs L1 ACTIVE, na 24 couronnes total (farafahakeliny 1 nalefa sy 1 voaray).</p>');
+        : '<p class="muted">Premier retrait mbola mihidy. Déblocage raha mahafeno ny iray amin’ireto: 15 filleuls directs L1 ACTIVE, na 20 couronnes total (farafahakeliny 1 nalefa sy 1 voaray).</p>');
     const form=$("ludoWithdrawalForm");
     if(form) form.classList.toggle("hidden",!unlocked);
   }
