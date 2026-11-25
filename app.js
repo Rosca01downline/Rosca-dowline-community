@@ -719,6 +719,34 @@ if(ludoStatePoller) clearInterval(ludoStatePoller);
 ludoStatePoller=setInterval(()=>{if(currentLudoRoomId && !ludoBoardBusy) loadLudoGameState();},1000);
 
 
+async function loadLudoCrownGiftStats(){
+  const sentEl=$("ludoCrownSent");
+  const receivedEl=$("ludoCrownReceived");
+  if(!sentEl || !receivedEl || !currentMember?.id) return;
+  try{
+    const [{data:catalog,error:catalogError},{data:transfers,error:transferError}]=await Promise.all([
+      db.from("ludo_gift_catalog").select("gift_code,gift_name"),
+      db.from("ludo_gift_transfers")
+        .select("sender_member_id,recipient_member_id,gift_code")
+        .or("sender_member_id.eq."+currentMember.id+",recipient_member_id.eq."+currentMember.id)
+    ]);
+    if(catalogError) throw catalogError;
+    if(transferError) throw transferError;
+    const crownCodes=new Set((catalog||[])
+      .filter(g=>/couronne|crown/i.test(String(g.gift_name||"")+" "+String(g.gift_code||"")))
+      .map(g=>String(g.gift_code)));
+    const crownTransfers=(transfers||[]).filter(t=>crownCodes.has(String(t.gift_code)));
+    const sent=crownTransfers.filter(t=>t.sender_member_id===currentMember.id).length;
+    const received=crownTransfers.filter(t=>t.recipient_member_id===currentMember.id).length;
+    sentEl.textContent=sent.toLocaleString("fr-FR");
+    receivedEl.textContent=received.toLocaleString("fr-FR");
+  }catch(error){
+    console.warn("Ludo crown gift history not readable:",error?.message||error);
+    sentEl.textContent="—";
+    receivedEl.textContent="—";
+  }
+}
+
 async function loadLudoHeaderBalance(){
   const host=$("ludoHeaderBalance");
   if(!host) return;
@@ -736,6 +764,7 @@ async function loadLudoHeaderBalance(){
     return;
   }
   host.textContent="Solde : "+Number(data?.balance_sc||0).toLocaleString("fr-FR")+" SC";
+  await loadLudoCrownGiftStats();
 }
 
 async function initializeLudoVirtualBalance(){
@@ -891,6 +920,7 @@ $("ludoSendGiftBtn").addEventListener("click", async () => {
       msg("ludoSocialMsg","Cadeau nalefa ary voaisa ny SC.");
     }
     await loadLudoChat();
+    await loadLudoHeaderBalance();
   }catch(error){
     msg("ludoSocialMsg","Tsy tafavoaka ny cadeau: "+(error?.message||String(error)),true);
   }finally{button.disabled=false;}
