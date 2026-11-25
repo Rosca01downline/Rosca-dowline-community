@@ -1126,6 +1126,14 @@ async function loadLudoChat(){
 
 $("adminRefresh").addEventListener("click",loadAdminData);
 $("communityRefresh").addEventListener("click",loadCommunityLists);
+$("togglePublicTurnListBtn").addEventListener("click",()=>{
+  const button=$("togglePublicTurnListBtn");
+  const opening=button.getAttribute("aria-expanded")!=="true";
+  button.setAttribute("aria-expanded",String(opening));
+  show("publicTurnListPanel",opening);
+  $("publicTurnListToggleIcon").textContent=opening?"−":"＋";
+  if(opening) $("publicTurnListPanel").scrollIntoView({behavior:"smooth",block:"nearest"});
+});
 $("rolePill").addEventListener("click",()=>{
   const section=document.querySelector(".community-lists");
   if(section){section.scrollIntoView({behavior:"smooth",block:"start"});$("memberRoster").focus?.({preventScroll:true});}
