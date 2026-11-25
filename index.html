@@ -9,7 +9,6 @@
   <link rel="icon" href="icons/rosca-logo.svg" type="image/svg+xml">\n  <link rel="apple-touch-icon" href="icons/rosca-logo.svg">
   <title>ROSCA & DOWNLINE COMMUNITY</title>
   <link rel="stylesheet" href="styles.css?v=20261125-weekly-history-colors">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'"></script>
 </head>
 <body>
 <header class="top">
@@ -294,6 +293,36 @@
   <p id="globalMsg" class="message" role="status"></p>
 </main>
 <footer>© ROSCA & DOWNLINE COMMUNITY · USDT</footer>
-<script src="app.js?v=20261125-weekly-history-colors"></script>
+<script>
+(function(){
+  const status=document.getElementById("authMsg");
+  const sources=[
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+    "https://unpkg.com/@supabase/supabase-js@2"
+  ];
+  function loadApp(){
+    if(!window.supabase){
+      if(status) status.textContent="Tsy tafiditra ny service de connexion. Hamarino ny Internet dia havaozy ny pejy.";
+      return;
+    }
+    const app=document.createElement("script");
+    app.src="app.js?v=20261125-login-guard";
+    app.onerror=function(){if(status)status.textContent="Tsy afaka nampiditra ny application. Havaozy ny pejy na andramo Chrome."};
+    document.body.appendChild(app);
+  }
+  function trySource(index){
+    if(index>=sources.length){
+      if(status)status.textContent="Tsy afaka mifandray amin'ny service de connexion. Hamarino ny Internet, vonoy VPN/Data Saver raha misy, dia tsindrio Havaozy.";
+      return;
+    }
+    const script=document.createElement("script");
+    script.src=sources[index];
+    script.onload=function(){if(window.supabase)loadApp();else trySource(index+1)};
+    script.onerror=function(){trySource(index+1)};
+    document.head.appendChild(script);
+  }
+  trySource(0);
+})();
+</script>
 </body>
 </html>
