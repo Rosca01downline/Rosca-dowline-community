@@ -1361,6 +1361,14 @@ async function loadChallengeData(){
   }
 }
 
+$("toggleMyReferralsBtn").addEventListener("click",()=>{
+  const content=$("myReferralsContent");
+  const opening=content.classList.contains("hidden");
+  content.classList.toggle("hidden",!opening);
+  $("toggleMyReferralsBtn").setAttribute("aria-expanded",String(opening));
+  $("toggleMyReferralsBtn").querySelector(".referrals-toggle-icon").textContent=opening?"−":"＋";
+});
+
 async function loadMyReferrals(member){
   const panel=$("myReferralsPanel");
   if(!member || String(member.status).toLowerCase()!=="active"){
@@ -1368,6 +1376,9 @@ async function loadMyReferrals(member){
     return;
   }
   show("myReferralsPanel",true);
+  show("myReferralsContent",false);
+  $("toggleMyReferralsBtn").setAttribute("aria-expanded","false");
+  $("toggleMyReferralsBtn").querySelector(".referrals-toggle-icon").textContent="＋";
   $("myReferralsList").innerHTML='<p class="muted">Ampidirina...</p>';
   const {data:referrals,error}=await db.rpc("get_my_referrals");
   if(error){
