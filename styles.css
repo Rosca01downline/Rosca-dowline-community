@@ -533,3 +533,5 @@ body.admin-mode #appView > :not(.welcome):not(#adminView) {
 #ludoWithdrawalForm{padding:12px;border:1px solid #dbe6f4;border-radius:12px;background:#fff;margin:10px 0}
 #ludoWithdrawalForm.hidden{display:none!important}
 @media(max-width:380px){.ludo-withdrawal-metrics{grid-template-columns:1fr 1fr}.ludo-withdrawal-metrics strong{font-size:14px}}
+
+.ludo-withdrawal-estimate{display:flex;flex-direction:column;gap:4px;margin:10px 0;padding:12px;border:1px solid #b9d2f2;border-radius:10px;background:#edf5ff}.ludo-withdrawal-estimate span,.ludo-withdrawal-estimate small{color:#52647a;font-size:12px}.ludo-withdrawal-estimate strong{font-size:20px;color:#173b69}
