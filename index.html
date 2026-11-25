@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/rosca-logo.svg" type="image/svg+xml">\n  <link rel="apple-touch-icon" href="icons/rosca-logo.svg">
   <title>ROSCA & DOWNLINE COMMUNITY</title>
-  <link rel="stylesheet" href="styles.css?v=20261125-ludo-withdrawal-direct-payout">
+  <link rel="stylesheet" href="styles.css?v=20261125-ludo-withdrawal-direct-payout-v2">
 </head>
 <body>
 <header class="top">
@@ -187,6 +187,10 @@
         <section class="ludo-sc-request panel">
           <p class="muted">Conversion: 1 000 SC = 1 USDT · Retrait minimum: 1 000 SC · Frais échange/retrait: 0 SC. Ny USDT dia alefa mivantana amin’ny FaucetPay; tsy miditra amin’ny Commission ROSCA.</p>
           <div id="ludoWithdrawalStatus" class="ludo-withdrawal-status"><p class="muted">Ampidirina...</p></div>
+            <div id="ludoWithdrawalEstimate" class="ludo-withdrawal-estimate" aria-live="polite">
+              <span>USDT horaisina</span><strong id="ludoWithdrawalUsdt">0.000 USDT</strong>
+              <small>Frais: 0 SC · 0 USDT</small>
+            </div>
           <form id="ludoWithdrawalForm" class="hidden">
             <label>Vola alaina (SC)
               <input id="ludoWithdrawalAmount" type="number" min="1000" step="1" required placeholder="1000">
@@ -194,10 +198,6 @@
             <label>Email FaucetPay
               <input id="ludoWithdrawalEmail" type="email" required autocomplete="email" placeholder="email@example.com">
             </label>
-            <div id="ludoWithdrawalEstimate" class="ludo-withdrawal-estimate" aria-live="polite">
-              <span>USDT horaisina</span><strong id="ludoWithdrawalUsdt">0.000 USDT</strong>
-              <small>Frais: 0 SC · 0 USDT</small>
-            </div>
             <p id="ludoWithdrawalMsg" class="message" role="status"></p>
             <button class="btn primary" type="submit">DEMANDER LE RETRAIT</button>
           </form>
@@ -385,7 +385,7 @@
       return;
     }
     const app=document.createElement("script");
-    app.src="app.js?v=20261125-ludo-withdrawal-direct-payout";
+    app.src="app.js?v=20261125-ludo-withdrawal-direct-payout-v2";
     app.onerror=function(){if(status)status.textContent="Tsy afaka nampiditra ny application. Havaozy ny pejy na andramo Chrome."};
     document.body.appendChild(app);
   }
