@@ -789,6 +789,8 @@ async function loadLudoWithdrawalData(){
   const historyHost=$("myLudoWithdrawals");
   if(!currentMember?.id || !statusHost || !historyHost) return;
   statusHost.innerHTML='<p class="muted">Ampidirina ny fepetra retrait...</p>';
+  const emailInput=$("ludoWithdrawalEmail");
+  if(emailInput && !emailInput.value) emailInput.value=currentUser?.email||"";
   const [{data:status,error:statusError},{data:rows,error:rowsError}]=await Promise.all([
     db.rpc("get_ludo_withdrawal_status"),
     db.from("ludo_withdrawal_requests")
