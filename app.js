@@ -783,6 +783,78 @@ $("ludoSCRequestRefreshBtn").addEventListener("click",loadMyLudoSCRequests);
 
 
 // Fangatahana SC fanampiny: wallet Ludo ihany.
+
+async function loadLudoWithdrawalData(){
+  const statusHost=$("ludoWithdrawalStatus");
+  const historyHost=$("myLudoWithdrawals");
+  if(!currentMember?.id || !statusHost || !historyHost) return;
+  statusHost.innerHTML='<p class="muted">Ampidirina ny fepetra retrait...</p>';
+  const [{data:status,error:statusError},{data:rows,error:rowsError}]=await Promise.all([
+    db.rpc("get_ludo_withdrawal_status"),
+    db.from("ludo_withdrawal_requests")
+      .select("id,amount_sc,amount_usdt,faucetpay_email,status,admin_message,faucetpay_tx_id,created_at,reviewed_at,paid_at")
+      .eq("member_id",currentMember.id)
+      .order("created_at",{ascending:false})
+  ]);
+  if(statusError){
+    statusHost.innerHTML='<p class="error">Statut retrait: '+esc(statusError.message)+'</p>';
+  }else{
+    const unlocked=Boolean(status?.unlocked);
+    const method=status?.unlock_method==="referrals"?"15 filleuls directs L1 ACTIVE":"24 couronnes (envoyées + reçues, avec au moins 1 de chaque)";
+    statusHost.innerHTML=
+      '<div class="ludo-withdrawal-metrics">'+
+        '<div><small>Solde Ludo</small><strong>'+Number(status?.balance_sc||0).toLocaleString("fr-FR")+' SC</strong></div>'+
+        '<div><small>Filleuls L1 ACTIVE</small><strong>'+Number(status?.active_l1||0)+'/15</strong></div>'+
+        '<div><small>Couronnes envoyées</small><strong>'+Number(status?.crown_sent||0)+'</strong></div>'+
+        '<div><small>Couronnes reçues</small><strong>'+Number(status?.crown_received||0)+'</strong></div>'+
+      '</div>'+
+      (unlocked
+        ? '<p class="success-text">Déblocage acquis définitivement · '+esc(method)+'.</p>'
+        : '<p class="muted">Premier retrait mbola mihidy. Déblocage raha mahafeno ny iray amin’ireto: 15 filleuls directs L1 ACTIVE, na 24 couronnes total (farafahakeliny 1 nalefa sy 1 voaray).</p>');
+    const form=$("ludoWithdrawalForm");
+    if(form) form.classList.toggle("hidden",!unlocked);
+  }
+  if(rowsError){
+    historyHost.innerHTML='<p class="error">Historique: '+esc(rowsError.message)+'</p>';
+    return;
+  }
+  if(!rows?.length){
+    historyHost.innerHTML='<p class="muted">Mbola tsy misy fangatahana retrait Ludo.</p>';
+    return;
+  }
+  historyHost.innerHTML='<div class="table-wrap"><table><thead><tr><th>SC</th><th>USDT</th><th>Sata</th><th>FaucetPay TxID</th><th>Fanazavana Admin</th><th>Daty</th></tr></thead><tbody>'+
+    rows.map(x=>'<tr><td>'+Number(x.amount_sc).toLocaleString("fr-FR")+'</td><td>'+Number(x.amount_usdt).toFixed(3)+'</td><td>'+esc(String(x.status||"").toUpperCase())+'</td><td>'+esc(x.faucetpay_tx_id||"—")+'</td><td>'+esc(x.admin_message||"—")+'</td><td>'+esc(date(x.created_at))+'</td></tr>').join("")+
+    '</tbody></table></div>';
+}
+$("ludoWithdrawalRefreshBtn").addEventListener("click",loadLudoWithdrawalData);
+$("ludoWithdrawalForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!currentUser||!currentMember?.id) return;
+  const amount=Number($("ludoWithdrawalAmount").value);
+  const email=$("ludoWithdrawalEmail").value.trim();
+  if(!Number.isSafeInteger(amount)||amount<1000){
+    msg("ludoWithdrawalMsg","Retrait minimum: 1 000 SC.",true);return;
+  }
+  if(!email){msg("ludoWithdrawalMsg","Ampidiro ny email FaucetPay.",true);return;}
+  const button=e.currentTarget.querySelector('button[type="submit"]');
+  button.disabled=true;
+  msg("ludoWithdrawalMsg","Alefa ny fangatahana retrait Ludo...");
+  try{
+    const {data,error}=await db.rpc("request_ludo_withdrawal",{
+      p_amount_sc:amount,
+      p_faucetpay_email:email
+    });
+    if(error) throw error;
+    e.currentTarget.reset();
+    $("ludoWithdrawalEmail").value=currentUser.email||"";
+    msg("ludoWithdrawalMsg","Voaray ny fangatahana: "+Number(data?.amount_sc||amount).toLocaleString("fr-FR")+" SC = "+Number(data?.amount_usdt||amount/1000).toFixed(3)+" USDT. Miandry fanamarinana Admin.");
+    await loadLudoWithdrawalData();
+    await loadLudoHeaderBalance();
+  }catch(error){
+    msg("ludoWithdrawalMsg","Tsy tafiditra ny fangatahana: "+(error?.message||String(error)),true);
+  }finally{button.disabled=false;}
+});
+
 async function loadMyLudoSCRequests(){
   if(!currentMember?.id) return;
   const host=$("myLudoSCRequests");
@@ -1187,6 +1259,7 @@ async function boot(){
   await loadCommunityLists();
   subscribeCommunityRoster();
   await loadLudoRooms();
+  await loadLudoWithdrawalData();
   if(profile.role==="admin") await loadAdminData();
 }
 
@@ -1667,6 +1740,7 @@ async function loadAdminData(){
   await loadAdminWeeklyContributions(m||[]);
   await loadAdminTurns();
   await loadAdminLudoSCRequests();
+  await loadAdminLudoWithdrawals();
 
 }
 async function loadAdminWeeklyContributions(members){
@@ -1813,6 +1887,30 @@ async function loadAdminLudoSCRequests(){
     data.map(x=>'<tr><td>'+esc(names.get(x.member_id)||"—")+'</td><td>'+Number(x.requested_sc).toLocaleString("fr-FR")+'</td><td>'+esc(x.request_message)+'</td><td>'+esc(x.status.toUpperCase())+'</td><td>'+esc(x.admin_message||"—")+'</td><td>'+esc(date(x.created_at))+'</td><td>'+(x.status==="pending"?'<button class="action" data-action="review-ludo-sc" data-decision="approved" data-id="'+esc(x.id)+'">CONFIRMER</button> <button class="action reject" data-action="review-ludo-sc" data-decision="rejected" data-id="'+esc(x.id)+'">REFUSER</button>':"—")+'</td></tr>').join("")+
     "</tbody></table>";
 }
+
+async function loadAdminLudoWithdrawals(){
+  const host=$("adminLudoWithdrawals");
+  if(!host) return;
+  host.innerHTML='<p class="muted">Ampidirina...</p>';
+  const {data,error}=await db.from("ludo_withdrawal_requests")
+    .select("id,member_id,amount_sc,amount_usdt,faucetpay_email,status,admin_message,faucetpay_tx_id,created_at")
+    .order("created_at",{ascending:false});
+  if(error){host.innerHTML='<p class="error">'+esc(error.message)+'</p>';return;}
+  if(!data?.length){host.innerHTML='<p class="muted">Tsy mbola misy fangatahana retrait Ludo.</p>';return;}
+  const ids=[...new Set(data.map(x=>x.member_id))];
+  const {data:members,error:memberError}=await db.from("members").select("id,full_name").in("id",ids);
+  if(memberError){host.innerHTML='<p class="error">'+esc(memberError.message)+'</p>';return;}
+  const names=new Map((members||[]).map(x=>[x.id,x.full_name]));
+  host.innerHTML='<div class="table-wrap"><table><thead><tr><th>Mpikambana</th><th>SC</th><th>USDT</th><th>Email FaucetPay</th><th>Sata</th><th>TxID</th><th>Daty</th><th>Action</th></tr></thead><tbody>'+
+    data.map(x=>{
+      let action="—";
+      if(x.status==="pending") action='<button class="action" data-action="review-ludo-withdrawal" data-decision="approved" data-id="'+esc(x.id)+'">APPROUVER</button> <button class="action reject" data-action="review-ludo-withdrawal" data-decision="rejected" data-id="'+esc(x.id)+'">REFUSER</button>';
+      else if(x.status==="approved") action='<button class="action" data-action="complete-ludo-withdrawal" data-id="'+esc(x.id)+'">CONFIRMER PAIEMENT + TxID</button>';
+      return '<tr><td>'+esc(names.get(x.member_id)||"—")+'</td><td>'+Number(x.amount_sc).toLocaleString("fr-FR")+'</td><td>'+Number(x.amount_usdt).toFixed(3)+'</td><td>'+esc(x.faucetpay_email)+'</td><td>'+esc(String(x.status).toUpperCase())+'</td><td>'+esc(x.faucetpay_tx_id||"—")+'</td><td>'+esc(date(x.created_at))+'</td><td>'+action+'</td></tr>';
+    }).join("")+
+    '</tbody></table></div>';
+}
+
 async function loadAdminTurns(){
 
   const [{data:current,error:currentError},{data:history,error:historyError}]=await Promise.all([
@@ -1861,6 +1959,43 @@ document.addEventListener("click",async e=>{
     msg("globalMsg",review==="approved"?"Voamarina ny fangatahana ary nampidirina ao amin'ny solde Ludo ny SC.":"Nolavina ny fangatahana ary voatahiry ny fanazavana.");
     await loadAdminLudoSCRequests();
     await loadLudoGameState();
+    return;
+  }
+
+
+  if(decision==="review-ludo-withdrawal"){
+    const review=b.dataset.decision;
+    let note=null;
+    if(review==="rejected"){
+      note=prompt("Antony handavana ny retrait (tsy maintsy fenoina):");
+      if(note===null)return;
+      if(!note.trim())return alert("Ilaina ny antony handavana.");
+    }else if(!confirm("Hankato ny fangatahana retrait Ludo ve? Hamarino fa misy vola ampy ao amin'ny mpamatsy alohan'ny handoavana."))return;
+    b.disabled=true;
+    const {error}=await db.rpc("review_ludo_withdrawal_request",{
+      p_request_id:id,p_decision:review,p_admin_message:note
+    });
+    if(error){msg("globalMsg",error.message,true);b.disabled=false;return;}
+    msg("globalMsg",review==="approved"?"Nankatoavina ny retrait Ludo. Alefaso ny paiement vao ampidirina ny TxID.":"Nolavina ny retrait Ludo ary naverina amin'ny solde SC ilay vola.");
+    await loadAdminLudoWithdrawals();
+    await loadLudoWithdrawalData();
+    await loadLudoHeaderBalance();
+    return;
+  }
+  if(decision==="complete-ludo-withdrawal"){
+    if(!confirm("Efa nalefanao tamin'ny FaucetPay ve ny vola?"))return;
+    const txid=prompt("Ampidiro ny FaucetPay Transaction ID (obligatoire):");
+    if(txid===null)return;
+    if(!txid.trim())return alert("Tsy maintsy misy FaucetPay TxID.");
+    b.disabled=true;
+    const {error}=await db.rpc("finalize_ludo_withdrawal_request",{
+      p_request_id:id,p_faucetpay_tx_id:txid.trim()
+    });
+    if(error){msg("globalMsg",error.message,true);b.disabled=false;return;}
+    msg("globalMsg","Vita ny retrait Ludo. Voatahiry ny FaucetPay TxID.");
+    await loadAdminLudoWithdrawals();
+    await loadLudoWithdrawalData();
+    await loadLudoHeaderBalance();
     return;
   }
 
