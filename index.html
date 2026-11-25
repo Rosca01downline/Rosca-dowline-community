@@ -224,9 +224,14 @@
     </section>
 
     <section class="panel community-lists">
-      <div class="section-head"><h2>Lisitry ny communauté</h2><button class="btn ghost small" id="communityRefresh" type="button">Havaozy</button></div>
-      <h3>Mpikambana</h3><div id="memberRoster" class="table-wrap"></div>
-      <h3>Lisitra fandraisana tour</h3><div id="publicTurnList" class="table-wrap"></div>
+      <details class="community-list-accordion">
+        <summary class="community-list-toggle"><span>👥 Lisitry ny communauté</span><span class="community-list-chevron" aria-hidden="true">＋</span></summary>
+        <div class="community-list-content">
+          <div class="section-head"><h2>Lisitry ny communauté</h2><button class="btn ghost small" id="communityRefresh" type="button">Havaozy</button></div>
+          <h3>Mpikambana</h3><div id="memberRoster" class="table-wrap"></div>
+          <h3>Lisitra fandraisana tour</h3><div id="publicTurnList" class="table-wrap"></div>
+        </div>
+      </details>
     </section>
 
     <section id="myReferralsPanel" class="panel hidden">
