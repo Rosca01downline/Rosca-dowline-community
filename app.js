@@ -1042,7 +1042,7 @@ function playLudoIncomingSound(){
       osc.type=choice==="pop"?"triangle":"sine";
       osc.frequency.setValueAtTime(note.f,ctx.currentTime+note.t);
       gain.gain.setValueAtTime(.0001,ctx.currentTime+note.t);
-      gain.gain.exponentialRampToValueAtTime(.16,ctx.currentTime+note.t+.015);
+      gain.gain.exponentialRampToValueAtTime(.65,ctx.currentTime+note.t+.015);
       gain.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+note.t+note.d);
       osc.connect(gain);gain.connect(ctx.destination);
       osc.start(ctx.currentTime+note.t);osc.stop(ctx.currentTime+note.t+note.d+.02);
