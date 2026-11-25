@@ -486,3 +486,12 @@ body.admin-mode #appView > :not(.welcome):not(#adminView) {
 .ludo-open-rooms-chevron{font-size:1.3rem;font-weight:800;transition:transform .18s ease}
 .ludo-open-rooms-accordion[open] .ludo-open-rooms-chevron{transform:rotate(45deg)}
 .ludo-open-rooms-accordion>.ludo-room-join{margin:0;padding:15px;border:0;border-top:1px solid var(--border-color,#d8e1ea);border-radius:0}
+
+
+/* Ludo: Message sy Cadeau ao anaty bokotra tokana */
+.ludo-social-accordion{margin:14px 0;border:1px solid var(--border-color,#d8e1ea);border-radius:14px;overflow:hidden;background:var(--panel-bg,#fff)}
+.ludo-social-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;padding:15px 17px;font-weight:800;color:var(--text-color,inherit);background:var(--soft-bg,#eef4fa)}
+.ludo-social-toggle::-webkit-details-marker{display:none}
+.ludo-social-chevron{font-size:1.3rem;font-weight:800;transition:transform .18s ease}
+.ludo-social-accordion[open] .ludo-social-chevron{transform:rotate(45deg)}
+.ludo-social-content{padding:14px;border-top:1px solid var(--border-color,#d8e1ea)}
