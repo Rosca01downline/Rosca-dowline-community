@@ -522,3 +522,14 @@ body.admin-mode #appView > :not(.welcome):not(#adminView) {
 .ludo-crown-sent{color:#1672d3}
 .ludo-crown-received{color:#8b45c6}
 .ludo-crown-separator{color:#64748b;font-weight:700}
+
+/* Ludo SC withdrawal: separate virtual wallet flow */
+.ludo-withdrawal-status{margin:10px 0;padding:12px;border:1px solid #cbdcf0;border-radius:12px;background:#f5f9ff}
+.ludo-withdrawal-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ludo-withdrawal-metrics>div{display:flex;flex-direction:column;gap:3px;padding:9px;border-radius:9px;background:#fff;border:1px solid #dbe6f4}
+.ludo-withdrawal-metrics small{font-size:11px;color:#52647a}
+.ludo-withdrawal-metrics strong{font-size:16px;color:#173b69}
+.ludo-withdrawal-status .success-text{color:#087443;font-weight:800;margin:10px 0 0}
+#ludoWithdrawalForm{padding:12px;border:1px solid #dbe6f4;border-radius:12px;background:#fff;margin:10px 0}
+#ludoWithdrawalForm.hidden{display:none!important}
+@media(max-width:380px){.ludo-withdrawal-metrics{grid-template-columns:1fr 1fr}.ludo-withdrawal-metrics strong{font-size:14px}}
