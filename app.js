@@ -828,6 +828,13 @@ async function loadLudoWithdrawalData(){
     rows.map(x=>'<tr><td>'+Number(x.amount_sc).toLocaleString("fr-FR")+'</td><td>'+Number(x.amount_usdt).toFixed(3)+'</td><td>'+esc(String(x.status||"").toUpperCase())+'</td><td>'+esc(x.faucetpay_tx_id||"—")+'</td><td>'+esc(x.admin_message||"—")+'</td><td>'+esc(date(x.created_at))+'</td></tr>').join("")+
     '</tbody></table></div>';
 }
+function updateLudoWithdrawalEstimate(){
+  const amount=Number($("ludoWithdrawalAmount")?.value||0);
+  const usdt=Number.isSafeInteger(amount)&&amount>0?amount/1000:0;
+  const output=$("ludoWithdrawalUsdt");
+  if(output) output.textContent=usdt.toFixed(3)+" USDT";
+}
+$("ludoWithdrawalAmount").addEventListener("input",updateLudoWithdrawalEstimate);
 $("ludoWithdrawalRefreshBtn").addEventListener("click",loadLudoWithdrawalData);
 $("ludoWithdrawalForm").addEventListener("submit",async e=>{
   e.preventDefault();
