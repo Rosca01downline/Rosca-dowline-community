@@ -1376,6 +1376,9 @@ async function loadMyReferrals(member){
     return;
   }
   show("myReferralsPanel",true);
+  const {data:earnedCommissions,error:earnedError}=await db.from("referral_commissions").select("amount").eq("member_id",member.id);
+  const earnedTotal=(earnedCommissions||[]).reduce((sum,item)=>sum+Number(item.amount||0),0);
+  $("referralEarnedTotal").textContent=earnedError?"Bonus: — USDT":"Bonus: "+earnedTotal.toFixed(8)+" USDT";
   show("myReferralsContent",false);
   $("toggleMyReferralsBtn").setAttribute("aria-expanded","false");
   $("toggleMyReferralsBtn").querySelector(".referrals-toggle-icon").textContent="＋";
