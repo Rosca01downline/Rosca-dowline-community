@@ -1015,6 +1015,56 @@ async function loadLudoRoomMembers(){
     msg("ludoRoomStatus","Erreur mpilalao: "+(error?.message||String(error)),true);
   }
 }
+let ludoUnreadCount=0;
+let ludoMessageAudioContext=null;
+function updateLudoUnreadBadge(){
+  const badge=$("ludoUnreadBadge");
+  if(!badge)return;
+  badge.textContent=ludoUnreadCount>99?"99+":String(ludoUnreadCount);
+  badge.hidden=ludoUnreadCount===0;
+}
+function playLudoIncomingSound(){
+  const choice=$("ludoMessageSound")?.value||"ding";
+  const AudioCtx=window.AudioContext||window.webkitAudioContext;
+  if(!AudioCtx)return;
+  try{
+    if(!ludoMessageAudioContext)ludoMessageAudioContext=new AudioCtx();
+    const ctx=ludoMessageAudioContext;
+    if(ctx.state==="suspended")ctx.resume();
+    const patterns={
+      ding:[{f:880,t:0,d:.16},{f:1175,t:.12,d:.22}],
+      bell:[{f:660,t:0,d:.32},{f:880,t:.18,d:.38}],
+      pop:[{f:520,t:0,d:.07},{f:760,t:.08,d:.09}],
+      chime:[{f:784,t:0,d:.18},{f:988,t:.16,d:.18},{f:1175,t:.32,d:.28}]
+    };
+    (patterns[choice]||patterns.ding).forEach(note=>{
+      const osc=ctx.createOscillator(),gain=ctx.createGain();
+      osc.type=choice==="pop"?"triangle":"sine";
+      osc.frequency.setValueAtTime(note.f,ctx.currentTime+note.t);
+      gain.gain.setValueAtTime(.0001,ctx.currentTime+note.t);
+      gain.gain.exponentialRampToValueAtTime(.16,ctx.currentTime+note.t+.015);
+      gain.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+note.t+note.d);
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.start(ctx.currentTime+note.t);osc.stop(ctx.currentTime+note.t+note.d+.02);
+    });
+  }catch(_){}
+}
+const ludoSocialAccordion=document.querySelector(".ludo-social-accordion");
+if(ludoSocialAccordion){
+  ludoSocialAccordion.addEventListener("toggle",()=>{
+    if(ludoSocialAccordion.open){ludoUnreadCount=0;updateLudoUnreadBadge();}
+  });
+}
+$("ludoMessageSound")?.addEventListener("change",()=>{
+  try{localStorage.setItem("roscaLudoMessageSound",$("ludoMessageSound").value);}catch(_){}
+  playLudoIncomingSound();
+});
+try{
+  const savedLudoSound=localStorage.getItem("roscaLudoMessageSound");
+  if(savedLudoSound&&$("ludoMessageSound")?.querySelector('option[value="'+savedLudoSound+'"]'))$("ludoMessageSound").value=savedLudoSound;
+}catch(_){}
+updateLudoUnreadBadge();
+
 async function loadLudoChat(){
   const feed=$("ludoChatFeed");
   if(!currentLudoRoomId){
@@ -1025,7 +1075,7 @@ async function loadLudoChat(){
     if(ludoChatChannel) await db.removeChannel(ludoChatChannel);
     const roomId=currentLudoRoomId;
     ludoChatChannel=db.channel("ludo-chat-"+roomId)
-      .on("postgres_changes",{event:"INSERT",schema:"public",table:"ludo_chat_messages",filter:"room_id=eq."+roomId},()=>{if(currentLudoRoomId===roomId) loadLudoChat();})
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"ludo_chat_messages",filter:"room_id=eq."+roomId},payload=>{if(currentLudoRoomId!==roomId)return;const incoming=payload?.new;if(incoming?.sender_member_id&&incoming.sender_member_id!==currentMember?.id){if(!ludoSocialAccordion?.open){ludoUnreadCount++;updateLudoUnreadBadge();}playLudoIncomingSound();}loadLudoChat();})
       .on("postgres_changes",{event:"INSERT",schema:"public",table:"ludo_chat_gift_events",filter:"room_id=eq."+roomId},()=>{if(currentLudoRoomId===roomId) loadLudoChat();})
       .subscribe();
     ludoChatChannelRoomId=roomId;
