@@ -192,21 +192,29 @@
           </div>
         </section>
       </div>
-      <div class="ludo-chat-feed" id="ludoChatFeed" aria-live="polite"><p class="muted">Safidio aloha ny room.</p></div>
-      <form id="ludoChatForm" class="ludo-chat-form">
-        <label>Hafatra<input id="ludoChatInput" maxlength="2000" placeholder="Soraty eto ny hafatra..." autocomplete="off"></label>
-        <button class="btn primary" type="submit">Alefa</button>
-      </form>
-      <div class="ludo-gift-row">
-        <label>Handefa cadeau ho an'i
-          <select id="ludoGiftRecipient"><option value="">Safidio ny mpandray</option></select>
-        </label>
-        <label>Cadeau
-          <select id="ludoGiftCode"><option value="">Safidio ny cadeau</option></select>
-        </label>
-        <button id="ludoSendGiftBtn" class="btn secondary" type="button">🎁 Alefa cadeau visuel</button>
-      </div>
-      <p id="ludoSocialMsg" class="message" role="status"></p>
+      <details class="ludo-social-accordion">
+        <summary class="ludo-social-toggle">
+          <span>💬 Message &amp; 🎁 Cadeau</span>
+          <span class="ludo-social-chevron" aria-hidden="true">＋</span>
+        </summary>
+        <div class="ludo-social-content">
+          <div class="ludo-chat-feed" id="ludoChatFeed" aria-live="polite"><p class="muted">Safidio aloha ny room.</p></div>
+          <form id="ludoChatForm" class="ludo-chat-form">
+            <label>Hafatra<input id="ludoChatInput" maxlength="2000" placeholder="Soraty eto ny hafatra..." autocomplete="off"></label>
+            <button class="btn primary" type="submit">Alefa</button>
+          </form>
+          <div class="ludo-gift-row">
+            <label>Handefa cadeau ho an'i
+              <select id="ludoGiftRecipient"><option value="">Safidio ny mpandray</option></select>
+            </label>
+            <label>Cadeau
+              <select id="ludoGiftCode"><option value="">Safidio ny cadeau</option></select>
+            </label>
+            <button id="ludoSendGiftBtn" class="btn secondary" type="button">🎁 Alefa cadeau visuel</button>
+          </div>
+          <p id="ludoSocialMsg" class="message" role="status"></p>
+        </div>
+      </details>
 
       </div>
       </details>
