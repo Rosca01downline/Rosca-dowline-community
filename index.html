@@ -203,16 +203,21 @@
     </section>
 
     <section id="myReferralsPanel" class="panel hidden">
-      <div class="section-head"><h2>MES FILLEULS</h2><button class="btn ghost small" type="button" onclick="loadMemberData()">Havaozy</button></div>
-      <div id="referralPanel" class="referral-panel hidden">
-        <h3>Lien de parrainage</h3>
-        <p class="muted">1,05$ bonus/filluela retrait immédiat</p>
-        <div class="referral-link-row"><input id="referralLink" type="text" readonly aria-label="Lien de parrainage"><button id="copyReferralBtn" class="btn primary" type="button">Copier</button><button id="shareReferralBtn" class="btn secondary" type="button">Partager</button></div>
-        <p id="referralMsg" class="muted" role="status"></p>
+      <button id="toggleMyReferralsBtn" class="btn primary referrals-toggle" type="button" aria-expanded="false" aria-controls="myReferralsContent">
+        MES FILLEULS <span class="referrals-toggle-icon" aria-hidden="true">＋</span>
+      </button>
+      <div id="myReferralsContent" class="referrals-content hidden">
+        <div class="section-head"><h2>MES FILLEULS</h2><button class="btn ghost small" type="button" onclick="loadMemberData()">Havaozy</button></div>
+        <div id="referralPanel" class="referral-panel hidden">
+          <h3>Lien de parrainage</h3>
+          <p class="muted">1,05$ bonus/filluela retrait immédiat</p>
+          <div class="referral-link-row"><input id="referralLink" type="text" readonly aria-label="Lien de parrainage"><button id="copyReferralBtn" class="btn primary" type="button">Copier</button><button id="shareReferralBtn" class="btn secondary" type="button">Partager</button></div>
+          <p id="referralMsg" class="muted" role="status"></p>
+        </div>
+        <p id="myReferralsCounts" class="muted">Total: 0 · ACTIVE: 0 · PENDING: 0</p>
+        <div id="myReferralsList" class="table-wrap"></div>
+        <p class="muted">Ny filleul ACTIVE ihany no isaina amin'ny bonus Mining parrainage. Ny PENDING dia mbola miandry activation.</p>
       </div>
-      <p id="myReferralsCounts" class="muted">Total: 0 · ACTIVE: 0 · PENDING: 0</p>
-      <div id="myReferralsList" class="table-wrap"></div>
-      <p class="muted">Ny filleul ACTIVE ihany no isaina amin'ny bonus Mining parrainage. Ny PENDING dia mbola miandry activation.</p>
     </section>
 
     <div class="action-shortcuts">
