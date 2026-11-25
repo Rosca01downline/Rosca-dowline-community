@@ -104,10 +104,23 @@ document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
 }));
 
 $("loginForm").addEventListener("submit",async e=>{
-  e.preventDefault(); msg("authMsg","Miditra...");
-  const {error}=await db.auth.signInWithPassword({email:$("loginEmail").value.trim(),password:$("loginPassword").value});
-  if(error) return msg("authMsg",error.message,true);
-  await boot();
+  e.preventDefault();
+  const email=$("loginEmail").value.trim();
+  const password=$("loginPassword").value;
+  msg("authMsg","Miditra...");
+  const button=$("loginForm").querySelector('button[type="submit"]');
+  if(button){button.disabled=true;button.textContent="Miandry...";}
+  try{
+    if(!window.supabase || !db || !db.auth) throw new Error("Tsy tafiditra ny service de connexion. Havaozy ny pejy ary hamarino ny Internet.");
+    const {error}=await db.auth.signInWithPassword({email,password});
+    if(error) throw error;
+    await boot();
+  }catch(error){
+    console.error("Login error:",error);
+    msg("authMsg",error.message||"Tsy nahomby ny fidirana. Andramo indray.",true);
+  }finally{
+    if(button){button.disabled=false;button.textContent="Hiditra";}
+  }
 });
 $("signupForm").addEventListener("submit",async e=>{
   e.preventDefault();
