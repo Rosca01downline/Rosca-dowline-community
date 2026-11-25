@@ -457,3 +457,6 @@ body.admin-mode #appView > :not(.welcome):not(#adminView) {
 .ludo-accordion[open]>.ludo-accordion-content{display:block!important}
 .ludo-toggle{user-select:none}
 @media(max-width:480px){.ludo-toggle{padding:12px;gap:11px}.ludo-toggle-image{width:54px;height:54px;flex-basis:54px}.ludo-toggle-copy strong{font-size:14px}.ludo-accordion-content{padding:12px}}
+
+/* Solde SC du membre visible directement sur le bouton ESPACE LUDO */
+.ludo-header-balance{display:inline-flex;align-items:center;align-self:flex-start;margin-top:3px;padding:4px 9px;border-radius:999px;background:#facc15;color:#172554;font-size:12px;font-weight:900;line-height:1.2;box-shadow:0 2px 5px #0003}
