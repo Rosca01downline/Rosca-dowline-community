@@ -409,3 +409,7 @@
 .mining-sound-btn .sound-label{font-size:9px;letter-spacing:.04em}
 .mining-sound-btn.is-playing{background:#0b7b54;border-color:#a9f5d2}
 .mining-sound-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+
+/* Weekly contribution history: alternating text colors by week/tour */
+#adminContributionsPaid tr.weekly-week-a td{color:#1456a0;font-weight:700}
+#adminContributionsPaid tr.weekly-week-b td{color:#13805b;font-weight:700}
