@@ -1490,7 +1490,21 @@ async function loadCommunityLists(){
     }
   }
   if(turnError) turnEl.innerHTML='<p class="error">Tsy afaka mamaky ny lisitry ny tours: '+esc(turnError.message)+'</p>';
-  else renderTurnRows("publicTurnList",(turns||[]).map(x=>({turn_number:x.turn_number,scheduled_date:x.scheduled_date,receiver_name:x.receiver_name,status:x.turn_status,faucetpay_tx_id:x.faucetpay_tx_id,paid_at:x.paid_at})),false);
+  else {
+    // In the community section, show only turns assigned to ACTIVE members.
+    // Sort by scheduled date first, then by the official turn number.
+    const activeNames=new Set((roster||[])
+      .filter(x=>String(x.member_status||"").toLowerCase()==="active")
+      .map(x=>String(x.full_name||"").trim().toLowerCase()));
+    const activeTurns=(turns||[])
+      .filter(x=>activeNames.has(String(x.receiver_name||"").trim().toLowerCase()))
+      .sort((a,b)=>{
+        const da=String(a.scheduled_date||"9999-12-31");
+        const db=String(b.scheduled_date||"9999-12-31");
+        return da.localeCompare(db)||Number(a.turn_number||0)-Number(b.turn_number||0);
+      });
+    renderTurnRows("publicTurnList",activeTurns.map(x=>({turn_number:x.turn_number,scheduled_date:x.scheduled_date,receiver_name:x.receiver_name,status:x.turn_status,faucetpay_tx_id:x.faucetpay_tx_id,paid_at:x.paid_at})),false);
+  }
 }
 function turnStatusBadge(status){
   const value=String(status||"").toLowerCase();
