@@ -1062,11 +1062,12 @@ $("rolePill").addEventListener("click",()=>{
 
 async function boot(){
   const {data:{user}}=await db.auth.getUser();
-  if(!user){show("authView",true);show("appView",false);show("logoutBtn",false);return;}
+  if(!user){document.body.classList.remove("admin-mode");show("authView",true);show("appView",false);show("logoutBtn",false);return;}
   currentUser=user;
   const {data:profile,error:pErr}=await db.from("profiles").select("id,full_name,email,role").eq("id",user.id).single();
   if(pErr){msg("globalMsg","Tsy afaka mamaky profil: "+pErr.message,true);return;}
   currentProfile=profile;
+  document.body.classList.toggle("admin-mode",profile.role==="admin");
   const {data:member}=await db.from("members").select("id,full_name,phone,status,membership_fee_paid").eq("auth_user_id",user.id).maybeSingle();
   currentMember=member;
   show("authView",false);show("appView",true);show("logoutBtn",true);
