@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/rosca-logo.svg" type="image/svg+xml">\n  <link rel="apple-touch-icon" href="icons/rosca-logo.svg">
   <title>ROSCA & DOWNLINE COMMUNITY</title>
-  <link rel="stylesheet" href="styles.css?v=20261125-ludo-balance-1">
+  <link rel="stylesheet" href="styles.css?v=20261125-referral-inside-filleuls">
 </head>
 <body>
 <header class="top">
@@ -202,15 +202,14 @@
       <h3>Lisitra fandraisana tour</h3><div id="publicTurnList" class="table-wrap"></div>
     </section>
 
-    <section id="referralPanel" class="panel referral-panel hidden">
-      <h2>Lien de parrainage</h2>
-      <p class="muted">Zarao amin’ny namanao ity lien manokana ity. Rehefa misoratra amin’io izy ireo dia ho voarakitra ho olona nasainao.</p>
-      <div class="referral-link-row"><input id="referralLink" type="text" readonly aria-label="Lien de parrainage"><button id="copyReferralBtn" class="btn primary" type="button">Copier</button><button id="shareReferralBtn" class="btn secondary" type="button">Partager</button></div>
-      <p id="referralMsg" class="muted" role="status"></p>
-    </section>
-
     <section id="myReferralsPanel" class="panel hidden">
       <div class="section-head"><h2>MES FILLEULS</h2><button class="btn ghost small" type="button" onclick="loadMemberData()">Havaozy</button></div>
+      <div id="referralPanel" class="referral-panel hidden">
+        <h3>Lien de parrainage</h3>
+        <p class="muted">Zarao amin’ny namanao ity lien manokana ity. Rehefa misoratra amin’io izy ireo dia ho voarakitra ho olona nasainao.</p>
+        <div class="referral-link-row"><input id="referralLink" type="text" readonly aria-label="Lien de parrainage"><button id="copyReferralBtn" class="btn primary" type="button">Copier</button><button id="shareReferralBtn" class="btn secondary" type="button">Partager</button></div>
+        <p id="referralMsg" class="muted" role="status"></p>
+      </div>
       <p id="myReferralsCounts" class="muted">Total: 0 · ACTIVE: 0 · PENDING: 0</p>
       <div id="myReferralsList" class="table-wrap"></div>
       <p class="muted">Ny filleul ACTIVE ihany no isaina amin'ny bonus Mining parrainage. Ny PENDING dia mbola miandry activation.</p>
