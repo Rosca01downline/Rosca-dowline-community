@@ -724,22 +724,21 @@ async function loadLudoCrownGiftStats(){
   const receivedEl=$("ludoCrownReceived");
   if(!sentEl || !receivedEl || !currentMember?.id) return;
   try{
-    const [{data:catalog,error:catalogError},{data:transfers,error:transferError}]=await Promise.all([
-      db.from("ludo_gift_catalog").select("gift_code,gift_name"),
+    // Code exact confirmé dans ludo_gift_catalog : couronne
+    const [{count:sent,error:sentError},{count:received,error:receivedError}]=await Promise.all([
       db.from("ludo_gift_transfers")
-        .select("sender_member_id,recipient_member_id,gift_code")
-        .or("sender_member_id.eq."+currentMember.id+",recipient_member_id.eq."+currentMember.id)
+        .select("id",{count:"exact",head:true})
+        .eq("gift_code","couronne")
+        .eq("sender_member_id",currentMember.id),
+      db.from("ludo_gift_transfers")
+        .select("id",{count:"exact",head:true})
+        .eq("gift_code","couronne")
+        .eq("recipient_member_id",currentMember.id)
     ]);
-    if(catalogError) throw catalogError;
-    if(transferError) throw transferError;
-    const crownCodes=new Set((catalog||[])
-      .filter(g=>/couronne|crown/i.test(String(g.gift_name||"")+" "+String(g.gift_code||"")))
-      .map(g=>String(g.gift_code)));
-    const crownTransfers=(transfers||[]).filter(t=>crownCodes.has(String(t.gift_code)));
-    const sent=crownTransfers.filter(t=>t.sender_member_id===currentMember.id).length;
-    const received=crownTransfers.filter(t=>t.recipient_member_id===currentMember.id).length;
-    sentEl.textContent=sent.toLocaleString("fr-FR");
-    receivedEl.textContent=received.toLocaleString("fr-FR");
+    if(sentError) throw sentError;
+    if(receivedError) throw receivedError;
+    sentEl.textContent=Number(sent||0).toLocaleString("fr-FR");
+    receivedEl.textContent=Number(received||0).toLocaleString("fr-FR");
   }catch(error){
     console.warn("Ludo crown gift history not readable:",error?.message||error);
     sentEl.textContent="—";
