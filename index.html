@@ -130,16 +130,21 @@
           <button id="ludoCreateRoomBtn" class="btn primary" type="button">＋ Créer room</button>
         </div>
       </details>
-      <div class="ludo-room-join">
-        <h3>Room ONLINE misokatra</h3>
-        <label>Recherche room (code na ID)
-          <input id="ludoRoomSearch" type="search" placeholder="Ohatra: 3b57f031" autocomplete="off">
-        </label>
-        <label>Safidio ny room hidirana
-          <select id="ludoOpenRoomSelect"><option value="">Mitady room...</option></select>
-        </label>
-        <button id="ludoJoinRoomBtn" class="btn secondary" type="button">Rejoindre room</button>
-      </div>
+      <details class="ludo-open-rooms-accordion">
+        <summary class="ludo-open-rooms-toggle">
+          <span>🌐 Room ONLINE misokatra</span>
+          <span class="ludo-open-rooms-chevron" aria-hidden="true">＋</span>
+        </summary>
+        <div class="ludo-room-join">
+          <label>Recherche room (code na ID)
+            <input id="ludoRoomSearch" type="search" placeholder="Ohatra: 3b57f031" autocomplete="off">
+          </label>
+          <label>Safidio ny room hidirana
+            <select id="ludoOpenRoomSelect"><option value="">Mitady room...</option></select>
+          </label>
+          <button id="ludoJoinRoomBtn" class="btn secondary" type="button">Rejoindre room</button>
+        </div>
+      </details>
       <label>Room efa nidiranao
         <select id="ludoRoomSelect"><option value="">Mitady room...</option></select>
       </label>
