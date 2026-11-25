@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Ludo board and dice">
+  <defs><clipPath id="board"><rect x="8" y="8" width="112" height="112" rx="18"/></clipPath></defs>
+  <rect x="5" y="5" width="118" height="118" rx="22" fill="#102a43"/>
+  <g clip-path="url(#board)">
+    <rect x="8" y="8" width="56" height="56" fill="#e74c3c"/>
+    <rect x="64" y="8" width="56" height="56" fill="#2eae72"/>
+    <rect x="8" y="64" width="56" height="56" fill="#f4c542"/>
+    <rect x="64" y="64" width="56" height="56" fill="#3988e8"/>
+    <path d="M64 48 80 64 64 80 48 64Z" fill="#fff"/>
+    <path d="M64 48 64 80 48 64Z" fill="#f4c542"/>
+    <path d="M64 48 80 64 64 80Z" fill="#3988e8"/>
+    <path d="M48 64 64 80 64 48Z" fill="#e74c3c"/>
+    <path d="M80 64 64 80 64 48Z" fill="#2eae72"/>
+    <g fill="#fff" stroke="#dce6f2" stroke-width="2">
+      <circle cx="25" cy="25" r="9"/><circle cx="47" cy="25" r="9"/><circle cx="25" cy="47" r="9"/><circle cx="47" cy="47" r="9"/>
+      <circle cx="81" cy="25" r="9"/><circle cx="103" cy="25" r="9"/><circle cx="81" cy="47" r="9"/><circle cx="103" cy="47" r="9"/>
+      <circle cx="25" cy="81" r="9"/><circle cx="47" cy="81" r="9"/><circle cx="25" cy="103" r="9"/><circle cx="47" cy="103" r="9"/>
+      <circle cx="81" cy="81" r="9"/><circle cx="103" cy="81" r="9"/><circle cx="81" cy="103" r="9"/><circle cx="103" cy="103" r="9"/>
+    </g>
+  </g>
+  <rect x="80" y="76" width="39" height="39" rx="9" fill="#fff" stroke="#102a43" stroke-width="4"/>
+  <g fill="#102a43"><circle cx="91" cy="87" r="3.5"/><circle cx="108" cy="104" r="3.5"/><circle cx="99.5" cy="95.5" r="3.5"/></g>
+</svg>
