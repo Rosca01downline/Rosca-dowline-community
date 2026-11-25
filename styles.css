@@ -438,3 +438,22 @@ body.admin-mode #appView > :not(.welcome):not(#adminView) {
 .rules-accordion:not([open])>.rules-accordion-content{display:none!important}
 .rules-accordion[open]>.rules-accordion-content{display:block!important}
 .rules-accordion>.rules-toggle{user-select:none}
+
+
+/* Ludo space accordion: collapsed by default, with a clear illustrated entry button. */
+.ludo-panel{padding:0;overflow:hidden}
+.ludo-accordion{border:0;border-radius:14px;overflow:hidden}
+.ludo-toggle{display:flex;align-items:center;gap:14px;list-style:none;cursor:pointer;padding:14px 16px;background:linear-gradient(115deg,#102a43,#1d4e89);color:#fff;min-height:86px}
+.ludo-toggle::-webkit-details-marker{display:none}
+.ludo-toggle::after{content:"＋";font-size:24px;line-height:1;margin-left:auto;color:#fff}
+.ludo-accordion[open]>.ludo-toggle::after{content:"−"}
+.ludo-toggle-image{width:62px;height:62px;flex:0 0 62px;object-fit:contain;border-radius:14px;background:#fff;padding:3px;box-shadow:0 3px 10px rgba(0,0,0,.22)}
+.ludo-toggle-copy{display:flex;flex-direction:column;gap:5px;min-width:0}
+.ludo-toggle-copy strong{font-size:15px;letter-spacing:.06em}
+.ludo-toggle-copy small{font-size:13px;opacity:.9}
+.ludo-toggle-state{display:none}
+.ludo-accordion-content{padding:16px}
+.ludo-accordion:not([open])>.ludo-accordion-content{display:none!important}
+.ludo-accordion[open]>.ludo-accordion-content{display:block!important}
+.ludo-toggle{user-select:none}
+@media(max-width:480px){.ludo-toggle{padding:12px;gap:11px}.ludo-toggle-image{width:54px;height:54px;flex-basis:54px}.ludo-toggle-copy strong{font-size:14px}.ludo-accordion-content{padding:12px}}
