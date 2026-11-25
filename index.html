@@ -194,10 +194,13 @@
       </div>
       <details class="ludo-social-accordion">
         <summary class="ludo-social-toggle">
-          <span>💬 Message &amp; 🎁 Cadeau</span>
+          <span>💬 Message &amp; 🎁 Cadeau <span id="ludoUnreadBadge" class="ludo-unread-badge" hidden>0</span></span>
           <span class="ludo-social-chevron" aria-hidden="true">＋</span>
         </summary>
         <div class="ludo-social-content">
+          <label class="ludo-sound-setting">Feon’ny message miditra
+            <select id="ludoMessageSound"><option value="ding">Ding</option><option value="bell">Cloche</option><option value="pop">Pop</option><option value="chime">Chime</option></select>
+          </label>
           <div class="ludo-chat-feed" id="ludoChatFeed" aria-live="polite"><p class="muted">Safidio aloha ny room.</p></div>
           <form id="ludoChatForm" class="ludo-chat-form">
             <label>Hafatra<input id="ludoChatInput" maxlength="2000" placeholder="Soraty eto ny hafatra..." autocomplete="off"></label>
