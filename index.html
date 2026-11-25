@@ -282,10 +282,11 @@
       </section>
       <section class="panel" id="withdrawPanel">
         <div class="section-head"><h2>Fangatahana retrait</h2><button class="btn ghost small" type="button" data-close-forms>Hidio</button></div>
-        <p class="muted">Alefa amin’ny email FaucetPay. Ny retrait épargne dia manana minimum 15 USDT.</p>
+        <p class="muted">Alefa amin’ny email FaucetPay. Commission: minimum 1 USDT. Épargne sy Mining: minimum 15 USDT avy.</p>
         <form id="withdrawForm">
-          <label>Karazana retrait<select id="withdrawType"><option value="commission">Commission</option><option value="savings">Épargne (minimum 15 USDT)</option></select></label>
-          <label>Vola (USDT)<input id="withdrawAmount" type="number" min="0.00000001" step="0.00000001" required></label>
+          <label>Karazana retrait<select id="withdrawType"><option value="commission">Commission (minimum 1 USDT)</option><option value="savings">Épargne (minimum 15 USDT)</option><option value="mining">Mining (minimum 15 USDT)</option></select></label>
+          <small id="withdrawMinimumInfo" class="muted">Minimum: 1 USDT</small>
+          <label>Vola (USDT)<input id="withdrawAmount" type="number" min="1" step="0.00000001" required></label>
           <label>Email FaucetPay<input id="withdrawEmail" type="email" required></label>
           <button class="btn primary" type="submit">Hangataka retrait</button>
         </form>
@@ -355,7 +356,7 @@
       return;
     }
     const app=document.createElement("script");
-    app.src="app.js?v=20261125-turn-list-button";
+    app.src="app.js?v=20261125-mining-withdrawal";
     app.onerror=function(){if(status)status.textContent="Tsy afaka nampiditra ny application. Havaozy ny pejy na andramo Chrome."};
     document.body.appendChild(app);
   }
