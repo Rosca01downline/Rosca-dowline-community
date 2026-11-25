@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/rosca-logo.svg" type="image/svg+xml">\n  <link rel="apple-touch-icon" href="icons/rosca-logo.svg">
   <title>ROSCA & DOWNLINE COMMUNITY</title>
-  <link rel="stylesheet" href="styles.css?v=20261125-referral-inside-filleuls">
+  <link rel="stylesheet" href="styles.css?v=20261125-turn-list-button">
 </head>
 <body>
 <header class="top">
@@ -229,7 +229,7 @@
         <div class="community-list-content">
           <div class="section-head"><h2>Lisitry ny communauté</h2><button class="btn ghost small" id="communityRefresh" type="button">Havaozy</button></div>
           <h3>Mpikambana</h3><div id="memberRoster" class="table-wrap"></div>
-          <h3>Lisitra fandraisana tour</h3><div id="publicTurnList" class="table-wrap"></div>
+          <button id="togglePublicTurnListBtn" class="btn primary full turn-list-toggle" type="button" aria-expanded="false" aria-controls="publicTurnListPanel">📋 LISITRY NY FANDRAISANA TOUR <span id="publicTurnListToggleIcon" aria-hidden="true">＋</span></button><div id="publicTurnListPanel" class="hidden"><div id="publicTurnList" class="table-wrap"></div></div>
         </div>
       </details>
     </section>
