@@ -1599,7 +1599,17 @@ async function loadAdminWeeklyContributions(members){
       fmt(x.oldAmount+x.newAmount+x.penaltyAmount),
       x.penaltyWeeks.length?"Misy pénalité tsy voaloa":"Contribution tsy vita"
     ]);
-  renderTable("adminContributionsPaid",["Mpikambana","Herinandro","Contribution","Daty nandoavana"],paidRows);
+  const paidHost=$( "adminContributionsPaid" );
+  if(!paidRows.length){
+    paidHost.innerHTML='<p class="muted">Tsy mbola misy contribution voaloa.</p>';
+  }else{
+    const weekColors=new Map();
+    const weekKeys=[...new Set(paidRows.map(row=>String(row[1])))].sort((a,b)=>b.localeCompare(a));
+    weekKeys.forEach((week,index)=>weekColors.set(week,index%2===0?"weekly-week-a":"weekly-week-b"));
+    paidHost.innerHTML="<table><thead><tr>"+["Mpikambana","Herinandro / Tour","Contribution","Daty nandoavana"].map(h=>'<th>'+esc(h)+'</th>').join("")+"</tr></thead><tbody>"+
+      paidRows.map(row=>'<tr class="'+weekColors.get(String(row[1]))+'">'+row.map(value=>'<td>'+esc(String(value??""))+'</td>').join("")+"</tr>").join("")+
+      "</tbody></table>";
+  }
   renderTable("adminContributionsUnpaid",["Mpikambana","Herinandro taloha tsy voaloa","Trosa taloha","Contribution vaovao","Pénalité tsy voaloa","TOTAL tokony haloana","Sata"],unpaidRows);
 }
 async function loadAdminLudoSCRequests(){
