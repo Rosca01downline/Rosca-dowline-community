@@ -512,3 +512,13 @@ body.admin-mode #appView > :not(.welcome):not(#adminView) {
 .community-list-accordion[open] .community-list-chevron{transform:rotate(45deg)}
 .community-list-content{padding:14px;border-top:1px solid var(--border-color,#d8e1ea)}
 .community-list-accordion:not([open])>.community-list-content{display:none!important}
+
+
+/* Ludo: compteur des couronnes envoyées (bleu) et reçues (violet) près du solde SC */
+.ludo-header-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:3px}
+.ludo-header-meta .ludo-header-balance{margin-top:0}
+.ludo-crown-stats{display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:999px;background:#fff;color:#26344a;font-size:12px;font-weight:900;line-height:1.2;box-shadow:0 2px 5px #0003}
+.ludo-crown-stats>span:first-child{font-size:15px}
+.ludo-crown-sent{color:#1672d3}
+.ludo-crown-received{color:#8b45c6}
+.ludo-crown-separator{color:#64748b;font-weight:700}
