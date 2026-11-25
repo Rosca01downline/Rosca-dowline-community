@@ -1476,7 +1476,7 @@ async function loadAdminData(){
   const {data:w,error:we}=await db.from("withdrawal_requests").select("id,member_id,amount,status,withdrawal_type,faucetpay_email,faucetpay_tx_id,created_at").order("created_at",{ascending:false});
   if(we){msg("globalMsg","Retrait admin: "+we.message,true);return;}
   $("adminWithdrawals").innerHTML=tableWithActions(["Vola","Karazana","Sata","Email FaucetPay","Transaction ID","Daty"],(w||[]).map(x=>({id:x.id,status:x.status,values:[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,x.faucetpay_tx_id||"—",date(x.created_at)]})),"withdrawal");
-  const {data:m,error:me}=await db.from("members").select("id,full_name,phone,status,created_at").order("created_at",{ascending:false});
+  const {data:m,error:me}=await db.from("members").select("id,full_name,phone,status,created_at,activated_at").order("created_at",{ascending:false});
   if(me){msg("globalMsg","Membre admin: "+me.message,true);return;}
   renderMemberTable(m||[]);
   await loadAdminWeeklyContributions(m||[]);
@@ -1563,13 +1563,14 @@ async function loadAdminWeeklyContributions(members){
       const key=m.id+"|"+wk;
       const payment=paidByWeek.get(key);
       const penalty=penaltyByWeek.get(key);
+      const penaltyStatus=String(penalty?.status||"").toLowerCase();
+      const penaltyAmount=penaltyStatus==="unpaid"?Number(penalty.amount||0):0;
       if(payment){
         paidRows.push([m.full_name||"—",dateOnly(wk),fmt(payment.amount),date(payment.paid_at||payment.created_at)||"—"]);
-      }else{
-        const penaltyStatus=String(penalty?.status||"").toLowerCase();
-        const penaltyAmount=penaltyStatus==="unpaid"?Number(penalty.amount||0):0;
-        const contributionAmount=3;
-        unpaidRows.push([m.full_name||"—",dateOnly(wk),fmt(contributionAmount),penaltyAmount?fmt(penaltyAmount):"0.00",fmt(contributionAmount+penaltyAmount),penaltyAmount?"Tsy vita + pénalité":"Tsy vita"]);
+      }
+      if(!payment||penaltyAmount>0){
+        const contributionAmount=payment?0:3;
+        unpaidRows.push([m.full_name||"—",dateOnly(wk),fmt(contributionAmount),penaltyAmount?fmt(penaltyAmount):"0.00",fmt(contributionAmount+penaltyAmount),payment?"Pénalité tsy voaloa":"Contribution tsy vita"]);
       }
       wk=plusDays(wk,7);
     }
