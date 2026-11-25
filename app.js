@@ -814,7 +814,12 @@ async function loadLudoWithdrawalData(){
         ? '<p class="success-text">Déblocage acquis définitivement · '+esc(method)+'.</p>'
         : '<p class="muted">Premier retrait mbola mihidy. Déblocage raha mahafeno ny iray amin’ireto: 15 filleuls directs L1 ACTIVE, na 20 couronnes total (farafahakeliny 1 nalefa sy 1 voaray).</p>');
     const form=$("ludoWithdrawalForm");
-    if(form) form.classList.toggle("hidden",!unlocked);
+    if(form){
+      form.classList.remove("hidden");
+      form.dataset.withdrawalUnlocked=unlocked?"true":"false";
+      const submit=form.querySelector('button[type="submit"]');
+      if(submit) submit.disabled=!unlocked;
+    }
   }
   if(rowsError){
     historyHost.innerHTML='<p class="error">Historique: '+esc(rowsError.message)+'</p>';
@@ -839,6 +844,10 @@ $("ludoWithdrawalRefreshBtn").addEventListener("click",loadLudoWithdrawalData);
 $("ludoWithdrawalForm").addEventListener("submit",async e=>{
   e.preventDefault();
   if(!currentUser||!currentMember?.id) return;
+  if(e.currentTarget.dataset.withdrawalUnlocked!=="true"){
+    msg("ludoWithdrawalMsg","Mbola mihidy ny premier retrait. Tsy azo alefa ny demande raha tsy mahafeno ny fepetra déblocage: 15 filleuls directs L1 ACTIVE na 20 couronnes (farafahakeliny 1 nalefa sy 1 voaray).",true);
+    return;
+  }
   const amount=Number($("ludoWithdrawalAmount").value);
   const email=$("ludoWithdrawalEmail").value.trim();
   if(!Number.isSafeInteger(amount)||amount<1000){
