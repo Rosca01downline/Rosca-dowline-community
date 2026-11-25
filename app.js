@@ -1518,7 +1518,7 @@ async function loadAdminWeeklyContributions(members){
   const dateKey=value=>{
     if(!value)return "";
     const str=String(value);
-    if(/^\\d{4}-\\d{2}-\\d{2}$/.test(str))return str;
+    if(/^\d{4}-\d{2}-\d{2}$/.test(str))return str;
     return localDateKey(str);
   };
   const plusDays=(key,n)=>{
