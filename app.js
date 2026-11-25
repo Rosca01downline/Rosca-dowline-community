@@ -1372,12 +1372,21 @@ async function loadCommunityLists(){
   ]);
   if(rosterError) rosterEl.innerHTML='<p class="error">Tsy afaka mamaky ny lisitry ny mpikambana: '+esc(rosterError.message)+'</p>';
   else {
-    renderTable("memberRoster",["Laharana","Anarana","Sata","Daty nidirana"],(roster||[]).map(x=>[x.member_number,x.full_name,x.member_status,date(x.joined_at)]));
+    // Show ACTIVE members first and move PENDING members to the end.
+    // Keep the original member_number values and preserve order within each status.
+    const orderedRoster=[...(roster||[])].sort((a,b)=>{
+      const rank=status=>{
+        const value=String(status||"").toLowerCase();
+        return value==="active"?0:value==="pending"?2:1;
+      };
+      return rank(a.member_status)-rank(b.member_status);
+    });
+    renderTable("memberRoster",["Laharana","Anarana","Sata","Daty nidirana"],orderedRoster.map(x=>[x.member_number,x.full_name,x.member_status,date(x.joined_at)]));
     if(currentProfile?.role!=="admin" && currentMember){
       const myName=currentMember.full_name||currentProfile?.full_name||"";
-      const myIndex=(roster||[]).findIndex(x=>String(x.full_name||"").trim().toLowerCase()===String(myName).trim().toLowerCase());
+      const myIndex=orderedRoster.findIndex(x=>String(x.full_name||"").trim().toLowerCase()===String(myName).trim().toLowerCase());
       if(myIndex>=0){
-        const myNumber=roster[myIndex].member_number||myIndex+1;
+        const myNumber=orderedRoster[myIndex].member_number||myIndex+1;
         $("rolePill").textContent=String(myNumber)+"/"+String(roster.length);
       } else {
         $("rolePill").textContent="MEMBRE";
