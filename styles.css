@@ -460,3 +460,6 @@ body.admin-mode #appView > :not(.welcome):not(#adminView) {
 
 /* Solde SC du membre visible directement sur le bouton ESPACE LUDO */
 .ludo-header-balance{display:inline-flex;align-items:center;align-self:flex-start;margin-top:3px;padding:4px 9px;border-radius:999px;background:#facc15;color:#172554;font-size:12px;font-weight:900;line-height:1.2;box-shadow:0 2px 5px #0003}
+
+/* MES FILLEULS single-button accordion */
+.referrals-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;font-weight:800;padding:15px 18px;border-radius:13px}.referrals-toggle-icon{font-size:1.25rem;line-height:1}.referrals-content{padding-top:14px}.referrals-content.hidden{display:none!important}
