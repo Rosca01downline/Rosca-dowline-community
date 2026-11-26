@@ -841,11 +841,22 @@ function updateLudoWithdrawalEstimate(){
 }
 $("ludoWithdrawalAmount").addEventListener("input",updateLudoWithdrawalEstimate);
 $("ludoWithdrawalRefreshBtn").addEventListener("click",loadLudoWithdrawalData);
+let ludoWithdrawalUnlockMessageTimer=null;
 $("ludoWithdrawalForm").addEventListener("submit",async e=>{
   e.preventDefault();
   if(!currentUser||!currentMember?.id) return;
   if(e.currentTarget.dataset.withdrawalUnlocked!=="true"){
-    msg("ludoWithdrawalMsg","Tsy mbola nahatratra ny déblocage premier retrait ianao. Fenoy aloha ny iray amin’ireto fepetra ireto: 15 filleuls directs L1 ACTIVE, na 20 couronnes total (farafahakeliny 1 nalefa sy 1 voaray). Tsy nalefa ny demande ary tsy nisy SC nesorina.",true);
+    const unlockMessage="Tsy mbola nahatratra ny déblocage premier retrait ianao. Fenoy aloha ny iray amin’ireto fepetra ireto: 15 filleuls directs L1 ACTIVE, na 20 couronnes total (farafahakeliny 1 nalefa sy 1 voaray). Tsy nalefa ny demande ary tsy nisy SC nesorina.";
+    msg("ludoWithdrawalMsg",unlockMessage,true);
+    if(ludoWithdrawalUnlockMessageTimer) clearTimeout(ludoWithdrawalUnlockMessageTimer);
+    ludoWithdrawalUnlockMessageTimer=setTimeout(()=>{
+      const messageHost=$("ludoWithdrawalMsg");
+      if(messageHost && messageHost.textContent===unlockMessage){
+        messageHost.textContent="";
+        messageHost.classList.remove("error");
+      }
+      ludoWithdrawalUnlockMessageTimer=null;
+    },60000);
     return;
   }
   const amount=Number($("ludoWithdrawalAmount").value);
