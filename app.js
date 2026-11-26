@@ -818,7 +818,7 @@ async function loadLudoWithdrawalData(){
       form.classList.remove("hidden");
       form.dataset.withdrawalUnlocked=unlocked?"true":"false";
       const submit=form.querySelector('button[type="submit"]');
-      if(submit) submit.disabled=!unlocked;
+      if(submit) submit.disabled=false;
     }
   }
   if(rowsError){
@@ -845,7 +845,7 @@ $("ludoWithdrawalForm").addEventListener("submit",async e=>{
   e.preventDefault();
   if(!currentUser||!currentMember?.id) return;
   if(e.currentTarget.dataset.withdrawalUnlocked!=="true"){
-    msg("ludoWithdrawalMsg","Mbola mihidy ny premier retrait. Tsy azo alefa ny demande raha tsy mahafeno ny fepetra déblocage: 15 filleuls directs L1 ACTIVE na 20 couronnes (farafahakeliny 1 nalefa sy 1 voaray).",true);
+    msg("ludoWithdrawalMsg","Tsy mbola nahatratra ny déblocage premier retrait ianao. Fenoy aloha ny iray amin’ireto fepetra ireto: 15 filleuls directs L1 ACTIVE, na 20 couronnes total (farafahakeliny 1 nalefa sy 1 voaray). Tsy nalefa ny demande ary tsy nisy SC nesorina.",true);
     return;
   }
   const amount=Number($("ludoWithdrawalAmount").value);
