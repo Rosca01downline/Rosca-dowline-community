@@ -918,31 +918,58 @@ $("ludoSCRequestForm").addEventListener("submit",async e=>{
   finally{button.disabled=false;}
 });
 
+ 
 $("ludoCreateRoomBtn").addEventListener("click", async () => {
-  const button=$("ludoCreateRoomBtn");
-  if(!currentMember?.id || String(currentMember.status).toLowerCase()!=="active"){
-    msg("ludoSocialMsg","Kaonty ACTIVE ihany no afaka mamorona room.",true); return;
+  const button = $("ludoCreateRoomBtn");
+
+  if (!currentMember?.id || String(currentMember.status).toLowerCase() !== "active") {
+    msg("ludoSocialMsg", "Kaonty ACTIVE ihany no afaka mamorona room.", true);
+    return;
   }
-  button.disabled=true;
-  msg("ludoSocialMsg","Mamorona room...");
-  try{
-        const {data,error}=await db.rpc("create_ludo_room",{
-      p_game_mode:$("ludoGameMode").value,
-      p_player_count:Number($("ludoPlayerCount").value),
-      p_stake_sc:Number($("ludoStakeSC").value)
+
+  const enteredPin = window.prompt("Ampidiro ny Code PIN Ludo (6 chiffres):");
+
+  if (enteredPin === null) {
+    msg("ludoSocialMsg", "Nofoanana ny famoronana room.");
+    return;
+  }
+
+  const createPin = enteredPin.trim();
+
+  if (!/^[0-9]{6}$/.test(createPin)) {
+    msg("ludoSocialMsg", "PIN diso endrika: chiffres 6 no ilaina.", true);
+    return;
+  }
+
+  button.disabled = true;
+  msg("ludoSocialMsg", "Fanamarinana PIN sy famoronana room...");
+
+  try {
+    const { data, error } = await db.rpc("create_ludo_room", {
+      p_game_mode: $("ludoGameMode").value,
+      p_player_count: Number($("ludoPlayerCount").value),
+      p_stake_sc: Number($("ludoStakeSC").value),
+      p_create_pin: createPin
     });
-    if(error) throw error;
-    currentLudoRoomId=data;
+
+    if (error) throw error;
+
+    currentLudoRoomId = data;
     await initializeLudoVirtualBalance();
-    msg("ludoSocialMsg","Voaforona ny room! Solde Ludo virtuel voamarina.");
+
+    msg("ludoSocialMsg", "Voaforona ny room! Solde Ludo virtuel voamarina.");
     await loadLudoRooms();
-    $("ludoRoomSelect").value=data;
+    $("ludoRoomSelect").value = data;
     await loadLudoRoomMembers();
     await loadLudoChat();
-  }catch(error){
-    msg("ludoSocialMsg","Tsy nahomby ny famoronana room: "+(error?.message||String(error)),true);
-  }finally{button.disabled=false;}
+
+  } catch (error) {
+    msg("ludoSocialMsg", "Tsy nahomby ny famoronana room: " + (error?.message || String(error)), true);
+  } finally {
+    button.disabled = false;
+  }
 });
+
 $("ludoJoinRoomBtn").addEventListener("click", async () => {
   const roomId=$("ludoOpenRoomSelect").value;
   const button=$("ludoJoinRoomBtn");
