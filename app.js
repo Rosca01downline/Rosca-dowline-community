@@ -1484,6 +1484,9 @@ async function loadMemberData(){
     $("reservedCommission").textContent="Voatokana: "+fmt(b?.reserved_commission);
     const {data:d}=await db.from("deposit_requests").select("amount,status,tx_hash,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
     const {data:w}=await db.from("withdrawal_requests").select("amount,status,withdrawal_type,faucetpay_email,faucetpay_tx_id,created_at,admin_note").eq("member_id",member.id).order("created_at",{ascending:false});
+    const {data:ludoWithdrawals,error:ludoWithdrawalsError}=await db.from("ludo_withdrawal_requests").select("amount_sc,status").eq("member_id",member.id);
+    if(ludoWithdrawalsError) msg("globalMsg","Retrait total Ludo SC: "+ludoWithdrawalsError.message,true);
+    const ludoWithdrawalTotal=(ludoWithdrawals||[]).filter(x=>String(x.status||"").toLowerCase()==="completed").reduce((sum,x)=>sum+Number(x.amount_sc||0),0);
     const depositTotal=(d||[]).filter(x=>["approved","completed"].includes(x.status)).reduce((sum,x)=>sum+Number(x.amount||0),0);
     const withdrawalBase=(w||[]).filter(x=>x.status==="completed").reduce((sum,x)=>sum+Number(x.amount||0),0);
     const {data:paidTurnTotal,error:turnTotalError}=await db.rpc("get_my_paid_turn_total");
@@ -1491,6 +1494,8 @@ async function loadMemberData(){
     const withdrawalTotal=withdrawalBase+Number(paidTurnTotal||0);
     $("totalDeposits").textContent=fmt(depositTotal);
     $("totalWithdrawals").textContent=fmt(withdrawalTotal);
+    const ludoTotalHost=$("totalLudoWithdrawals");
+    if(ludoTotalHost) ludoTotalHost.textContent=ludoWithdrawalTotal.toLocaleString("fr-FR")+" SC";
     renderTable("myDeposits",["Vola","Sata","TxID","Daty","Fanamarihana"],(d||[]).map(x=>[fmt(x.amount),x.status,x.tx_hash||"",date(x.created_at),x.admin_note||""]));
     renderTable("myWithdrawals",["Vola","Karazana","Sata","FaucetPay","Transaction ID","Daty","Fanamarihana"],(w||[]).map(x=>[fmt(x.amount),x.withdrawal_type,x.status,x.faucetpay_email,x.faucetpay_tx_id||"Miandry ID",date(x.created_at),x.admin_note||""]));
   } else {
@@ -1500,6 +1505,7 @@ async function loadMemberData(){
     $("miningBalance").textContent=fmt(0);$("totalBalance").textContent=fmt(0);
     show("miningBonusPanel",false);
     $("totalDeposits").textContent=fmt(0);$("totalWithdrawals").textContent=fmt(0);
+    if($("totalLudoWithdrawals")) $("totalLudoWithdrawals").textContent="0 SC";
     $("totalPenalty").textContent=fmt(0);$("unpaidWeeks").textContent="0 semaine(s)";
     msg("penaltyMsg","Tsy mbola misy pénalité.");
     renderTable("myPenalties",["Herinandro","Vola","Sata"],[]);
