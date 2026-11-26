@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/rosca-logo.svg" type="image/svg+xml">\n  <link rel="apple-touch-icon" href="icons/rosca-logo.svg">
   <title>ROSCA & DOWNLINE COMMUNITY</title>
-  <link rel="stylesheet" href="styles.css?v=20261125-ludo-withdrawal-form-visible-v3">
+  <link rel="stylesheet" href="styles.css?v=20261126-ludo-withdrawal-unlock-message-v4">
 </head>
 <body>
 <header class="top">
@@ -199,7 +199,7 @@
               <input id="ludoWithdrawalEmail" type="email" required autocomplete="email" placeholder="email@example.com">
             </label>
             <p id="ludoWithdrawalMsg" class="message" role="status"></p>
-            <button class="btn primary" type="submit" disabled>DEMANDER LE RETRAIT</button>
+            <button class="btn primary" type="submit">DEMANDER LE RETRAIT</button>
           </form>
           <div class="section-head"><h3>Historique retrait Ludo</h3><button id="ludoWithdrawalRefreshBtn" class="btn ghost small" type="button">Havaozy</button></div>
           <div id="myLudoWithdrawals" class="table-wrap"><p class="muted">Ampidirina...</p></div>
@@ -385,7 +385,7 @@
       return;
     }
     const app=document.createElement("script");
-    app.src="app.js?v=20261125-ludo-withdrawal-form-visible-v3";
+    app.src="app.js?v=20261126-ludo-withdrawal-unlock-message-v4";
     app.onerror=function(){if(status)status.textContent="Tsy afaka nampiditra ny application. Havaozy ny pejy na andramo Chrome."};
     document.body.appendChild(app);
   }
