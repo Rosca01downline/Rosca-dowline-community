@@ -84,7 +84,7 @@ function startMiningTicker(serverBalance, bonusActive, bonusUntil, referralCount
     const bonusSeconds = miningDisplayState.bonusActive && miningDisplayState.bonusEnd
       ? Math.max(0, (Math.min(now, miningDisplayState.bonusEnd) - miningDisplayState.startedAt) / 1000)
       : 0;
-    const bonusGain = bonusSeconds * (0.088888 * miningDisplayState.referralCount / 86400);
+    const bonusGain = bonusSeconds * (0.03433 * miningDisplayState.referralCount / 86400);
     const liveMining = miningDisplayState.balance + baseGain + bonusGain;
     $("miningBalance").textContent = fmtMining(liveMining);
     $("totalBalance").textContent = fmtMining(miningDisplayState.savings + miningDisplayState.commission + liveMining);
