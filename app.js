@@ -1,4 +1,4 @@
-// Public Supabase configuration. The publishable key is intended for browser use.
+ // Public Supabase configuration. The publishable key is intended for browser use.
 // Keep RLS enabled. NEVER put service_role or private API secrets in this file.
 const SUPABASE_URL = "https://zdnlwgqodtiieewxzoda.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KgimutZrYi9tI4ixcbaTvA_0KwxihZ7";
@@ -501,7 +501,7 @@ function renderLudoBoard(snapshot,previousSnapshot=null){
   $("ludoDiceValue").textContent=state.dice_value==null?"–":String(state.dice_value);
   const winnerPlayer=players.find(p=>{
     const pp=state.pawns?.[String(p.seat_number)]?.pawns||[];
-    return pp.length===4 && pp.every(pos=>Number(pos)===57);
+    return pp.length===4 && pp.every(pos=>Number(pos)===56);
   });
   const winnerPanel=$("ludoWinnerPanel");
   const winnerSeat=winnerPlayer?Number(winnerPlayer.seat_number):null;
