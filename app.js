@@ -226,7 +226,7 @@ function animateLudoPawnPath(pawn,seat,oldPos,newPos,index){
   if(!pawn || Number(oldPos)===Number(newPos)) return;
   const steps=[];
   if(Number(oldPos)<0){ steps.push(Number(newPos)); }
-  else if(Number(newPos)>Number(oldPos) && Number(newPos)<=57){
+  else if(Number(newPos)>Number(oldPos) && Number(newPos)<=56){
     for(let p=Number(oldPos)+1;p<=Number(newPos);p++) steps.push(p);
   }else{ steps.push(Number(newPos)); }
   const board=$("ludoBoard");
